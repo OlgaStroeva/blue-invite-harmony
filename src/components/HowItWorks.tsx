@@ -2,35 +2,44 @@
 import { Container } from "@/components/ui/container";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { CalendarPlus, LayoutTemplate, UserPlus, Send, Check, BarChart } from "lucide-react";
 
 const steps = [
   {
     number: "01",
-    title: "Choose a Template",
-    description:
-      "Browse through our collection of beautifully designed invitation templates.",
-    icon: "select",
+    title: "Create an Event",
+    description: "Add title, image and description for your upcoming event.",
+    icon: CalendarPlus,
   },
   {
     number: "02",
-    title: "Customize",
-    description:
-      "Personalize your invitation with your details, colors, and style preferences.",
-    icon: "edit",
+    title: "Add Invitation Template",
+    description: "Add all needed fields for your event invitation.",
+    icon: LayoutTemplate,
   },
   {
     number: "03",
-    title: "Share",
-    description:
-      "Send your invitation via email, messaging apps, or generate a shareable link.",
-    icon: "share",
+    title: "Add Participant's Info",
+    description: "Import or manually add information about your guests.",
+    icon: UserPlus,
   },
   {
     number: "04",
+    title: "Send Invitations",
+    description: "Send invitations to participants via email, messaging apps, or generate a shareable link.",
+    icon: Send,
+  },
+  {
+    number: "05",
     title: "Track Responses",
-    description:
-      "Monitor RSVPs and responses in real-time through our intuitive dashboard.",
-    icon: "track",
+    description: "Check invitations and responses on event using our app.",
+    icon: Check,
+  },
+  {
+    number: "06",
+    title: "Use Analytics",
+    description: "Check how many participants confirmed and who they are using the participant's info.",
+    icon: BarChart,
   },
 ];
 
@@ -95,8 +104,8 @@ const HowItWorks = () => {
                 }`}
               >
                 <div className="flex-shrink-0 relative">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center bg-blue-gradient text-white font-bold text-xl shadow-highlight z-10 relative">
-                    {step.number}
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center bg-blue-gradient text-white shadow-highlight z-10 relative">
+                    {step.icon && <step.icon className="w-7 h-7" />}
                   </div>
                   <div className="absolute -inset-1 bg-white/50 rounded-full blur-md -z-10"></div>
                 </div>
