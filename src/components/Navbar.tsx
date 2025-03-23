@@ -43,11 +43,11 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <NavLinks />
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm">
-                Log In
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/sign-in">Log In</Link>
               </Button>
-              <Button size="sm" className="bg-blue-gradient hover:shadow-highlight transition-all duration-300">
-                Sign Up
+              <Button size="sm" className="bg-blue-gradient hover:shadow-highlight transition-all duration-300" asChild>
+                <Link to="/sign-up">Sign Up</Link>
               </Button>
             </div>
           </div>
@@ -73,11 +73,11 @@ const Navbar = () => {
           <div className="flex flex-col space-y-3">
             <NavLinks mobile />
             <div className="pt-3 flex flex-col space-y-3">
-              <Button variant="ghost" size="sm" className="justify-start">
-                Log In
+              <Button variant="ghost" size="sm" className="justify-start" asChild>
+                <Link to="/sign-in">Log In</Link>
               </Button>
-              <Button size="sm" className="bg-blue-gradient">
-                Sign Up
+              <Button size="sm" className="bg-blue-gradient" asChild>
+                <Link to="/sign-up">Sign Up</Link>
               </Button>
             </div>
           </div>
