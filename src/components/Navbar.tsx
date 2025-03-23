@@ -95,12 +95,12 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
   return (
     <>
       <Link
-        to="#templates"
+        to="#events"
         className={`${baseClasses} ${
           mobile ? mobileClasses : desktopClasses
         }`}
       >
-        Templates
+        Events
       </Link>
       <Link
         to="#how-it-works"
