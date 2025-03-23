@@ -93,7 +93,7 @@ const Events = () => {
     : events.filter(event => event.category === activeCategory);
 
   return (
-    <section id="events" className="py-20 relative" ref={sectionRef}>
+    <section id="events" className="py-20 relative bg-gradient-to-b from-blue-50/50 to-transparent" ref={sectionRef}>
       {/* Background decorations */}
       <div className="absolute top-1/2 right-0 w-1/3 h-1/3 bg-blue-100/30 rounded-full blur-[100px]" />
       <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-blue-50/20 rounded-full blur-[80px]" />

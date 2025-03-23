@@ -68,6 +68,19 @@ export default {
 					700: '#1D4ED8',
 					800: '#1E40AF',
 					900: '#1E3A8A',
+					950: '#172554',
+				},
+				blueGray: {
+					50: '#F8FAFC',
+					100: '#F1F5F9',
+					200: '#E2E8F0',
+					300: '#CBD5E1',
+					400: '#94A3B8',
+					500: '#64748B',
+					600: '#475569',
+					700: '#334155',
+					800: '#1E293B',
+					900: '#0F172A',
 				},
 			},
 			borderRadius: {
@@ -123,6 +136,8 @@ export default {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
 				'blue-gradient': 'linear-gradient(to right, #60a5fa, #3b82f6)',
 				'blue-to-purple': 'linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)',
+				'blue-to-cyan': 'linear-gradient(90deg, #3b82f6 0%, #0ea5e9 100%)',
+				'blue-to-teal': 'linear-gradient(90deg, #3b82f6 0%, #14b8a6 100%)',
 			},
 			boxShadow: {
 				'soft': '0 10px 30px -10px rgba(0, 0, 0, 0.05)',

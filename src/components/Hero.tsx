@@ -11,7 +11,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden">
+    <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden bg-gradient-to-b from-blue-50/70 to-blue-100/30">
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-blue-200/30 rounded-full blur-[120px]" />
@@ -35,7 +35,7 @@ const Hero = () => {
                 Create Your Invitation
               </Button>
               <Button size="lg" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50/50 rounded-lg">
-                Explore Templates
+                Explore Events
               </Button>
             </div>
           </div>
@@ -61,7 +61,7 @@ const Hero = () => {
                 className={`absolute top-[45%] -right-[10%] ${isLoaded ? 'animate-slideUp opacity-100' : 'opacity-0'}`}
                 style={{ animationDelay: '0.6s' }}
                 title="Corporate Event"
-                gradient="bg-gradient-to-br from-white to-blue-50"
+                gradient="bg-gradient-to-br from-blue-50 to-blue-100"
                 shadow="shadow-card"
               />
             </div>
@@ -82,17 +82,17 @@ interface CardProps {
 
 const Card = ({ className = "", style = {}, title, gradient, shadow }: CardProps) => (
   <div 
-    className={`${className} ${gradient} ${shadow} rounded-2xl p-6 w-full max-w-md mx-auto backdrop-blur-sm border border-white/50 transition-all hover:-translate-y-1 hover:shadow-highlight`}
+    className={`${className} ${gradient} ${shadow} rounded-2xl p-6 w-full max-w-md mx-auto backdrop-blur-sm border border-blue-100/50 transition-all hover:-translate-y-1 hover:shadow-highlight`}
     style={style}
   >
     <div className="flex items-center justify-between">
       <h3 className="text-lg font-medium text-blue-800">{title}</h3>
-      <span className="px-2 py-1 text-xs bg-white/80 text-blue-600 rounded-md backdrop-blur-sm">Preview</span>
+      <span className="px-2 py-1 text-xs bg-blue-50/80 text-blue-600 rounded-md backdrop-blur-sm">Preview</span>
     </div>
     <div className="mt-4 space-y-2">
-      <div className="h-2 bg-white/60 rounded-full w-3/4"></div>
-      <div className="h-2 bg-white/60 rounded-full w-full"></div>
-      <div className="h-2 bg-white/60 rounded-full w-1/2"></div>
+      <div className="h-2 bg-blue-100/60 rounded-full w-3/4"></div>
+      <div className="h-2 bg-blue-100/60 rounded-full w-full"></div>
+      <div className="h-2 bg-blue-100/60 rounded-full w-1/2"></div>
     </div>
     <div className="mt-6 flex justify-between items-center">
       <div className="flex -space-x-2">
