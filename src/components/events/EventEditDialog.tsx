@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Edit, X, Image as ImageIcon, Tag, Save, Trash2 } from "lucide-react";
+import { Edit, X, Image as ImageIcon, Tag, Save } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -90,23 +90,23 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-blue-50 border-blue-200">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-blue-700">
             <Edit className="h-5 w-5" /> Edit Event
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-blue-600">
             Make changes to your event details
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left column - Image and Preview */}
+            {/* Left column - Image */}
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="image" className="text-blue-700 font-medium">Event Image</Label>
-                <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer">
+                <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer bg-blue-100/70">
                   <input
                     id="image"
                     type="file"
@@ -145,11 +145,30 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                 </div>
               </div>
 
-              {/* Event Preview Card */}
-              <Card className="overflow-hidden border-blue-200">
-                <div className="bg-blue-50 p-3 border-b border-blue-200">
-                  <h3 className="font-medium text-blue-700">Event Preview</h3>
+              {/* Category selector - Moved above title */}
+              <div className="space-y-2">
+                <Label htmlFor="category" className="text-blue-700 font-medium">Category</Label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <Button
+                      key={cat}
+                      type="button"
+                      variant={category === cat ? "default" : "outline"}
+                      className={category === cat 
+                        ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                        : "hover:bg-blue-100 border-blue-200 bg-blue-50"
+                      }
+                      onClick={() => setCategory(cat)}
+                    >
+                      <Tag className="mr-1 h-4 w-4" />
+                      {cat}
+                    </Button>
+                  ))}
                 </div>
+              </div>
+
+              {/* Live Preview */}
+              <Card className="overflow-hidden border-blue-200 bg-blue-100/50">
                 <CardContent className="p-4">
                   <div 
                     className={`aspect-[4/5] rounded-lg overflow-hidden ${
@@ -186,7 +205,7 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter event title..."
-                  className="border-blue-200 focus-visible:ring-blue-400"
+                  className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
                 />
               </div>
               
@@ -197,53 +216,18 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe your event..."
-                  className="border-blue-200 focus-visible:ring-blue-400 min-h-[150px]"
+                  className="border-blue-200 focus-visible:ring-blue-400 min-h-[230px] bg-blue-50"
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="category" className="text-blue-700 font-medium">Category</Label>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((cat) => (
-                    <Button
-                      key={cat}
-                      type="button"
-                      variant={category === cat ? "default" : "outline"}
-                      className={category === cat 
-                        ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                        : "hover:bg-blue-50 border-blue-200"
-                      }
-                      onClick={() => setCategory(cat)}
-                    >
-                      <Tag className="mr-1 h-4 w-4" />
-                      {cat}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="pt-4">
-                <h3 className="text-blue-700 font-medium mb-2">Advanced Options</h3>
-                <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start border-blue-200 text-blue-700"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4 text-red-500" />
-                    Delete Event
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
           
-          <DialogFooter className="gap-2 pt-4 border-t border-blue-100">
+          <DialogFooter className="gap-2 pt-4 border-t border-blue-200">
             <Button 
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-blue-200"
+              className="border-blue-200 bg-blue-50 hover:bg-blue-100"
             >
               Cancel
             </Button>
