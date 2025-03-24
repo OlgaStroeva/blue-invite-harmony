@@ -75,17 +75,17 @@ const Testimonials = () => {
   }, []);
 
   return (
-    <section id="testimonials" className="py-20 relative" ref={sectionRef}>
+    <section id="testimonials" className="py-20 relative bg-gradient-to-b from-blue-200 to-blue-100" ref={sectionRef}>
       {/* Background decorations */}
-      <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-blue-50/30 rounded-full blur-[100px]" />
-      <div className="absolute top-1/4 left-0 w-1/4 h-1/4 bg-blue-100/20 rounded-full blur-[80px]" />
+      <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-blue-300/40 rounded-full blur-[100px]" />
+      <div className="absolute top-1/4 left-0 w-1/4 h-1/4 bg-blue-200/30 rounded-full blur-[80px]" />
       
       <Container>
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">
             What Our Users <span className="text-gradient">Say</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-blue-700 max-w-2xl mx-auto">
             Join thousands of satisfied users creating beautiful invitations
           </p>
         </div>
@@ -94,7 +94,7 @@ const Testimonials = () => {
           {testimonials.map((testimonial, index) => (
             <div
               key={testimonial.id}
-              className={`bg-white border border-blue-100 rounded-xl p-6 shadow-soft transition-all duration-500 hover:shadow-elegant ${
+              className={`bg-white border border-blue-200 rounded-xl p-6 shadow-soft transition-all duration-500 hover:shadow-elegant ${
                 animatedItems.includes(index)
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-8"
@@ -123,11 +123,11 @@ const Testimonials = () => {
           ))}
         </div>
 
-        <div className="mt-16 text-center p-8 bg-blue-50 rounded-xl border border-blue-100">
+        <div className="mt-16 text-center p-8 bg-blue-300/30 rounded-xl border border-blue-200">
           <p className="text-blue-800 text-lg font-medium mb-3">
             Join over 10,000 users creating stunning invitations
           </p>
-          <p className="text-blue-600">
+          <p className="text-blue-700">
             Start crafting your perfect invitation today
           </p>
         </div>

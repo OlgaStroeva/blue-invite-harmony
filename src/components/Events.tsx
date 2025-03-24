@@ -93,17 +93,17 @@ const Events = () => {
     : events.filter(event => event.category === activeCategory);
 
   return (
-    <section id="events" className="py-20 relative bg-gradient-to-b from-blue-50/50 to-transparent" ref={sectionRef}>
+    <section id="events" className="py-20 relative bg-gradient-to-b from-blue-200 to-blue-100" ref={sectionRef}>
       {/* Background decorations */}
-      <div className="absolute top-1/2 right-0 w-1/3 h-1/3 bg-blue-100/30 rounded-full blur-[100px]" />
-      <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-blue-50/20 rounded-full blur-[80px]" />
+      <div className="absolute top-1/2 right-0 w-1/3 h-1/3 bg-blue-300/40 rounded-full blur-[100px]" />
+      <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-blue-200/30 rounded-full blur-[80px]" />
       
       <Container>
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">
             Featured <span className="text-gradient">Events</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-blue-700 max-w-2xl mx-auto">
             Browse our collection of elegant events and create invitations for any occasion
           </p>
         </div>
@@ -116,7 +116,7 @@ const Events = () => {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                 activeCategory === category
                   ? "bg-blue-500 text-white shadow-md"
-                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                  : "bg-white text-blue-700 hover:bg-blue-50"
               }`}
             >
               {category}
@@ -179,7 +179,7 @@ const Events = () => {
         </div>
 
         <div className="mt-12 text-center">
-          <Button size="lg" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50/50">
+          <Button size="lg" variant="outline" className="border-blue-400 bg-white text-blue-700 hover:bg-blue-50">
             View All Events
           </Button>
         </div>

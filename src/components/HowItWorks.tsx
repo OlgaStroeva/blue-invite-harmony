@@ -73,23 +73,23 @@ const HowItWorks = () => {
   }, []);
 
   return (
-    <section id="how-it-works" className="py-20 relative bg-gradient-to-b from-white to-blue-50" ref={sectionRef}>
+    <section id="how-it-works" className="py-20 relative bg-gradient-to-b from-blue-100 to-blue-200" ref={sectionRef}>
       {/* Background decorations */}
-      <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-blue-100/20 rounded-full blur-[120px]" />
+      <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-blue-300/30 rounded-full blur-[120px]" />
       
       <Container>
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">
             How It <span className="text-gradient">Works</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-blue-700 max-w-2xl mx-auto">
             Creating and sharing beautiful invitations has never been easier
           </p>
         </div>
 
         <div className="relative">
           {/* Connection Line */}
-          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 via-blue-400 to-transparent" />
+          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 via-blue-500 to-transparent" />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-y-24">
             {steps.map((step, index) => (
@@ -107,11 +107,11 @@ const HowItWorks = () => {
                   <div className="w-16 h-16 rounded-full flex items-center justify-center bg-blue-gradient text-white shadow-highlight z-10 relative">
                     {step.icon && <step.icon className="w-7 h-7" />}
                   </div>
-                  <div className="absolute -inset-1 bg-white/50 rounded-full blur-md -z-10"></div>
+                  <div className="absolute -inset-1 bg-blue-300/50 rounded-full blur-md -z-10"></div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground">{step.description}</p>
+                  <h3 className="text-xl font-semibold mb-2 text-blue-900">{step.title}</h3>
+                  <p className="text-blue-700">{step.description}</p>
                 </div>
               </div>
             ))}

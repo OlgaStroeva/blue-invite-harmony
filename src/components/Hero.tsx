@@ -11,30 +11,30 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden bg-gradient-to-b from-blue-50/70 to-blue-100/30">
+    <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden bg-gradient-to-b from-blue-200 to-blue-100">
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-blue-200/30 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-blue-100/20 rounded-full blur-[130px]" />
+        <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-blue-300/40 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-blue-200/30 rounded-full blur-[130px]" />
       </div>
 
       <Container>
         <div className="max-w-3xl mx-auto text-center">
           <div className={`space-y-6 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
-            <div className="inline-block px-3 py-1 mb-6 text-sm font-medium text-blue-700 bg-blue-100 rounded-full shadow-sm">
+            <div className="inline-block px-3 py-1 mb-6 text-sm font-medium text-blue-800 bg-blue-200 rounded-full shadow-sm">
               Simple. Elegant. Effective.
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-balance">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-balance text-blue-900">
               Create <span className="text-gradient font-bold">Beautiful Invitations</span> That Leave an Impression
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-blue-700 max-w-2xl mx-auto">
               Craft stunning digital invitations for any occasion with our intuitive platform. Designed for simplicity and elegance.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
               <Button size="lg" className="bg-blue-gradient hover:shadow-highlight transition-all duration-300 rounded-lg">
                 Create Your Invitation
               </Button>
-              <Button size="lg" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50/50 rounded-lg">
+              <Button size="lg" variant="outline" className="border-blue-400 text-blue-700 hover:bg-blue-100/50 rounded-lg">
                 Explore Events
               </Button>
             </div>
@@ -47,21 +47,21 @@ const Hero = () => {
                 className={`${isLoaded ? 'animate-slideUp opacity-100' : 'opacity-0'}`}
                 style={{ animationDelay: '0.2s' }}
                 title="Wedding Invitation"
-                gradient="bg-gradient-to-br from-blue-50 to-blue-100"
+                gradient="bg-gradient-to-br from-white to-blue-100"
                 shadow="shadow-elegant"
               />
               <Card 
                 className={`absolute top-[30%] -left-[15%] ${isLoaded ? 'animate-slideUp opacity-100' : 'opacity-0'}`}
                 style={{ animationDelay: '0.4s' }}
                 title="Birthday Party"
-                gradient="bg-gradient-to-br from-blue-100 to-blue-200"
+                gradient="bg-gradient-to-br from-blue-300 to-blue-400"
                 shadow="shadow-card"
               />
               <Card 
                 className={`absolute top-[45%] -right-[10%] ${isLoaded ? 'animate-slideUp opacity-100' : 'opacity-0'}`}
                 style={{ animationDelay: '0.6s' }}
                 title="Corporate Event"
-                gradient="bg-gradient-to-br from-blue-50 to-blue-100"
+                gradient="bg-gradient-to-br from-white to-blue-100"
                 shadow="shadow-card"
               />
             </div>

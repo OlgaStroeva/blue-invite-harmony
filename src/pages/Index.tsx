@@ -32,7 +32,7 @@ const Index = () => {
   }, []);
 
   return (
-    <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <main className="min-h-screen bg-blue-100 text-foreground overflow-x-hidden">
       <Navbar />
       <Hero />
       <Events />
