@@ -34,7 +34,7 @@ const SignIn = () => {
           title: "Signed in successfully",
           description: "Welcome back!",
         });
-        navigate("/");
+        navigate("/dashboard");
       } else {
         setError("Please fill in all fields");
       }
@@ -57,7 +57,7 @@ const SignIn = () => {
         title: `Signed in with ${provider}`,
         description: "Welcome back!",
       });
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError(`Failed to sign in with ${provider}`);
       console.error(err);
