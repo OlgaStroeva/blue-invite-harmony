@@ -6,11 +6,13 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Image, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import EventFormDialog from "@/components/events/EventFormDialog";
 
 interface Event {
   id: number;
   title: string;
   category: string;
+  description?: string;
   image: string;
   gradient: string;
 }
@@ -61,8 +63,10 @@ const events: Event[] = [
 ];
 
 const Dashboard = () => {
+  const [userEvents, setUserEvents] = useState<Event[]>(events);
   const [activeCategory, setActiveCategory] = useState("All");
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -73,7 +77,7 @@ const Dashboard = () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             // Start animating items sequentially
-            events.forEach((_, index) => {
+            userEvents.forEach((_, index) => {
               setTimeout(() => {
                 setAnimatedItems((prev) => [...prev, index]);
               }, 150 * index);
@@ -90,19 +94,19 @@ const Dashboard = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [userEvents]);
 
   const categories = ["All", "Wedding", "Birthday", "Corporate", "Party", "Formal"];
   const filteredEvents = activeCategory === "All" 
-    ? events 
-    : events.filter(event => event.category === activeCategory);
+    ? userEvents 
+    : userEvents.filter(event => event.category === activeCategory);
 
   const handleAddEvent = () => {
-    // For demonstration purposes - would open event creation form in a real app
-    toast({
-      title: "Create New Event",
-      description: "Event creation functionality coming soon!",
-    });
+    setIsDialogOpen(true);
+  };
+
+  const handleEventCreated = (newEvent: Event) => {
+    setUserEvents((prev) => [newEvent, ...prev]);
   };
 
   return (
@@ -152,27 +156,25 @@ const Dashboard = () => {
                 >
                   <div className="rounded-xl overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant">
                     <div 
-                      className={`aspect-[4/5] bg-gradient-to-br ${event.gradient} relative p-6 flex flex-col justify-between`}
+                      className={`aspect-[4/5] ${
+                        event.image 
+                          ? "" 
+                          : `bg-gradient-to-br ${event.gradient}`
+                      } relative p-6 flex flex-col justify-between`}
+                      style={event.image ? { backgroundImage: `url(${event.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
                     >
                       <div className="absolute inset-0 bg-blue-900/5 group-hover:bg-blue-900/0 transition-all duration-300"></div>
-                      
-                      {/* Event image placeholder */}
-                      <div className="relative z-10 flex justify-center items-center mb-4">
-                        <div className="w-full h-40 bg-white/30 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                          <Image className="w-12 h-12 text-blue-100/70" />
-                        </div>
-                      </div>
                       
                       {/* Event content preview */}
                       <div className="relative z-10">
                         <span className="inline-block px-2 py-1 text-xs font-medium bg-white/80 text-blue-700 rounded-md backdrop-blur-sm">
                           {event.category}
                         </span>
-                        <div className="mt-4 space-y-2">
-                          <div className="h-4 bg-white/70 rounded-md w-3/4"></div>
-                          <div className="h-2 bg-white/60 rounded-full w-1/2"></div>
-                          <div className="h-2 bg-white/60 rounded-full w-2/3"></div>
-                        </div>
+                        {event.description && (
+                          <div className="mt-4 p-3 bg-white/70 rounded-md backdrop-blur-sm">
+                            <p className="text-sm text-blue-900 line-clamp-3">{event.description}</p>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="relative z-10 mt-auto">
@@ -204,6 +206,13 @@ const Dashboard = () => {
         >
           <Plus className="w-6 h-6" />
         </button>
+
+        {/* Event Creation Dialog */}
+        <EventFormDialog 
+          open={isDialogOpen} 
+          onOpenChange={setIsDialogOpen}
+          onEventCreated={handleEventCreated}
+        />
       </main>
     </div>
   );
