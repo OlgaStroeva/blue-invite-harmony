@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Image, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import EventFormDialog from "@/components/events/EventFormDialog";
+import EventEditDialog from "@/components/events/EventEditDialog";
 
 interface Event {
   id: number;
@@ -67,6 +68,8 @@ const Dashboard = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -105,8 +108,25 @@ const Dashboard = () => {
     setIsDialogOpen(true);
   };
 
+  const handleEditEvent = (event: Event) => {
+    setCurrentEvent(event);
+    setIsEditDialogOpen(true);
+  };
+
   const handleEventCreated = (newEvent: Event) => {
     setUserEvents((prev) => [newEvent, ...prev]);
+  };
+
+  const handleEventUpdated = (updatedEvent: Event) => {
+    setUserEvents((prev) => 
+      prev.map((event) => 
+        event.id === updatedEvent.id ? updatedEvent : event
+      )
+    );
+    toast({
+      title: "Event Updated",
+      description: "Your event has been updated successfully!",
+    });
   };
 
   return (
@@ -165,29 +185,32 @@ const Dashboard = () => {
                     >
                       <div className="absolute inset-0 bg-blue-900/5 group-hover:bg-blue-900/0 transition-all duration-300"></div>
                       
-                      {/* Event content preview */}
+                      {/* Event category label */}
                       <div className="relative z-10">
                         <span className="inline-block px-2 py-1 text-xs font-medium bg-white/80 text-blue-700 rounded-md backdrop-blur-sm">
                           {event.category}
                         </span>
-                        {event.description && (
-                          <div className="mt-4 p-3 bg-white/70 rounded-md backdrop-blur-sm">
-                            <p className="text-sm text-blue-900 line-clamp-3">{event.description}</p>
-                          </div>
-                        )}
                       </div>
                       
+                      {/* Title and buttons with background panel */}
                       <div className="relative z-10 mt-auto">
-                        <h3 className="text-lg font-medium text-white drop-shadow-sm mb-1">
-                          {event.title}
-                        </h3>
-                        <div className="flex justify-between items-center">
-                          <Button size="sm" variant="secondary" className="bg-white/80 hover:bg-white text-blue-600 text-xs backdrop-blur-sm">
-                            Edit
-                          </Button>
-                          <Button size="sm" className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs backdrop-blur-sm">
-                            Send Invites
-                          </Button>
+                        <div className="bg-black/60 backdrop-blur-sm p-3 rounded-lg">
+                          <h3 className="text-lg font-medium text-white mb-3">
+                            {event.title}
+                          </h3>
+                          <div className="flex justify-between items-center">
+                            <Button 
+                              size="sm" 
+                              variant="secondary" 
+                              className="bg-white/90 hover:bg-white text-blue-600 text-xs"
+                              onClick={() => handleEditEvent(event)}
+                            >
+                              Edit
+                            </Button>
+                            <Button size="sm" className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs">
+                              Send Invites
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -213,6 +236,16 @@ const Dashboard = () => {
           onOpenChange={setIsDialogOpen}
           onEventCreated={handleEventCreated}
         />
+
+        {/* Event Edit Dialog */}
+        {currentEvent && (
+          <EventEditDialog
+            open={isEditDialogOpen}
+            onOpenChange={setIsEditDialogOpen}
+            event={currentEvent}
+            onEventUpdated={handleEventUpdated}
+          />
+        )}
       </main>
     </div>
   );
