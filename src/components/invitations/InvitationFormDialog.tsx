@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Dialog, 
   DialogContent, 
@@ -74,6 +74,7 @@ interface InvitationFormDialogProps {
 }
 
 const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: InvitationFormDialogProps) => {
+  const navigate = useNavigate();
   const [formFields, setFormFields] = useState<FormField[]>([
     { id: "email", name: "Email", type: "email", required: true }
   ]);
@@ -168,7 +169,23 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
     });
   };
 
-  // Preview Form
+  const handlePreviewSubmit = () => {
+    if (!selectedTemplate) {
+      const newTemplate: Template = {
+        id: Date.now(),
+        name: `Template for ${event.title}`,
+        eventId: event.id,
+        fields: [...formFields]
+      };
+      setTemplates([...templates, newTemplate]);
+    }
+    
+    onOpenChange(false);
+    if (onClose) onClose();
+    
+    navigate(`/participant-form/${event.id}`);
+  };
+
   const form = useForm();
 
   return (
@@ -361,7 +378,11 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
                       </FormControl>
                     </FormItem>
                   ))}
-                  <Button type="button" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button 
+                    type="button" 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={handlePreviewSubmit}
+                  >
                     Submit
                   </Button>
                 </form>
