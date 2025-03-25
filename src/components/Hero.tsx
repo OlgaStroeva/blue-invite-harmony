@@ -2,9 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setIsLoaded(true);
@@ -22,20 +24,20 @@ const Hero = () => {
         <div className="max-w-3xl mx-auto text-center">
           <div className={`space-y-6 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
             <div className="inline-block px-3 py-1 mb-6 text-sm font-medium text-blue-800 bg-blue-200 rounded-full shadow-sm">
-              Simple. Elegant. Effective.
+              {t("simpleElegantEffective")}
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-balance text-blue-900">
-              Create <span className="text-gradient font-bold">Beautiful Invitations</span> That Leave an Impression
+              {t("createBeautifulInvitations")}
             </h1>
             <p className="text-xl text-blue-700 max-w-2xl mx-auto">
-              Craft stunning digital invitations for any occasion with our intuitive platform. Designed for simplicity and elegance.
+              {t("craftStunningDigital")}
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
               <Button size="lg" className="bg-blue-gradient hover:shadow-highlight transition-all duration-300 rounded-lg">
-                Create Your Invitation
+                {t("createYourInvitation")}
               </Button>
               <Button size="lg" variant="outline" className="border-blue-400 text-blue-700 hover:bg-blue-100/50 rounded-lg">
-                Explore Events
+                {t("exploreEvents")}
               </Button>
             </div>
           </div>
@@ -46,21 +48,21 @@ const Hero = () => {
               <Card
                 className={`${isLoaded ? 'animate-slideUp opacity-100' : 'opacity-0'}`}
                 style={{ animationDelay: '0.2s' }}
-                title="Wedding Invitation"
+                title={t("wedding")}
                 gradient="bg-gradient-to-br from-white to-blue-100"
                 shadow="shadow-elegant"
               />
               <Card 
                 className={`absolute top-[30%] -left-[15%] ${isLoaded ? 'animate-slideUp opacity-100' : 'opacity-0'}`}
                 style={{ animationDelay: '0.4s' }}
-                title="Birthday Party"
+                title={t("birthday")}
                 gradient="bg-gradient-to-br from-blue-300 to-blue-400"
                 shadow="shadow-card"
               />
               <Card 
                 className={`absolute top-[45%] -right-[10%] ${isLoaded ? 'animate-slideUp opacity-100' : 'opacity-0'}`}
                 style={{ animationDelay: '0.6s' }}
-                title="Corporate Event"
+                title={t("corporate")}
                 gradient="bg-gradient-to-br from-white to-blue-100"
                 shadow="shadow-card"
               />

@@ -1,7 +1,9 @@
+
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, useRef } from "react";
 import { Image } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Event {
   id: number;
@@ -11,55 +13,56 @@ interface Event {
   gradient: string;
 }
 
-const events: Event[] = [
-  {
-    id: 1,
-    title: "Elegant Blue",
-    category: "Wedding",
-    image: "",
-    gradient: "from-blue-100 to-blue-200",
-  },
-  {
-    id: 2,
-    title: "Modern Sapphire",
-    category: "Corporate",
-    image: "",
-    gradient: "from-blue-600 to-blue-800",
-  },
-  {
-    id: 3,
-    title: "Sky Celebration",
-    category: "Birthday",
-    image: "",
-    gradient: "from-blue-300 to-blue-500",
-  },
-  {
-    id: 4,
-    title: "Ocean Waves",
-    category: "Party",
-    image: "",
-    gradient: "from-blue-400 to-blue-600",
-  },
-  {
-    id: 5,
-    title: "Azure Delight",
-    category: "Wedding",
-    image: "",
-    gradient: "from-blue-200 to-blue-400",
-  },
-  {
-    id: 6,
-    title: "Navy Elegance",
-    category: "Formal",
-    image: "",
-    gradient: "from-blue-700 to-blue-900",
-  },
-];
-
 const Events = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
+
+  const events: Event[] = [
+    {
+      id: 1,
+      title: "Elegant Blue",
+      category: t("wedding"),
+      image: "",
+      gradient: "from-blue-100 to-blue-200",
+    },
+    {
+      id: 2,
+      title: "Modern Sapphire",
+      category: t("corporate"),
+      image: "",
+      gradient: "from-blue-600 to-blue-800",
+    },
+    {
+      id: 3,
+      title: "Sky Celebration",
+      category: t("birthday"),
+      image: "",
+      gradient: "from-blue-300 to-blue-500",
+    },
+    {
+      id: 4,
+      title: "Ocean Waves",
+      category: t("party"),
+      image: "",
+      gradient: "from-blue-400 to-blue-600",
+    },
+    {
+      id: 5,
+      title: "Azure Delight",
+      category: t("wedding"),
+      image: "",
+      gradient: "from-blue-200 to-blue-400",
+    },
+    {
+      id: 6,
+      title: "Navy Elegance",
+      category: t("formal"),
+      image: "",
+      gradient: "from-blue-700 to-blue-900",
+    },
+  ];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -83,10 +86,10 @@ const Events = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [events]);
 
-  const categories = ["All", "Wedding", "Birthday", "Corporate", "Party", "Formal"];
-  const filteredEvents = activeCategory === "All" 
+  const categories = [t("all"), t("wedding"), t("birthday"), t("corporate"), t("party"), t("formal")];
+  const filteredEvents = activeCategory === t("all") 
     ? events 
     : events.filter(event => event.category === activeCategory);
 
@@ -98,10 +101,10 @@ const Events = () => {
       <Container>
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">
-            Featured <span className="text-gradient">Events</span>
+            {t("featured")} <span className="text-gradient">{t("eventsHeading")}</span>
           </h2>
           <p className="text-blue-700 max-w-2xl mx-auto">
-            Browse our collection of elegant events and create invitations for any occasion
+            {t("browseCollection")}
           </p>
         </div>
 
@@ -156,10 +159,10 @@ const Events = () => {
                       </h3>
                       <div className="flex justify-between items-center">
                         <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white text-blue-600 text-xs">
-                          Preview
+                          {t("preview")}
                         </Button>
                         <Button size="sm" className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs">
-                          Create Invitation
+                          {t("createInvitation")}
                         </Button>
                       </div>
                     </div>
@@ -172,7 +175,7 @@ const Events = () => {
 
         <div className="mt-12 text-center">
           <Button size="lg" variant="outline" className="border-blue-400 bg-white text-blue-700 hover:bg-blue-50">
-            View All Events
+            {t("viewAllEvents")}
           </Button>
         </div>
       </Container>

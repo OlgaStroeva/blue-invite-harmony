@@ -1,6 +1,7 @@
 
 import { Container } from "@/components/ui/container";
 import { useEffect, useRef, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Testimonial {
   id: number;
@@ -10,44 +11,49 @@ interface Testimonial {
   rating: number;
 }
 
-const testimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: "Emily Johnson",
-    title: "Wedding Planner",
-    content:
-      "The elegance and simplicity of these invitations made my clients' wedding announcements truly special. The blue designs are particularly stunning.",
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    title: "Event Coordinator",
-    content:
-      "I've used this platform for multiple corporate events. The professional templates and ease of customization save me hours of work.",
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: "Sarah Williams",
-    title: "Birthday Celebrant",
-    content:
-      "My birthday invitations were a hit! Everyone commented on how beautiful and unique they were. The tracking feature was super helpful.",
-    rating: 4,
-  },
-  {
-    id: 4,
-    name: "David Rodriguez",
-    title: "Marketing Director",
-    content:
-      "The product launch invitations we created generated exceptional engagement. The design quality exceeded our expectations.",
-    rating: 5,
-  },
-];
-
 const Testimonials = () => {
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { t, language } = useLanguage();
+
+  const testimonials: Testimonial[] = [
+    {
+      id: 1,
+      name: "Emily Johnson",
+      title: language === "en" ? "Wedding Planner" : "Свадебный планировщик",
+      content: language === "en" 
+        ? "The elegance and simplicity of these invitations made my clients' wedding announcements truly special. The blue designs are particularly stunning."
+        : "Элегантность и простота этих приглашений сделали свадебные объявления моих клиентов действительно особенными. Синие дизайны особенно потрясающие.",
+      rating: 5,
+    },
+    {
+      id: 2,
+      name: "Michael Chen",
+      title: language === "en" ? "Event Coordinator" : "Координатор мероприятий",
+      content: language === "en"
+        ? "I've used this platform for multiple corporate events. The professional templates and ease of customization save me hours of work."
+        : "Я использовал эту платформу для нескольких корпоративных мероприятий. Профессиональные шаблоны и простота настройки экономят мне часы работы.",
+      rating: 5,
+    },
+    {
+      id: 3,
+      name: "Sarah Williams",
+      title: language === "en" ? "Birthday Celebrant" : "Именинница",
+      content: language === "en"
+        ? "My birthday invitations were a hit! Everyone commented on how beautiful and unique they were. The tracking feature was super helpful."
+        : "Мои приглашения на день рождения имели огромный успех! Все комментировали, насколько они красивые и уникальные. Функция отслеживания была очень полезной.",
+      rating: 4,
+    },
+    {
+      id: 4,
+      name: "David Rodriguez",
+      title: language === "en" ? "Marketing Director" : "Директор по маркетингу",
+      content: language === "en"
+        ? "The product launch invitations we created generated exceptional engagement. The design quality exceeded our expectations."
+        : "Приглашения на запуск продукта, которые мы создали, вызвали исключительную вовлеченность. Качество дизайна превзошло наши ожидания.",
+      rating: 5,
+    },
+  ];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -72,7 +78,7 @@ const Testimonials = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [testimonials]);
 
   return (
     <section id="testimonials" className="py-20 relative bg-gradient-to-b from-blue-200 to-blue-100" ref={sectionRef}>
@@ -83,10 +89,10 @@ const Testimonials = () => {
       <Container>
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">
-            What Our Users <span className="text-gradient">Say</span>
+            {t("whatOurUsers")} <span className="text-gradient">{t("say")}</span>
           </h2>
           <p className="text-blue-700 max-w-2xl mx-auto">
-            Join thousands of satisfied users creating beautiful invitations
+            {t("joinThousands")}
           </p>
         </div>
 
@@ -125,10 +131,10 @@ const Testimonials = () => {
 
         <div className="mt-16 text-center p-8 bg-blue-300/30 rounded-xl border border-blue-200">
           <p className="text-blue-800 text-lg font-medium mb-3">
-            Join over 10,000 users creating stunning invitations
+            {t("joinOver")}
           </p>
           <p className="text-blue-700">
-            Start crafting your perfect invitation today
+            {t("startCrafting")}
           </p>
         </div>
       </Container>

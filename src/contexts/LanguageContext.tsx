@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 // Define available languages
@@ -58,6 +57,48 @@ const enTranslations: Record<string, string> = {
   "logIn": "Log In",
   "signUp": "Sign Up",
   
+  // Hero section
+  "simpleElegantEffective": "Simple. Elegant. Effective.",
+  "createBeautifulInvitations": "Create Beautiful Invitations That Leave an Impression",
+  "craftStunningDigital": "Craft stunning digital invitations for any occasion with our intuitive platform. Designed for simplicity and elegance.",
+  "createYourInvitation": "Create Your Invitation",
+  "exploreEvents": "Explore Events",
+
+  // Events section
+  "featured": "Featured",
+  "eventsHeading": "Events",
+  "browseCollection": "Browse our collection of elegant events and create invitations for any occasion",
+  "preview": "Preview",
+  "createInvitation": "Create Invitation",
+  "viewAllEvents": "View All Events",
+  
+  // How It Works section
+  "how": "How",
+  "works": "Works",
+  "creatingSharing": "Creating and sharing beautiful invitations has never been easier",
+  "createFirstInvitation": "Create Your First Invitation",
+  
+  // How It Works steps
+  "step1Title": "Create an Event",
+  "step1Description": "Add title, image and description for your upcoming event.",
+  "step2Title": "Add Invitation Template",
+  "step2Description": "Add all needed fields for your event invitation.",
+  "step3Title": "Add Participant's Info",
+  "step3Description": "Import or manually add information about your guests.",
+  "step4Title": "Send Invitations",
+  "step4Description": "Send invitations to participants via email, messaging apps, or generate a shareable link.",
+  "step5Title": "Track Responses",
+  "step5Description": "Check invitations and responses on event using our app.",
+  "step6Title": "Use Analytics",
+  "step6Description": "Check how many participants confirmed and who they are using the participant's info.",
+  
+  // Testimonials section
+  "whatOurUsers": "What Our Users",
+  "say": "Say",
+  "joinThousands": "Join thousands of satisfied users creating beautiful invitations",
+  "joinOver": "Join over 10,000 users creating stunning invitations",
+  "startCrafting": "Start crafting your perfect invitation today",
+  
   // Registration Form
   "registrationForm": "Registration Form",
   "submitRegistration": "Submit Registration",
@@ -73,7 +114,25 @@ const enTranslations: Record<string, string> = {
   "dietary": "Dietary Restrictions",
   "company": "Company",
   "position": "Position",
-  "enter": "Enter"
+  "enter": "Enter",
+  
+  // Sign In
+  "backToHome": "Back to Home",
+  "signInHeading": "Sign In",
+  "enterCredentials": "Enter your credentials to access your account",
+  "password": "Password",
+  "forgotPassword": "Forgot password?",
+  "signingIn": "Signing in...",
+  "orContinueWith": "Or continue with",
+  "dontHaveAccount": "Don't have an account?",
+  
+  // Other common text
+  "wedding": "Wedding",
+  "birthday": "Birthday",
+  "corporate": "Corporate",
+  "party": "Party",
+  "formal": "Formal",
+  "all": "All"
 };
 
 // Russian translations
@@ -84,6 +143,48 @@ const ruTranslations: Record<string, string> = {
   "testimonials": "Отзывы",
   "logIn": "Войти",
   "signUp": "Регистрация",
+  
+  // Hero section
+  "simpleElegantEffective": "Просто. Элегантно. Эффективно.",
+  "createBeautifulInvitations": "Создавайте красивые приглашения, которые производят впечатление",
+  "craftStunningDigital": "Создавайте потрясающие цифровые приглашения для любого случая с помощью нашей интуитивно понятной платформы. Разработано для простоты и элегантности.",
+  "createYourInvitation": "Создать приглашение",
+  "exploreEvents": "Изучить события",
+
+  // Events section
+  "featured": "Избранные",
+  "eventsHeading": "События",
+  "browseCollection": "Просмотрите нашу коллекцию элегантных событий и создавайте приглашения для любого случая",
+  "preview": "Предпросмотр",
+  "createInvitation": "Создать приглашение",
+  "viewAllEvents": "Посмотреть все события",
+  
+  // How It Works section
+  "how": "Как",
+  "works": "это работает",
+  "creatingSharing": "Создавать и делиться красивыми приглашениями никогда не было так просто",
+  "createFirstInvitation": "Создать ваше первое приглашение",
+  
+  // How It Works steps
+  "step1Title": "Создайте событие",
+  "step1Description": "Добавьте заголовок, изображение и описание для вашего предстоящего мероприятия.",
+  "step2Title": "Добавьте шаблон приглашения",
+  "step2Description": "Добавьте все необходимые поля для вашего приглашения на мероприятие.",
+  "step3Title": "Добавьте информацию об участниках",
+  "step3Description": "Импортируйте или вручную добавьте информацию о ваших гостях.",
+  "step4Title": "Отправьте приглашения",
+  "step4Description": "Отправьте приглашения участникам по электронной почте, через мессенджеры или создайте ссылку для публикации.",
+  "step5Title": "Отслеживайте ответы",
+  "step5Description": "Проверяйте приглашения и ответы на событие с помощью нашего приложения.",
+  "step6Title": "Используйте аналитику",
+  "step6Description": "Проверьте, сколько участников подтвердили свое участие и кто они, используя информацию об участниках.",
+  
+  // Testimonials section
+  "whatOurUsers": "Что говорят наши",
+  "say": "пользователи",
+  "joinThousands": "Присоединяйтесь к тысячам довольных пользователей, создающих красивые приглашения",
+  "joinOver": "Присоединяйтесь к более чем 10 000 пользователей, создающих потрясающие приглашения",
+  "startCrafting": "Начните создавать свое идеальное приглашение сегодня",
   
   // Registration Form
   "registrationForm": "Форма регистрации",
@@ -100,5 +201,23 @@ const ruTranslations: Record<string, string> = {
   "dietary": "Пищевые ограничения",
   "company": "Компания",
   "position": "Должность",
-  "enter": "Введите"
+  "enter": "Введите",
+  
+  // Sign In
+  "backToHome": "Назад на главную",
+  "signInHeading": "Вход",
+  "enterCredentials": "Введите свои учетные данные для доступа к аккаунту",
+  "password": "Пароль",
+  "forgotPassword": "Забыли пароль?",
+  "signingIn": "Выполняется вход...",
+  "orContinueWith": "Или продолжить с",
+  "dontHaveAccount": "Нет аккаунта?",
+  
+  // Other common text
+  "wedding": "Свадьба",
+  "birthday": "День рождения",
+  "corporate": "Корпоратив",
+  "party": "Вечеринка",
+  "formal": "Формальное",
+  "all": "Все"
 };

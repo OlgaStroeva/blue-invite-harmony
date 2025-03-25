@@ -3,49 +3,51 @@ import { Container } from "@/components/ui/container";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CalendarPlus, LayoutTemplate, UserPlus, Send, Check, BarChart } from "lucide-react";
-
-const steps = [
-  {
-    number: "01",
-    title: "Create an Event",
-    description: "Add title, image and description for your upcoming event.",
-    icon: CalendarPlus,
-  },
-  {
-    number: "02",
-    title: "Add Invitation Template",
-    description: "Add all needed fields for your event invitation.",
-    icon: LayoutTemplate,
-  },
-  {
-    number: "03",
-    title: "Add Participant's Info",
-    description: "Import or manually add information about your guests.",
-    icon: UserPlus,
-  },
-  {
-    number: "04",
-    title: "Send Invitations",
-    description: "Send invitations to participants via email, messaging apps, or generate a shareable link.",
-    icon: Send,
-  },
-  {
-    number: "05",
-    title: "Track Responses",
-    description: "Check invitations and responses on event using our app.",
-    icon: Check,
-  },
-  {
-    number: "06",
-    title: "Use Analytics",
-    description: "Check how many participants confirmed and who they are using the participant's info.",
-    icon: BarChart,
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const HowItWorks = () => {
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
+
+  const steps = [
+    {
+      number: "01",
+      title: t("step1Title"),
+      description: t("step1Description"),
+      icon: CalendarPlus,
+    },
+    {
+      number: "02",
+      title: t("step2Title"),
+      description: t("step2Description"),
+      icon: LayoutTemplate,
+    },
+    {
+      number: "03",
+      title: t("step3Title"),
+      description: t("step3Description"),
+      icon: UserPlus,
+    },
+    {
+      number: "04",
+      title: t("step4Title"),
+      description: t("step4Description"),
+      icon: Send,
+    },
+    {
+      number: "05",
+      title: t("step5Title"),
+      description: t("step5Description"),
+      icon: Check,
+    },
+    {
+      number: "06",
+      title: t("step6Title"),
+      description: t("step6Description"),
+      icon: BarChart,
+    },
+  ];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -70,7 +72,7 @@ const HowItWorks = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [steps]);
 
   return (
     <section id="how-it-works" className="py-20 relative bg-gradient-to-b from-blue-100 to-blue-200" ref={sectionRef}>
@@ -80,10 +82,10 @@ const HowItWorks = () => {
       <Container>
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">
-            How It <span className="text-gradient">Works</span>
+            {t("how")} <span className="text-gradient">{t("works")}</span>
           </h2>
           <p className="text-blue-700 max-w-2xl mx-auto">
-            Creating and sharing beautiful invitations has never been easier
+            {t("creatingSharing")}
           </p>
         </div>
 
@@ -120,7 +122,7 @@ const HowItWorks = () => {
 
         <div className="mt-20 text-center">
           <Button size="lg" className="bg-blue-gradient hover:shadow-highlight transition-all duration-300">
-            Create Your First Invitation
+            {t("createFirstInvitation")}
           </Button>
         </div>
       </Container>

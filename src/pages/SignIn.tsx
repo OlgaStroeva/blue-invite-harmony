@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { ThirdPartyAuthButton } from "@/components/auth/ThirdPartyAuthButton";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -19,6 +20,7 @@ const SignIn = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,15 +74,15 @@ const SignIn = () => {
       <Container className="max-w-md py-20 min-h-screen flex flex-col justify-center">
         <div className="mb-4">
           <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-800">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
+            <ArrowLeft className="w-4 h-4 mr-2" /> {t("backToHome")}
           </Link>
         </div>
         
         <Card className="w-full">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+            <CardTitle className="text-2xl text-center">{t("signInHeading")}</CardTitle>
             <CardDescription className="text-center">
-              Enter your credentials to access your account
+              {t("enterCredentials")}
             </CardDescription>
           </CardHeader>
           
@@ -94,7 +96,7 @@ const SignIn = () => {
             
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("email")}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input 
@@ -111,12 +113,12 @@ const SignIn = () => {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t("password")}</Label>
                   <Link 
                     to="#" 
                     className="text-sm text-blue-600 hover:text-blue-800"
                   >
-                    Forgot password?
+                    {t("forgotPassword")}
                   </Link>
                 </div>
                 <div className="relative">
@@ -137,7 +139,7 @@ const SignIn = () => {
                 className="w-full bg-blue-gradient" 
                 disabled={isLoading}
               >
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isLoading ? t("signingIn") : t("logIn")}
               </Button>
             </form>
             
@@ -147,7 +149,7 @@ const SignIn = () => {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
+                  {t("orContinueWith")}
                 </span>
               </div>
             </div>
@@ -168,9 +170,9 @@ const SignIn = () => {
           
           <CardFooter className="flex justify-center">
             <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              {t("dontHaveAccount")}{" "}
               <Link to="/sign-up" className="text-blue-600 hover:text-blue-800 font-medium">
-                Sign up
+                {t("signUp")}
               </Link>
             </p>
           </CardFooter>
