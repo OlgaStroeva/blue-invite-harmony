@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Edit, X, Image as ImageIcon, Tag, Save, Mail } from "lucide-react";
+import { Edit, X, Image as ImageIcon, Tag, Save, Mail, TableIcon } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
+import ParticipantsTable from "@/components/participants/ParticipantsTable";
+import { Table } from "lucide-react";
 
 interface Event {
   id: number;
@@ -38,6 +40,7 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(event.image);
   const [showInvitationForm, setShowInvitationForm] = useState(false);
+  const [showParticipantsTable, setShowParticipantsTable] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -86,6 +89,11 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
 
   const handleOpenInvitationForm = () => {
     setShowInvitationForm(true);
+    onOpenChange(false);
+  };
+
+  const handleOpenParticipantsTable = () => {
+    setShowParticipantsTable(true);
     onOpenChange(false);
   };
 
@@ -180,14 +188,25 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                   />
                 </div>
 
-                <Button 
-                  type="button"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={handleOpenInvitationForm}
-                >
-                  <Mail className="mr-2 h-4 w-4" />
-                  Manage Invitations
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    type="button"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={handleOpenInvitationForm}
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    Manage Form
+                  </Button>
+                  
+                  <Button 
+                    type="button"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={handleOpenParticipantsTable}
+                  >
+                    <Table className="mr-2 h-4 w-4" />
+                    View Data
+                  </Button>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -234,6 +253,14 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
             setShowInvitationForm(false);
             onOpenChange(true);
           }}
+        />
+      )}
+
+      {showParticipantsTable && (
+        <ParticipantsTable
+          open={showParticipantsTable}
+          onOpenChange={setShowParticipantsTable}
+          event={event}
         />
       )}
     </>

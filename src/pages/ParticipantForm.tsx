@@ -58,19 +58,19 @@ const mockFormTemplates = [
     id: 1,
     eventId: 1,
     fields: [
-      { id: "email", name: "Email", type: "email", required: true },
-      { id: "name", name: "Full Name", type: "text", required: true },
-      { id: "dietary", name: "Dietary Restrictions", type: "text", required: false },
+      { id: "email", name: "Email", type: "email" as const, required: true },
+      { id: "name", name: "Full Name", type: "text" as const, required: true },
+      { id: "dietary", name: "Dietary Restrictions", type: "text" as const, required: false },
     ]
   },
   {
     id: 2,
     eventId: 2,
     fields: [
-      { id: "email", name: "Email", type: "email", required: true },
-      { id: "name", name: "Full Name", type: "text", required: true },
-      { id: "company", name: "Company", type: "text", required: true },
-      { id: "position", name: "Position", type: "text", required: false },
+      { id: "email", name: "Email", type: "email" as const, required: true },
+      { id: "name", name: "Full Name", type: "text" as const, required: true },
+      { id: "company", name: "Company", type: "text" as const, required: true },
+      { id: "position", name: "Position", type: "text" as const, required: false },
     ]
   }
 ];
