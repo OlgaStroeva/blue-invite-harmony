@@ -4,10 +4,13 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Menu, X } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,26 +47,30 @@ const Navbar = () => {
             <NavLinks />
             <div className="flex items-center space-x-3">
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/sign-in">Log In</Link>
+                <Link to="/sign-in">{t("logIn")}</Link>
               </Button>
               <Button size="sm" className="bg-blue-gradient hover:shadow-highlight transition-all duration-300" asChild>
-                <Link to="/sign-up">Sign Up</Link>
+                <Link to="/sign-up">{t("signUp")}</Link>
               </Button>
+              <LanguageSwitcher />
             </div>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-foreground"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher />
+            <button
+              className="text-foreground"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
       </Container>
 
@@ -74,10 +81,10 @@ const Navbar = () => {
             <NavLinks mobile />
             <div className="pt-3 flex flex-col space-y-3">
               <Button variant="ghost" size="sm" className="justify-start" asChild>
-                <Link to="/sign-in">Log In</Link>
+                <Link to="/sign-in">{t("logIn")}</Link>
               </Button>
               <Button size="sm" className="bg-blue-gradient" asChild>
-                <Link to="/sign-up">Sign Up</Link>
+                <Link to="/sign-up">{t("signUp")}</Link>
               </Button>
             </div>
           </div>
@@ -88,6 +95,7 @@ const Navbar = () => {
 };
 
 const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
+  const { t } = useLanguage();
   const baseClasses = "transition-all duration-200 hover:text-blue-600";
   const mobileClasses = "block py-2";
   const desktopClasses = "text-sm font-medium text-gray-600";
@@ -100,7 +108,7 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
           mobile ? mobileClasses : desktopClasses
         }`}
       >
-        Events
+        {t("events")}
       </Link>
       <Link
         to="#how-it-works"
@@ -108,7 +116,7 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
           mobile ? mobileClasses : desktopClasses
         }`}
       >
-        How It Works
+        {t("howItWorks")}
       </Link>
       <Link
         to="#testimonials"
@@ -116,7 +124,7 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
           mobile ? mobileClasses : desktopClasses
         }`}
       >
-        Testimonials
+        {t("testimonials")}
       </Link>
     </>
   );

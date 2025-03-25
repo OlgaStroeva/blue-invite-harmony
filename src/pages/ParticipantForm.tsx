@@ -15,6 +15,7 @@ import {
   FormMessage 
 } from "@/components/ui/form";
 import { Mail, CheckCircle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FormField {
   id: string;
@@ -58,19 +59,19 @@ const mockFormTemplates = [
     id: 1,
     eventId: 1,
     fields: [
-      { id: "email", name: "Email", type: "email" as const, required: true },
-      { id: "name", name: "Full Name", type: "text" as const, required: true },
-      { id: "dietary", name: "Dietary Restrictions", type: "text" as const, required: false },
+      { id: "email", name: "email", type: "email" as const, required: true },
+      { id: "name", name: "fullName", type: "text" as const, required: true },
+      { id: "dietary", name: "dietary", type: "text" as const, required: false },
     ]
   },
   {
     id: 2,
     eventId: 2,
     fields: [
-      { id: "email", name: "Email", type: "email" as const, required: true },
-      { id: "name", name: "Full Name", type: "text" as const, required: true },
-      { id: "company", name: "Company", type: "text" as const, required: true },
-      { id: "position", name: "Position", type: "text" as const, required: false },
+      { id: "email", name: "email", type: "email" as const, required: true },
+      { id: "name", name: "fullName", type: "text" as const, required: true },
+      { id: "company", name: "company", type: "text" as const, required: true },
+      { id: "position", name: "position", type: "text" as const, required: false },
     ]
   }
 ];
@@ -79,6 +80,7 @@ const ParticipantForm = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [event, setEvent] = useState<Event | null>(null);
   const [formFields, setFormFields] = useState<FormField[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -116,7 +118,7 @@ const ParticipantForm = () => {
     
     // Display success toast and set submitted state
     toast({
-      title: "Registration successful!",
+      title: t("registrationComplete"),
       description: "Your information has been submitted",
     });
     
@@ -129,13 +131,13 @@ const ParticipantForm = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-blue-50">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold text-blue-700">Event Not Found</h1>
-          <p className="text-blue-600 mt-2">The event you're looking for doesn't exist or has been removed.</p>
+          <h1 className="text-2xl font-semibold text-blue-700">{t("eventNotFound")}</h1>
+          <p className="text-blue-600 mt-2">{t("eventNotExist")}</p>
           <Button 
             className="mt-4 bg-blue-600 hover:bg-blue-700"
             onClick={() => navigate("/")}
           >
-            Return Home
+            {t("returnHome")}
           </Button>
         </div>
       </div>
@@ -149,15 +151,15 @@ const ParticipantForm = () => {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="h-10 w-10 text-green-500" />
           </div>
-          <h1 className="text-2xl font-semibold text-blue-700">Registration Complete!</h1>
+          <h1 className="text-2xl font-semibold text-blue-700">{t("registrationComplete")}</h1>
           <p className="text-blue-600 mt-2">
-            Thank you for registering for {event.title}. We've sent a confirmation email to your address.
+            {t("thankYouRegistering").replace("{0}", event.title)}
           </p>
           <Button 
             className="mt-6 bg-blue-600 hover:bg-blue-700"
             onClick={() => navigate("/")}
           >
-            Return Home
+            {t("returnHome")}
           </Button>
         </div>
       </div>
@@ -196,7 +198,7 @@ const ParticipantForm = () => {
           <div className="p-8">
             <h2 className="text-xl font-semibold text-blue-700 mb-6 flex items-center">
               <Mail className="mr-2 h-5 w-5" />
-              Registration Form
+              {t("registrationForm")}
             </h2>
             
             <Form {...form}>
@@ -209,13 +211,13 @@ const ParticipantForm = () => {
                     render={({ field: formField }) => (
                       <FormItem>
                         <FormLabel className="text-blue-700">
-                          {field.name} {field.required && <span className="text-red-500">*</span>}
+                          {t(field.name)} {field.required && <span className="text-red-500">*</span>}
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...formField}
                             type={field.type}
-                            placeholder={`Enter ${field.name.toLowerCase()}`}
+                            placeholder={`${t("enter")} ${t(field.name).toLowerCase()}`}
                             required={field.required}
                             className="border-blue-200 focus-visible:ring-blue-400"
                           />
@@ -230,7 +232,7 @@ const ParticipantForm = () => {
                   type="submit" 
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  Submit Registration
+                  {t("submitRegistration")}
                 </Button>
               </form>
             </Form>
