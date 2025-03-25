@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Image, Plus } from "lucide-react";
+import { Image, Plus, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import EventFormDialog from "@/components/events/EventFormDialog";
 import EventEditDialog from "@/components/events/EventEditDialog";
+import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
 
 interface Event {
   id: number;
@@ -69,6 +70,7 @@ const Dashboard = () => {
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isInvitationDialogOpen, setIsInvitationDialogOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -111,6 +113,11 @@ const Dashboard = () => {
   const handleEditEvent = (event: Event) => {
     setCurrentEvent(event);
     setIsEditDialogOpen(true);
+  };
+
+  const handleOpenInvitations = (event: Event) => {
+    setCurrentEvent(event);
+    setIsInvitationDialogOpen(true);
   };
 
   const handleEventCreated = (newEvent: Event) => {
@@ -207,8 +214,13 @@ const Dashboard = () => {
                             >
                               Edit
                             </Button>
-                            <Button size="sm" className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs">
-                              Send Invites
+                            <Button 
+                              size="sm" 
+                              className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs"
+                              onClick={() => handleOpenInvitations(event)}
+                            >
+                              <Mail className="mr-1 h-3 w-3" />
+                              Invitations
                             </Button>
                           </div>
                         </div>
@@ -244,6 +256,15 @@ const Dashboard = () => {
             onOpenChange={setIsEditDialogOpen}
             event={currentEvent}
             onEventUpdated={handleEventUpdated}
+          />
+        )}
+
+        {/* Invitation Form Dialog */}
+        {currentEvent && (
+          <InvitationFormDialog
+            open={isInvitationDialogOpen}
+            onOpenChange={setIsInvitationDialogOpen}
+            event={currentEvent}
           />
         )}
       </main>
