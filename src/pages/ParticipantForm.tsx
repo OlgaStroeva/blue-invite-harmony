@@ -83,7 +83,8 @@ const ParticipantForm = () => {
   const [formFields, setFormFields] = useState<FormField[]>([]);
   const [submitted, setSubmitted] = useState(false);
   
-  const form = useForm({
+  // Use Record<string, string | number> to allow different types of form values
+  const form = useForm<Record<string, string | number>>({
     defaultValues: {},
   });
 
@@ -100,7 +101,7 @@ const ParticipantForm = () => {
           setFormFields(template.fields);
           
           // Set default values for the form
-          const defaultValues: Record<string, string> = {};
+          const defaultValues: Record<string, string | number> = {};
           template.fields.forEach(field => {
             defaultValues[field.id] = "";
           });
@@ -110,7 +111,7 @@ const ParticipantForm = () => {
     }
   }, [eventId, form]);
 
-  const onSubmit = (data: Record<string, string>) => {
+  const onSubmit = (data: Record<string, string | number>) => {
     console.log("Form submitted:", data);
     
     // Display success toast and set submitted state
