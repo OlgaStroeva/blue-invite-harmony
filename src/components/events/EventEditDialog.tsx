@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Edit, X, Image as ImageIcon, Tag, Save, Mail } from "lucide-react";
 import { 
@@ -14,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
 
 interface Event {
   id: number;
@@ -40,7 +40,6 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
   const [showInvitationForm, setShowInvitationForm] = useState(false);
   const { toast } = useToast();
 
-  // Update state when event changes
   useEffect(() => {
     setTitle(event.title);
     setDescription(event.description || "");
@@ -72,7 +71,6 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
       return;
     }
 
-    // Update the event with new values
     const updatedEvent = {
       ...event,
       title,
@@ -108,7 +106,6 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left column - Image */}
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="image" className="text-blue-700 font-medium">Event Image</Label>
@@ -151,7 +148,6 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                   </div>
                 </div>
 
-                {/* Category selector - Moved above title */}
                 <div className="space-y-2">
                   <Label htmlFor="category" className="text-blue-700 font-medium">Category</Label>
                   <div className="flex flex-wrap gap-2">
@@ -194,7 +190,6 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                 </Button>
               </div>
 
-              {/* Right column - Description */}
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="description" className="text-blue-700 font-medium">Description</Label>
