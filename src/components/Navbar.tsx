@@ -6,11 +6,14 @@ import { Container } from "@/components/ui/container";
 import { Menu, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import UserAvatar from "@/components/UserAvatar";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
+  // Mock authentication state - in a real app, this would come from an auth context
+  const isAuthenticated = true;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,12 +49,18 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <NavLinks />
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/sign-in">{t("logIn")}</Link>
-              </Button>
-              <Button size="sm" className="bg-blue-gradient hover:shadow-highlight transition-all duration-300" asChild>
-                <Link to="/sign-up">{t("signUp")}</Link>
-              </Button>
+              {isAuthenticated ? (
+                <UserAvatar />
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/sign-in">{t("logIn")}</Link>
+                  </Button>
+                  <Button size="sm" className="bg-blue-gradient hover:shadow-highlight transition-all duration-300" asChild>
+                    <Link to="/sign-up">{t("signUp")}</Link>
+                  </Button>
+                </>
+              )}
               <LanguageSwitcher />
             </div>
           </div>
@@ -59,6 +68,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
             <LanguageSwitcher />
+            {isAuthenticated && <UserAvatar />}
             <button
               className="text-foreground"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -79,14 +89,16 @@ const Navbar = () => {
         <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-md py-4 px-6 glassmorphism animate-slideDown">
           <div className="flex flex-col space-y-3">
             <NavLinks mobile />
-            <div className="pt-3 flex flex-col space-y-3">
-              <Button variant="ghost" size="sm" className="justify-start" asChild>
-                <Link to="/sign-in">{t("logIn")}</Link>
-              </Button>
-              <Button size="sm" className="bg-blue-gradient" asChild>
-                <Link to="/sign-up">{t("signUp")}</Link>
-              </Button>
-            </div>
+            {!isAuthenticated && (
+              <div className="pt-3 flex flex-col space-y-3">
+                <Button variant="ghost" size="sm" className="justify-start" asChild>
+                  <Link to="/sign-in">{t("logIn")}</Link>
+                </Button>
+                <Button size="sm" className="bg-blue-gradient" asChild>
+                  <Link to="/sign-up">{t("signUp")}</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
