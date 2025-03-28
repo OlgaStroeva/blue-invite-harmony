@@ -1,37 +1,14 @@
 
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Form, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormControl,
-  FormMessage 
-} from "@/components/ui/form";
-import { Mail, CheckCircle } from "lucide-react";
+import { useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-
-interface FormField {
-  id: string;
-  name: string;
-  type: 'text' | 'email' | 'tel' | 'number' | 'date';
-  required: boolean;
-  options?: string[];
-}
-
-interface Event {
-  id: number;
-  title: string;
-  category: string;
-  description?: string;
-  image: string;
-  gradient: string;
-}
+import { Event } from "@/types/event";
+import { FormField } from "@/types/form";
+import EventHeader from "@/components/participant/EventHeader";
+import SuccessMessage from "@/components/participant/SuccessMessage";
+import EventNotFound from "@/components/participant/EventNotFound";
+import RegistrationForm from "@/components/participant/RegistrationForm";
 
 // Mock events and form templates - in a real app, this would come from a database
 const mockEvents = [
@@ -77,17 +54,11 @@ const mockFormTemplates = [
 
 const ParticipantForm = () => {
   const { eventId } = useParams();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
   const [event, setEvent] = useState<Event | null>(null);
   const [formFields, setFormFields] = useState<FormField[]>([]);
   const [submitted, setSubmitted] = useState(false);
-  
-  // Use Record<string, string | number> to allow different types of form values
-  const form = useForm<Record<string, string | number>>({
-    defaultValues: {},
-  });
 
   useEffect(() => {
     // Find event and its form template
@@ -100,19 +71,12 @@ const ParticipantForm = () => {
         const template = mockFormTemplates.find(t => t.eventId.toString() === eventId);
         if (template) {
           setFormFields(template.fields);
-          
-          // Set default values for the form
-          const defaultValues: Record<string, string | number> = {};
-          template.fields.forEach(field => {
-            defaultValues[field.id] = "";
-          });
-          form.reset(defaultValues);
         }
       }
     }
-  }, [eventId, form]);
+  }, [eventId]);
 
-  const onSubmit = (data: Record<string, string | number>) => {
+  const handleSubmit = (data: Record<string, string | number>) => {
     console.log("Form submitted:", data);
     
     // Display success toast and set submitted state
@@ -127,42 +91,11 @@ const ParticipantForm = () => {
   };
 
   if (!event) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-blue-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-blue-700">{t("eventNotFound")}</h1>
-          <p className="text-blue-600 mt-2">{t("eventNotExist")}</p>
-          <Button 
-            className="mt-4 bg-blue-600 hover:bg-blue-700"
-            onClick={() => navigate("/")}
-          >
-            {t("returnHome")}
-          </Button>
-        </div>
-      </div>
-    );
+    return <EventNotFound />;
   }
 
   if (submitted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-blue-50">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="h-10 w-10 text-green-500" />
-          </div>
-          <h1 className="text-2xl font-semibold text-blue-700">{t("registrationComplete")}</h1>
-          <p className="text-blue-600 mt-2">
-            {t("thankYouRegistering").replace("{0}", event.title)}
-          </p>
-          <Button 
-            className="mt-6 bg-blue-600 hover:bg-blue-700"
-            onClick={() => navigate("/")}
-          >
-            {t("returnHome")}
-          </Button>
-        </div>
-      </div>
-    );
+    return <SuccessMessage eventTitle={event.title} />;
   }
 
   return (
@@ -170,72 +103,10 @@ const ParticipantForm = () => {
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Event Header */}
-          <div 
-            className={`p-8 bg-gradient-to-r ${event.gradient} text-white`}
-            style={event.image ? {
-              backgroundImage: `url(${event.image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              position: 'relative',
-            } : {}}
-          >
-            {event.image && (
-              <div className="absolute inset-0 bg-black opacity-50"></div>
-            )}
-            <div className="relative z-10">
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/20 backdrop-blur-sm">
-                {event.category}
-              </span>
-              <h1 className="text-3xl font-bold mt-3">{event.title}</h1>
-              {event.description && (
-                <p className="mt-2 text-white/90">{event.description}</p>
-              )}
-            </div>
-          </div>
+          <EventHeader event={event} />
           
           {/* Registration Form */}
-          <div className="p-8">
-            <h2 className="text-xl font-semibold text-blue-700 mb-6 flex items-center">
-              <Mail className="mr-2 h-5 w-5" />
-              {t("registrationForm")}
-            </h2>
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {formFields.map((field) => (
-                  <FormField
-                    key={field.id}
-                    control={form.control}
-                    name={field.id}
-                    render={({ field: formField }) => (
-                      <FormItem>
-                        <FormLabel className="text-blue-700">
-                          {t(field.name)} {field.required && <span className="text-red-500">*</span>}
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...formField}
-                            type={field.type}
-                            placeholder={`${t("enter")} ${t(field.name).toLowerCase()}`}
-                            required={field.required}
-                            className="border-blue-200 focus-visible:ring-blue-400"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                ))}
-                
-                <Button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {t("submitRegistration")}
-                </Button>
-              </form>
-            </Form>
-          </div>
+          <RegistrationForm formFields={formFields} onSubmit={handleSubmit} />
         </div>
       </div>
     </div>
