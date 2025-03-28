@@ -5,6 +5,9 @@ export interface Employee {
   name: string;
   role?: string;
   avatar?: string;
+  assignmentPreferences?: {
+    allowAssignmentByOthers: boolean;
+  };
 }
 
 export interface EventEmployee {
