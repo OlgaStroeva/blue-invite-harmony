@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { Edit, X, Image as ImageIcon, Tag, Save, Mail, TableIcon } from "lucide-react";
+import { Edit, X, Image as ImageIcon, Tag, Save, Mail, Table, Users } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -15,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
 import ParticipantsTable from "@/components/participants/ParticipantsTable";
-import { Table } from "lucide-react";
+import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
 
 interface Event {
   id: number;
@@ -41,6 +42,7 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
   const [imagePreview, setImagePreview] = useState<string>(event.image);
   const [showInvitationForm, setShowInvitationForm] = useState(false);
   const [showParticipantsTable, setShowParticipantsTable] = useState(false);
+  const [showEmployeeManagement, setShowEmployeeManagement] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -94,6 +96,11 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
 
   const handleOpenParticipantsTable = () => {
     setShowParticipantsTable(true);
+    onOpenChange(false);
+  };
+
+  const handleOpenEmployeeManagement = () => {
+    setShowEmployeeManagement(true);
     onOpenChange(false);
   };
 
@@ -188,7 +195,7 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <Button 
                     type="button"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -205,6 +212,15 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                   >
                     <Table className="mr-2 h-4 w-4" />
                     View Data
+                  </Button>
+                  
+                  <Button 
+                    type="button"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={handleOpenEmployeeManagement}
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Staff
                   </Button>
                 </div>
               </div>
@@ -260,6 +276,17 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
         <ParticipantsTable
           open={showParticipantsTable}
           onOpenChange={setShowParticipantsTable}
+          event={event}
+        />
+      )}
+      
+      {showEmployeeManagement && (
+        <EmployeeManagementDialog
+          open={showEmployeeManagement}
+          onOpenChange={(open) => {
+            setShowEmployeeManagement(open);
+            if (!open) onOpenChange(true);
+          }}
           event={event}
         />
       )}

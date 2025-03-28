@@ -4,20 +4,13 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Image, Plus, Mail } from "lucide-react";
+import { Image, Plus, Mail, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import EventFormDialog from "@/components/events/EventFormDialog";
 import EventEditDialog from "@/components/events/EventEditDialog";
 import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
-
-interface Event {
-  id: number;
-  title: string;
-  category: string;
-  description?: string;
-  image: string;
-  gradient: string;
-}
+import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
+import { Event } from "@/types/event";
 
 const events: Event[] = [
   {
@@ -71,6 +64,7 @@ const Dashboard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isInvitationDialogOpen, setIsInvitationDialogOpen] = useState(false);
+  const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -118,6 +112,11 @@ const Dashboard = () => {
   const handleOpenInvitations = (event: Event) => {
     setCurrentEvent(event);
     setIsInvitationDialogOpen(true);
+  };
+  
+  const handleOpenEmployees = (event: Event) => {
+    setCurrentEvent(event);
+    setIsEmployeeDialogOpen(true);
   };
 
   const handleEventCreated = (newEvent: Event) => {
@@ -205,7 +204,7 @@ const Dashboard = () => {
                           <h3 className="text-lg font-medium text-white mb-3">
                             {event.title}
                           </h3>
-                          <div className="flex justify-between items-center">
+                          <div className="flex justify-between items-center gap-2">
                             <Button 
                               size="sm" 
                               variant="secondary" 
@@ -220,7 +219,15 @@ const Dashboard = () => {
                               onClick={() => handleOpenInvitations(event)}
                             >
                               <Mail className="mr-1 h-3 w-3" />
-                              Invitations
+                              Invites
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs"
+                              onClick={() => handleOpenEmployees(event)}
+                            >
+                              <Users className="mr-1 h-3 w-3" />
+                              Staff
                             </Button>
                           </div>
                         </div>
@@ -264,6 +271,15 @@ const Dashboard = () => {
           <InvitationFormDialog
             open={isInvitationDialogOpen}
             onOpenChange={setIsInvitationDialogOpen}
+            event={currentEvent}
+          />
+        )}
+        
+        {/* Employee Management Dialog */}
+        {currentEvent && (
+          <EmployeeManagementDialog
+            open={isEmployeeDialogOpen}
+            onOpenChange={setIsEmployeeDialogOpen}
             event={currentEvent}
           />
         )}
