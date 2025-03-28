@@ -4,8 +4,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { 
   Form, 
   FormField, 
@@ -15,6 +13,7 @@ import {
   FormMessage 
 } from "@/components/ui/form";
 import { Mail, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FormField {

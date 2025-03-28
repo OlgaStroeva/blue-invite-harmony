@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -15,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Mail, Trash2, Save, FileText, GripVertical } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose } from "@/components/ui/sheet";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Event {
@@ -42,7 +41,6 @@ interface Template {
   fields: FormField[];
 }
 
-// Mock templates
 const mockTemplates: Template[] = [
   {
     id: 1,
@@ -171,7 +169,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
     });
   };
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     
     // Don't allow moving the email field (index 0)
@@ -258,8 +256,8 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
                     >
                       {formFields.map((field, index) => (
                         <Draggable
-                          key={field.id + index}
-                          draggableId={field.id + index}
+                          key={`${field.id}-${index}`}
+                          draggableId={`${field.id}-${index}`}
                           index={index}
                           isDragDisabled={index === 0} // Email field can't be moved
                         >
