@@ -1,0 +1,155 @@
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Mail, Edit, Users, Table } from "lucide-react";
+import { Event } from "@/types/event";
+import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
+import ParticipantsTable from "@/components/participants/ParticipantsTable";
+import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
+import EventEditDialog from "./EventEditDialog";
+import { useState } from "react";
+
+interface EventViewDialogProps {
+  event: Event;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onEventUpdated: (event: Event) => void;
+}
+
+const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventViewDialogProps) => {
+  const [showInvitationForm, setShowInvitationForm] = useState(false);
+  const [showParticipantsTable, setShowParticipantsTable] = useState(false);
+  const [showEmployeeManagement, setShowEmployeeManagement] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-blue-700">{event.title}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {event.image && (
+              <img src={event.image} alt={event.title} className="w-full rounded-lg aspect-video object-cover" />
+            )}
+
+            <div className="grid gap-4">
+              <div>
+                <h3 className="font-medium text-blue-700">Category</h3>
+                <p>{event.category}</p>
+              </div>
+
+              {event.date && (
+                <div>
+                  <h3 className="font-medium text-blue-700">Date</h3>
+                  <p>{new Date(event.date).toLocaleString()}</p>
+                </div>
+              )}
+
+              {event.place && (
+                <div>
+                  <h3 className="font-medium text-blue-700">Location</h3>
+                  <p>{event.place}</p>
+                </div>
+              )}
+
+              {event.description && (
+                <div>
+                  <h3 className="font-medium text-blue-700">Description</h3>
+                  <p className="whitespace-pre-wrap">{event.description}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <Button
+                onClick={() => setShowEditDialog(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+              
+              <Button
+                onClick={() => setShowInvitationForm(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Invitations
+              </Button>
+              
+              <Button
+                onClick={() => setShowParticipantsTable(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                <Table className="mr-2 h-4 w-4" />
+                Data
+              </Button>
+              
+              <Button
+                onClick={() => setShowEmployeeManagement(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Staff
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {showEditDialog && (
+        <EventEditDialog
+          open={showEditDialog}
+          onOpenChange={(open) => {
+            setShowEditDialog(open);
+            if (!open) onOpenChange(true);
+          }}
+          event={event}
+          onEventUpdated={(updatedEvent) => {
+            onEventUpdated(updatedEvent);
+            setShowEditDialog(false);
+            onOpenChange(true);
+          }}
+        />
+      )}
+
+      {showInvitationForm && (
+        <InvitationFormDialog
+          open={showInvitationForm}
+          onOpenChange={(open) => {
+            setShowInvitationForm(open);
+            if (!open) onOpenChange(true);
+          }}
+          event={event}
+        />
+      )}
+
+      {showParticipantsTable && (
+        <ParticipantsTable
+          open={showParticipantsTable}
+          onOpenChange={(open) => {
+            setShowParticipantsTable(open);
+            if (!open) onOpenChange(true);
+          }}
+          event={event}
+        />
+      )}
+
+      {showEmployeeManagement && (
+        <EmployeeManagementDialog
+          open={showEmployeeManagement}
+          onOpenChange={(open) => {
+            setShowEmployeeManagement(open);
+            if (!open) onOpenChange(true);
+          }}
+          event={event}
+        />
+      )}
+    </>
+  );
+};
+
+export default EventViewDialog;

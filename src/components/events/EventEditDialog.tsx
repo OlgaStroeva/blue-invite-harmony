@@ -137,212 +137,181 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
   const categories = ["Wedding", "Birthday", "Corporate", "Party", "Formal"];
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto bg-blue-50 border-blue-200">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-blue-700">
-              <Edit className="h-5 w-5" /> Edit Event
-            </DialogTitle>
-            <DialogDescription className="text-blue-600">
-              Make changes to your event details
-            </DialogDescription>
-          </DialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto bg-blue-50 border-blue-200">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-blue-700">
+            <Edit className="h-5 w-5" /> Edit Event
+          </DialogTitle>
+          <DialogDescription className="text-blue-600">
+            Make changes to your event details
+          </DialogDescription>
+        </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title" className="text-blue-700 font-medium">Event Title</Label>
-                  <Input 
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter event title..."
-                    className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
-                  />
-                </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-blue-700 font-medium">Event Title</Label>
+                <Input 
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter event title..."
+                  className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-blue-700 font-medium">Event Date</Label>
-                  <Input 
-                    id="date"
-                    type="datetime-local"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="place" className="text-blue-700 font-medium">Event Location</Label>
-                  <Input 
-                    id="place"
-                    value={place}
-                    onChange={(e) => setPlace(e.target.value)}
-                    placeholder="Enter event location..."
-                    className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="image" className="text-blue-700 font-medium">Event Image</Label>
-                  <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer bg-blue-100/70">
-                    <input
-                      id="image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                    
-                    {imagePreview ? (
-                      <div className="relative">
-                        <img 
-                          src={imagePreview} 
-                          alt="Event preview" 
-                          className="w-full aspect-[4/3] object-cover rounded-md"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={() => {
-                            setImage(null);
-                            setImagePreview("");
-                          }}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <label htmlFor="image" className="flex flex-col items-center justify-center gap-2 h-48">
-                        <ImageIcon className="h-10 w-10 text-blue-400" />
-                        <span className="text-blue-600 font-medium">Upload an image</span>
-                        <span className="text-sm text-blue-400">or drag and drop</span>
-                      </label>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="category" className="text-blue-700 font-medium">Category</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((cat) => (
-                      <Button
-                        key={cat}
-                        type="button"
-                        variant={category === cat ? "default" : "outline"}
-                        className={category === cat 
-                          ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                          : "hover:bg-blue-100 border-blue-200 bg-blue-50"
-                        }
-                        onClick={() => setCategory(cat)}
-                      >
-                        <Tag className="mr-1 h-4 w-4" />
-                        {cat}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <Button 
-                    type="button"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={handleOpenInvitationForm}
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Manage Form
-                  </Button>
-                  
-                  <Button 
-                    type="button"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={handleOpenParticipantsTable}
-                  >
-                    <Table className="mr-2 h-4 w-4" />
-                    View Data
-                  </Button>
-                  
-                  <Button 
-                    type="button"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={handleOpenEmployeeManagement}
-                  >
-                    <Users className="mr-2 h-4 w-4" />
-                    Staff
-                  </Button>
+              <div className="space-y-2">
+                <Label htmlFor="category" className="text-blue-700 font-medium">Category</Label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <Button
+                      key={cat}
+                      type="button"
+                      variant={category === cat ? "default" : "outline"}
+                      className={category === cat 
+                        ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                        : "hover:bg-blue-100 border-blue-200 bg-blue-50"
+                      }
+                      onClick={() => setCategory(cat)}
+                    >
+                      <Tag className="mr-1 h-4 w-4" />
+                      {cat}
+                    </Button>
+                  ))}
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="description" className="text-blue-700 font-medium">Description</Label>
-                  <Textarea 
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe your event..."
-                    className="border-blue-200 focus-visible:ring-blue-400 min-h-[300px] bg-blue-50"
+              <div className="space-y-2">
+                <Label htmlFor="image" className="text-blue-700 font-medium">Event Image</Label>
+                <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer bg-blue-100/70">
+                  <input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
                   />
+                  
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img 
+                        src={imagePreview} 
+                        alt="Event preview" 
+                        className="w-full aspect-[4/3] object-cover rounded-md"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={() => {
+                          setImage(null);
+                          setImagePreview("");
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <label htmlFor="image" className="flex flex-col items-center justify-center gap-2 h-48">
+                      <ImageIcon className="h-10 w-10 text-blue-400" />
+                      <span className="text-blue-600 font-medium">Upload an image</span>
+                      <span className="text-sm text-blue-400">or drag and drop</span>
+                    </label>
+                  )}
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="date" className="text-blue-700 font-medium">Event Date</Label>
+                <Input 
+                  id="date"
+                  type="datetime-local"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="place" className="text-blue-700 font-medium">Event Location</Label>
+                <Input 
+                  id="place"
+                  value={place}
+                  onChange={(e) => setPlace(e.target.value)}
+                  placeholder="Enter event location..."
+                  className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
+                />
               </div>
             </div>
-            
-            <DialogFooter className="gap-2 pt-4 border-t border-blue-200">
-              <Button 
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="border-blue-200 bg-blue-50 hover:bg-blue-100"
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                Save Changes
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
 
-      {showInvitationForm && (
-        <InvitationFormDialog
-          open={showInvitationForm}
-          onOpenChange={setShowInvitationForm}
-          event={event}
-          onClose={() => {
-            setShowInvitationForm(false);
-            onOpenChange(true);
-          }}
-        />
-      )}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-blue-700 font-medium">Description</Label>
+                <Textarea 
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe your event..."
+                  className="border-blue-200 focus-visible:ring-blue-400 min-h-[300px] bg-blue-50"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="gap-2 pt-4 border-t border-blue-200">
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="border-blue-200 bg-blue-50 hover:bg-blue-100"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
 
-      {showParticipantsTable && (
-        <ParticipantsTable
-          open={showParticipantsTable}
-          onOpenChange={setShowParticipantsTable}
-          event={event}
-        />
-      )}
-      
-      {showEmployeeManagement && (
-        <EmployeeManagementDialog
-          open={showEmployeeManagement}
-          onOpenChange={(open) => {
-            setShowEmployeeManagement(open);
-            if (!open) onOpenChange(true);
-          }}
-          event={event}
-        />
-      )}
-    </>
+    {showInvitationForm && (
+      <InvitationFormDialog
+        open={showInvitationForm}
+        onOpenChange={setShowInvitationForm}
+        event={event}
+        onClose={() => {
+          setShowInvitationForm(false);
+          onOpenChange(true);
+        }}
+      />
+    )}
+
+    {showParticipantsTable && (
+      <ParticipantsTable
+        open={showParticipantsTable}
+        onOpenChange={setShowParticipantsTable}
+        event={event}
+      />
+    )}
+    
+    {showEmployeeManagement && (
+      <EmployeeManagementDialog
+        open={showEmployeeManagement}
+        onOpenChange={(open) => {
+          setShowEmployeeManagement(open);
+          if (!open) onOpenChange(true);
+        }}
+        event={event}
+      />
+    )}
   );
 };
 

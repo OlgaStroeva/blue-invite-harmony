@@ -25,13 +25,12 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
   const getButtonText = () => {
     if (event.status === 'upcoming') return 'Begin';
     if (event.status === 'in_progress') return 'Finish';
-    return 'Finished';
+    return '';
   };
 
   const getIcon = () => {
-    if (event.status === 'upcoming' || event.status === 'in_progress') {
-      return event.status === 'upcoming' ? <Play className="h-3 w-3" /> : <Square className="h-3 w-3" />;
-    }
+    if (event.status === 'upcoming') return <Play className="h-3 w-3" />;
+    if (event.status === 'in_progress') return <Square className="h-3 w-3" />;
     return null;
   };
 
@@ -55,7 +54,7 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
             <AlertDialogTitle>Confirm Event Status Change</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to {event.status === 'upcoming' ? 'begin' : 'finish'} this event?
-              This action cannot be undone.
+              {event.status === 'in_progress' && " This action cannot be undone."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

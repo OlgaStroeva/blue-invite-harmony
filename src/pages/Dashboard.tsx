@@ -11,6 +11,7 @@ import InvitationFormDialog from "@/components/invitations/InvitationFormDialog"
 import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
 import EventStatusButton from "@/components/events/EventStatusButton";
 import { Event } from "@/types/event";
+import EventViewDialog from "@/components/events/EventViewDialog";
 
 const events: Event[] = [
   {
@@ -62,9 +63,7 @@ const Dashboard = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isInvitationDialogOpen, setIsInvitationDialogOpen] = useState(false);
-  const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -148,6 +147,11 @@ const Dashboard = () => {
     });
   };
 
+  const handleViewEvent = (event: Event) => {
+    setCurrentEvent(event);
+    setIsViewDialogOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-blue-100 text-foreground overflow-x-hidden">
       <Navbar />
@@ -217,27 +221,10 @@ const Dashboard = () => {
                           <div className="flex justify-between items-center gap-2">
                             <Button 
                               size="sm" 
-                              variant="secondary" 
                               className="bg-white/90 hover:bg-white text-blue-600 text-xs"
-                              onClick={() => handleEditEvent(event)}
+                              onClick={() => handleViewEvent(event)}
                             >
-                              Edit
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs"
-                              onClick={() => handleOpenInvitations(event)}
-                            >
-                              <Mail className="mr-1 h-3 w-3" />
-                              Invites
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs"
-                              onClick={() => handleOpenEmployees(event)}
-                            >
-                              <Users className="mr-1 h-3 w-3" />
-                              Staff
+                              Open
                             </Button>
                             <EventStatusButton 
                               event={event} 
@@ -269,27 +256,11 @@ const Dashboard = () => {
         />
 
         {currentEvent && (
-          <EventEditDialog
-            open={isEditDialogOpen}
-            onOpenChange={setIsEditDialogOpen}
+          <EventViewDialog
+            open={isViewDialogOpen}
+            onOpenChange={setIsViewDialogOpen}
             event={currentEvent}
             onEventUpdated={handleEventUpdated}
-          />
-        )}
-
-        {currentEvent && (
-          <InvitationFormDialog
-            open={isInvitationDialogOpen}
-            onOpenChange={setIsInvitationDialogOpen}
-            event={currentEvent}
-          />
-        )}
-        
-        {currentEvent && (
-          <EmployeeManagementDialog
-            open={isEmployeeDialogOpen}
-            onOpenChange={setIsEmployeeDialogOpen}
-            event={currentEvent}
           />
         )}
       </main>
