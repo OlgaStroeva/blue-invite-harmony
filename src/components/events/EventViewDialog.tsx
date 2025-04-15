@@ -1,7 +1,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Mail, Edit, Users, Table } from "lucide-react";
+import { Mail, Edit, Users, Table, CalendarIcon, MapPin } from "lucide-react";
 import { Event } from "@/types/event";
 import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
 import ParticipantsTable from "@/components/participants/ParticipantsTable";
@@ -38,29 +38,31 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
             <div className="grid gap-4">
               <div>
                 <h3 className="font-medium text-blue-700">Category</h3>
-                <p>{event.category}</p>
+                <p className="mt-1">{event.category}</p>
               </div>
-
-              {event.date && (
-                <div>
-                  <h3 className="font-medium text-blue-700">Date</h3>
-                  <p>{new Date(event.date).toLocaleString()}</p>
-                </div>
-              )}
-
-              {event.place && (
-                <div>
-                  <h3 className="font-medium text-blue-700">Location</h3>
-                  <p>{event.place}</p>
-                </div>
-              )}
 
               {event.description && (
                 <div>
                   <h3 className="font-medium text-blue-700">Description</h3>
-                  <p className="whitespace-pre-wrap">{event.description}</p>
+                  <p className="mt-1 whitespace-pre-wrap text-gray-700">{event.description}</p>
                 </div>
               )}
+
+              <div className="flex flex-col gap-2">
+                {event.date && (
+                  <div className="flex items-center gap-2">
+                    <CalendarIcon className="h-4 w-4 text-blue-600" />
+                    <span>{new Date(event.date).toLocaleString()}</span>
+                  </div>
+                )}
+
+                {event.place && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-blue-600" />
+                    <span>{event.place}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
