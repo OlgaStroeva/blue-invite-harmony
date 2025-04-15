@@ -6,4 +6,7 @@ export interface Event {
   description?: string;
   image: string;
   gradient: string;
+  date?: string;
+  place?: string;
+  status?: 'upcoming' | 'in_progress' | 'finished';
 }

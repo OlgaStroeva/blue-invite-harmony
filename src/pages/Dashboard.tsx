@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -10,6 +9,7 @@ import EventFormDialog from "@/components/events/EventFormDialog";
 import EventEditDialog from "@/components/events/EventEditDialog";
 import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
 import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
+import EventStatusButton from "@/components/events/EventStatusButton";
 import { Event } from "@/types/event";
 
 const events: Event[] = [
@@ -75,7 +75,6 @@ const Dashboard = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Start animating items sequentially
             userEvents.forEach((_, index) => {
               setTimeout(() => {
                 setAnimatedItems((prev) => [...prev, index]);
@@ -135,12 +134,25 @@ const Dashboard = () => {
     });
   };
 
+  const handleEventStatusChange = (eventToUpdate: Event, newStatus: 'upcoming' | 'in_progress' | 'finished') => {
+    setUserEvents(prev => 
+      prev.map(event => 
+        event.id === eventToUpdate.id 
+          ? { ...event, status: newStatus }
+          : event
+      )
+    );
+    toast({
+      title: "Event Status Updated",
+      description: `Event has been marked as ${newStatus.replace('_', ' ')}`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-blue-100 text-foreground overflow-x-hidden">
       <Navbar />
       <main className="pt-20">
         <section className="py-8 relative" ref={sectionRef}>
-          {/* Background decorations */}
           <div className="absolute top-1/2 right-0 w-1/3 h-1/3 bg-blue-300/40 rounded-full blur-[100px]" />
           <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-blue-200/30 rounded-full blur-[80px]" />
           
@@ -191,14 +203,12 @@ const Dashboard = () => {
                     >
                       <div className="absolute inset-0 bg-blue-900/5 group-hover:bg-blue-900/0 transition-all duration-300"></div>
                       
-                      {/* Event category label */}
                       <div className="relative z-10">
                         <span className="inline-block px-2 py-1 text-xs font-medium bg-white/80 text-blue-700 rounded-md backdrop-blur-sm">
                           {event.category}
                         </span>
                       </div>
                       
-                      {/* Title and buttons with background panel */}
                       <div className="relative z-10 mt-auto">
                         <div className="bg-black/60 backdrop-blur-sm p-3 rounded-lg">
                           <h3 className="text-lg font-medium text-white mb-3">
@@ -229,6 +239,10 @@ const Dashboard = () => {
                               <Users className="mr-1 h-3 w-3" />
                               Staff
                             </Button>
+                            <EventStatusButton 
+                              event={event} 
+                              onStatusChange={handleEventStatusChange}
+                            />
                           </div>
                         </div>
                       </div>
@@ -240,7 +254,6 @@ const Dashboard = () => {
           </Container>
         </section>
 
-        {/* Floating Action Button */}
         <button
           onClick={handleAddEvent}
           className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:shadow-highlight z-20"
@@ -249,14 +262,12 @@ const Dashboard = () => {
           <Plus className="w-6 h-6" />
         </button>
 
-        {/* Event Creation Dialog */}
         <EventFormDialog 
           open={isDialogOpen} 
           onOpenChange={setIsDialogOpen}
           onEventCreated={handleEventCreated}
         />
 
-        {/* Event Edit Dialog */}
         {currentEvent && (
           <EventEditDialog
             open={isEditDialogOpen}
@@ -266,7 +277,6 @@ const Dashboard = () => {
           />
         )}
 
-        {/* Invitation Form Dialog */}
         {currentEvent && (
           <InvitationFormDialog
             open={isInvitationDialogOpen}
@@ -275,7 +285,6 @@ const Dashboard = () => {
           />
         )}
         
-        {/* Employee Management Dialog */}
         {currentEvent && (
           <EmployeeManagementDialog
             open={isEmployeeDialogOpen}

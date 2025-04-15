@@ -25,6 +25,9 @@ interface Event {
   description?: string;
   image: string;
   gradient: string;
+  date?: string;
+  place?: string;
+  status?: 'upcoming' | 'in_progress' | 'finished';
 }
 
 interface EventEditDialogProps {
@@ -38,6 +41,8 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
   const [title, setTitle] = useState(event.title);
   const [description, setDescription] = useState(event.description || "");
   const [category, setCategory] = useState(event.category);
+  const [date, setDate] = useState(event.date || "");
+  const [place, setPlace] = useState(event.place || "");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(event.image);
   const [showInvitationForm, setShowInvitationForm] = useState(false);
@@ -49,6 +54,8 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
     setTitle(event.title);
     setDescription(event.description || "");
     setCategory(event.category);
+    setDate(event.date || "");
+    setPlace(event.place || "");
     setImagePreview(event.image);
   }, [event]);
 
@@ -102,6 +109,8 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
       title,
       description,
       category,
+      date,
+      place,
       image: imagePreview,
       gradient: !imagePreview ? event.gradient : "",
     };
@@ -150,6 +159,28 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter event title..."
+                    className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="date" className="text-blue-700 font-medium">Event Date</Label>
+                  <Input 
+                    id="date"
+                    type="datetime-local"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="place" className="text-blue-700 font-medium">Event Location</Label>
+                  <Input 
+                    id="place"
+                    value={place}
+                    onChange={(e) => setPlace(e.target.value)}
+                    placeholder="Enter event location..."
                     className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
                   />
                 </div>
@@ -213,24 +244,6 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                         {cat}
                       </Button>
                     ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="xlsx" className="text-blue-700 font-medium">Import Invitations</Label>
-                  <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer bg-blue-100/70">
-                    <input
-                      id="xlsx"
-                      type="file"
-                      accept=".xlsx,.xls"
-                      onChange={handleXlsxUpload}
-                      className="hidden"
-                    />
-                    <label htmlFor="xlsx" className="flex flex-col items-center justify-center gap-2 h-24 cursor-pointer">
-                      <Upload className="h-8 w-8 text-blue-400" />
-                      <span className="text-blue-600 font-medium">Upload XLSX file</span>
-                      <span className="text-sm text-blue-400">Import participant data</span>
-                    </label>
                   </div>
                 </div>
 
