@@ -1,15 +1,19 @@
-
 import { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Edit, Table as TableIcon, Mail } from "lucide-react";
+import { Edit, Table as TableIcon, Mail, Check, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Participant {
   id: number;
   name: string;
   email: string;
-  [key: string]: string | number | boolean; // For dynamic fields
+  company: string;
+  dietaryRestrictions: string;
+  invitationSent: boolean;
+  attended: boolean;
+  [key: string]: string | number | boolean;
 }
 
 interface FormField {
@@ -36,37 +40,73 @@ interface ParticipantsTableProps {
 }
 
 const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps) => {
-  // Mock data - in a real app, this would come from your backend
+  const { toast } = useToast();
+
   const [participants, setParticipants] = useState<Participant[]>([
     {
       id: 1,
       name: "John Doe",
       email: "john@example.com",
       company: "Acme Inc",
-      dietaryRestrictions: "Vegetarian"
+      dietaryRestrictions: "Vegetarian",
+      invitationSent: false,
+      attended: false
     },
     {
       id: 2,
       name: "Jane Smith",
       email: "jane@example.com",
       company: "Globex Corp",
-      dietaryRestrictions: "None"
+      dietaryRestrictions: "None",
+      invitationSent: false,
+      attended: false
     },
     {
       id: 3,
       name: "Bob Johnson",
       email: "bob@example.com",
       company: "Wayne Enterprises",
-      dietaryRestrictions: "Gluten-free"
+      dietaryRestrictions: "Gluten-free",
+      invitationSent: false,
+      attended: false
     }
   ]);
 
-  // Get all unique keys across all participants to determine table columns
+  const handleSendInvite = (participantId: number) => {
+    setParticipants(prev => 
+      prev.map(p => 
+        p.id === participantId 
+          ? { ...p, invitationSent: true }
+          : p
+      )
+    );
+    toast({
+      title: "Invitation Sent",
+      description: "The participant has been notified via email",
+    });
+  };
+
+  const handleToggleAttendance = (participantId: number) => {
+    setParticipants(prev => 
+      prev.map(p => 
+        p.id === participantId 
+          ? { ...p, attended: !p.attended }
+          : p
+      )
+    );
+  };
+
   const allKeys = Array.from(
     new Set(
-      participants.flatMap(participant => Object.keys(participant))
+      participants.flatMap(participant => 
+        Object.keys(participant).filter(key => 
+          !['id', 'invitationSent', 'attended'].includes(key)
+        )
+      )
     )
-  ).filter(key => key !== 'id'); // Exclude the ID field from display
+  );
+
+  const isEventFinished = false;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -103,6 +143,10 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </TableHead>
                     ))}
+                    <TableHead className="text-blue-700">Invite</TableHead>
+                    {isEventFinished && (
+                      <TableHead className="text-blue-700">Attended</TableHead>
+                    )}
                     <TableHead className="text-right text-blue-700">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -114,8 +158,44 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                           {participant[key] !== undefined ? String(participant[key]) : '—'}
                         </TableCell>
                       ))}
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => !participant.invitationSent && handleSendInvite(participant.id)}
+                          className={participant.invitationSent ? "text-red-600" : "text-blue-600"}
+                        >
+                          {participant.invitationSent ? (
+                            <>
+                              <X className="h-4 w-4 mr-1" />
+                              Cancel
+                            </>
+                          ) : (
+                            <>
+                              <Mail className="h-4 w-4 mr-1" />
+                              Invite
+                            </>
+                          )}
+                        </Button>
+                      </TableCell>
+                      {isEventFinished && (
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleAttendance(participant.id)}
+                            className={participant.attended ? "text-green-600" : "text-gray-400"}
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      )}
                       <TableCell className="text-right">
-                        <Button variant="ghost" className="h-8 w-8 p-0" aria-label="Edit participant">
+                        <Button 
+                          variant="ghost" 
+                          className="h-8 w-8 p-0" 
+                          aria-label="Edit participant"
+                        >
                           <Edit className="h-4 w-4 text-blue-600" />
                         </Button>
                       </TableCell>

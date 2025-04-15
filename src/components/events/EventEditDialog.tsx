@@ -1,6 +1,6 @@
-
-import { useState, useEffect } from "react";
-import { Edit, X, Image as ImageIcon, Tag, Save, Mail, Table, Users } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Edit, X, Image as ImageIcon, Tag, Save, Mail, Table, Users, Upload } from "lucide-react";
+import * as XLSX from 'xlsx';
 import { 
   Dialog, 
   DialogContent, 
@@ -64,6 +64,27 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
     }
   };
 
+  const handleXlsxUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const bstr = evt.target?.result;
+      const wb = XLSX.read(bstr, { type: 'binary' });
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+      const data = XLSX.utils.sheet_to_json(ws);
+      
+      console.log("Imported data:", data);
+      toast({
+        title: "Data imported",
+        description: `Successfully imported ${data.length} records`,
+      });
+    };
+    reader.readAsBinaryString(file);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -122,6 +143,17 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-blue-700 font-medium">Event Title</Label>
+                  <Input 
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter event title..."
+                    className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="image" className="text-blue-700 font-medium">Event Image</Label>
                   <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer bg-blue-100/70">
@@ -185,14 +217,21 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-blue-700 font-medium">Event Title</Label>
-                  <Input 
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter event title..."
-                    className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
-                  />
+                  <Label htmlFor="xlsx" className="text-blue-700 font-medium">Import Invitations</Label>
+                  <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer bg-blue-100/70">
+                    <input
+                      id="xlsx"
+                      type="file"
+                      accept=".xlsx,.xls"
+                      onChange={handleXlsxUpload}
+                      className="hidden"
+                    />
+                    <label htmlFor="xlsx" className="flex flex-col items-center justify-center gap-2 h-24 cursor-pointer">
+                      <Upload className="h-8 w-8 text-blue-400" />
+                      <span className="text-blue-600 font-medium">Upload XLSX file</span>
+                      <span className="text-sm text-blue-400">Import participant data</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
