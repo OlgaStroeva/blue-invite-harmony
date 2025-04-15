@@ -64,6 +64,9 @@ const Dashboard = () => {
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isInvitationDialogOpen, setIsInvitationDialogOpen] = useState(false);
+  const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -256,12 +259,33 @@ const Dashboard = () => {
         />
 
         {currentEvent && (
-          <EventViewDialog
-            open={isViewDialogOpen}
-            onOpenChange={setIsViewDialogOpen}
-            event={currentEvent}
-            onEventUpdated={handleEventUpdated}
-          />
+          <>
+            <EventEditDialog
+              open={isEditDialogOpen}
+              onOpenChange={setIsEditDialogOpen}
+              event={currentEvent}
+              onEventUpdated={handleEventUpdated}
+            />
+            
+            <InvitationFormDialog
+              open={isInvitationDialogOpen}
+              onOpenChange={setIsInvitationDialogOpen}
+              event={currentEvent}
+            />
+
+            <EmployeeManagementDialog
+              open={isEmployeeDialogOpen}
+              onOpenChange={setIsEmployeeDialogOpen}
+              event={currentEvent}
+            />
+
+            <EventViewDialog
+              open={isViewDialogOpen}
+              onOpenChange={setIsViewDialogOpen}
+              event={currentEvent}
+              onEventUpdated={handleEventUpdated}
+            />
+          </>
         )}
       </main>
     </div>
