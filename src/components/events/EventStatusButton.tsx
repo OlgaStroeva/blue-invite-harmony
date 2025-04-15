@@ -35,6 +35,7 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
     return null;
   };
 
+  // Don't render the button if the event is finished
   if (event.status === 'finished') return null;
 
   return (
@@ -43,7 +44,6 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
         size="sm"
         onClick={() => setShowConfirmDialog(true)}
         className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs"
-        disabled={event.status === 'finished'}
       >
         {getIcon()}
         {getButtonText()}
