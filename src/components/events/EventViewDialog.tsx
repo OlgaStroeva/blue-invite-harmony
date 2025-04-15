@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Mail, Edit, Users, Table, CalendarIcon, MapPin } from "lucide-react";
@@ -8,6 +7,7 @@ import ParticipantsTable from "@/components/participants/ParticipantsTable";
 import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
 import EventEditDialog from "./EventEditDialog";
 import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface EventViewDialogProps {
   event: Event;
@@ -25,7 +25,7 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-blue-700">{event.title}</DialogTitle>
           </DialogHeader>
@@ -35,17 +35,21 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
               <img src={event.image} alt={event.title} className="w-full rounded-lg aspect-video object-cover" />
             )}
 
-            <div className="grid gap-4">
+            <div className="grid gap-6">
               <div>
                 <h3 className="font-medium text-blue-700">Category</h3>
                 <p className="mt-1">{event.category}</p>
               </div>
 
               {event.description && (
-                <div>
-                  <h3 className="font-medium text-blue-700">Description</h3>
-                  <p className="mt-1 whitespace-pre-wrap text-gray-700">{event.description}</p>
-                </div>
+                <article className="prose prose-blue max-w-none">
+                  <h3 className="font-medium text-blue-700 mb-3">Description</h3>
+                  <ScrollArea className="h-[200px] rounded-md border p-4">
+                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                      {event.description}
+                    </div>
+                  </ScrollArea>
+                </article>
               )}
 
               <div className="flex flex-col gap-2">
