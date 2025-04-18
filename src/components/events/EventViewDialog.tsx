@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Mail, Edit, Users, Table, CalendarIcon, MapPin } from "lucide-react";
@@ -44,11 +45,11 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
               {event.description && (
                 <article className="prose prose-blue max-w-none">
                   <h3 className="font-medium text-blue-700 mb-3">Description</h3>
-                  <ScrollArea className="h-[200px] rounded-md border p-4">
+                  <div className="rounded-md border p-4">
                     <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
                       {event.description}
                     </div>
-                  </ScrollArea>
+                  </div>
                 </article>
               )}
 
