@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -20,6 +21,7 @@ const events: Event[] = [
     category: "Wedding",
     image: "",
     gradient: "from-blue-100 to-blue-200",
+    status: "upcoming"
   },
   {
     id: 2,
@@ -27,6 +29,7 @@ const events: Event[] = [
     category: "Corporate",
     image: "",
     gradient: "from-blue-600 to-blue-800",
+    status: "upcoming"
   },
   {
     id: 3,
@@ -34,6 +37,7 @@ const events: Event[] = [
     category: "Birthday",
     image: "",
     gradient: "from-blue-300 to-blue-500",
+    status: "in_progress"
   },
   {
     id: 4,
@@ -41,6 +45,7 @@ const events: Event[] = [
     category: "Party",
     image: "",
     gradient: "from-blue-400 to-blue-600",
+    status: "finished"
   },
   {
     id: 5,
@@ -48,6 +53,7 @@ const events: Event[] = [
     category: "Wedding",
     image: "",
     gradient: "from-blue-200 to-blue-400",
+    status: "upcoming"
   },
   {
     id: 6,
@@ -55,6 +61,7 @@ const events: Event[] = [
     category: "Formal",
     image: "",
     gradient: "from-blue-700 to-blue-900",
+    status: "in_progress"
   },
 ];
 
