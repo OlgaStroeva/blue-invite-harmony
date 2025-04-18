@@ -3,7 +3,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Event } from "@/types/event";
-import { Play, Square } from "lucide-react";
+import { Play, Square, Check } from "lucide-react";
 
 interface EventStatusButtonProps {
   event: Event;
@@ -22,30 +22,46 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
     setShowConfirmDialog(false);
   };
 
-  const getButtonText = () => {
-    if (event.status === 'upcoming') return 'Begin';
-    if (event.status === 'in_progress') return 'Finish';
-    return '';
+  const getButtonContent = () => {
+    switch (event.status) {
+      case 'upcoming':
+        return {
+          text: 'Start',
+          icon: <Play className="h-4 w-4 mr-2" />,
+          className: "bg-green-600 hover:bg-green-700"
+        };
+      case 'in_progress':
+        return {
+          text: 'Finish',
+          icon: <Square className="h-4 w-4 mr-2" />,
+          className: "bg-blue-600 hover:bg-blue-700"
+        };
+      case 'finished':
+        return {
+          text: 'Finished',
+          icon: <Check className="h-4 w-4 mr-2" />,
+          className: "bg-gray-500 cursor-not-allowed"
+        };
+      default:
+        return null;
+    }
   };
 
-  const getIcon = () => {
-    if (event.status === 'upcoming') return <Play className="h-3 w-3" />;
-    if (event.status === 'in_progress') return <Square className="h-3 w-3" />;
-    return null;
-  };
-
-  // Don't render the button if the event is finished
-  if (event.status === 'finished') return null;
+  const buttonContent = getButtonContent();
+  
+  // If we don't have button content or the event has no status, don't render anything
+  if (!buttonContent || !event.status) return null;
 
   return (
     <>
       <Button
         size="sm"
-        onClick={() => setShowConfirmDialog(true)}
-        className="bg-blue-600/90 hover:bg-blue-600 text-white text-xs"
+        onClick={() => event.status !== 'finished' && setShowConfirmDialog(true)}
+        className={`text-white ${buttonContent.className}`}
+        disabled={event.status === 'finished'}
       >
-        {getIcon()}
-        {getButtonText()}
+        {buttonContent.icon}
+        {buttonContent.text}
       </Button>
 
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
@@ -53,7 +69,7 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Event Status Change</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to {event.status === 'upcoming' ? 'begin' : 'finish'} this event?
+              Are you sure you want to {event.status === 'upcoming' ? 'start' : 'finish'} this event?
               {event.status === 'in_progress' && " This action cannot be undone."}
             </AlertDialogDescription>
           </AlertDialogHeader>
