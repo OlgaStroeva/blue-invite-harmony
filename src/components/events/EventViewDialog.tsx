@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Mail, Edit, Users, Table, CalendarIcon, MapPin } from "lucide-react";
@@ -25,15 +26,15 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh]">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-blue-700">{event.title}</DialogTitle>
           </DialogHeader>
 
-          <ScrollArea className="pr-4">
-            <div className="space-y-6">
+          <ScrollArea className="max-h-[70vh]">
+            <div className="space-y-6 pr-4">
               {event.image && (
-                <div className="max-h-[40vh] overflow-hidden rounded-lg">
+                <div className="rounded-lg overflow-hidden">
                   <img 
                     src={event.image} 
                     alt={event.title} 
@@ -75,42 +76,42 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
                   )}
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sticky bottom-0 bg-background py-4">
-                <Button
-                  onClick={() => setShowEditDialog(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </Button>
-                
-                <Button
-                  onClick={() => setShowInvitationForm(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <Mail className="mr-2 h-4 w-4" />
-                  Invitations
-                </Button>
-                
-                <Button
-                  onClick={() => setShowParticipantsTable(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <Table className="mr-2 h-4 w-4" />
-                  Data
-                </Button>
-                
-                <Button
-                  onClick={() => setShowEmployeeManagement(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <Users className="mr-2 h-4 w-4" />
-                  Staff
-                </Button>
-              </div>
             </div>
           </ScrollArea>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t mt-4">
+            <Button
+              onClick={() => setShowEditDialog(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </Button>
+            
+            <Button
+              onClick={() => setShowInvitationForm(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              Invitations
+            </Button>
+            
+            <Button
+              onClick={() => setShowParticipantsTable(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <Table className="mr-2 h-4 w-4" />
+              Data
+            </Button>
+            
+            <Button
+              onClick={() => setShowEmployeeManagement(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <Users className="mr-2 h-4 w-4" />
+              Staff
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
