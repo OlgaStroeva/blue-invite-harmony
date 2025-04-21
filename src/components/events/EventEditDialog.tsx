@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Edit, X, Image as ImageIcon, Tag, Save, Mail, Table, Users, Upload } from "lucide-react";
 import * as XLSX from 'xlsx';
@@ -225,6 +224,19 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                     )}
                   </div>
                 </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-blue-700 font-medium">Description</Label>
+                  <Textarea 
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe your event..."
+                    className="border-blue-200 focus-visible:ring-blue-400 min-h-[300px] bg-blue-50"
+                  />
+                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="date" className="text-blue-700 font-medium">Event Date</Label>
@@ -245,19 +257,6 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
                     onChange={(e) => setPlace(e.target.value)}
                     placeholder="Enter event location..."
                     className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="description" className="text-blue-700 font-medium">Description</Label>
-                  <Textarea 
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe your event..."
-                    className="border-blue-200 focus-visible:ring-blue-400 min-h-[300px] bg-blue-50"
                   />
                 </div>
               </div>
