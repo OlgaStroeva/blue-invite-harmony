@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { ThirdPartyAuthButton } from "@/components/auth/ThirdPartyAuthButton";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useAuth } from "@/App";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");

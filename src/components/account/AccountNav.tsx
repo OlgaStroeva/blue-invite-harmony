@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { 
   Collapsible,
@@ -8,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, User, Lock, Settings, LogOut } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "@/App";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface AccountNavProps {

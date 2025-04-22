@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User, Settings, LogOut } from "lucide-react";
-import { useAuth } from "@/App";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 // Mock user data - in a real app, this would come from authentication context
