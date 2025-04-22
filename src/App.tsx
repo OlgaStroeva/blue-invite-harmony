@@ -12,6 +12,7 @@ import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import ParticipantForm from "./pages/ParticipantForm";
 import Account from "./pages/Account";
+import HowItWorksDetailed from "./pages/HowItWorksDetailed";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 // Create authentication context
@@ -51,8 +52,8 @@ const App = () => {
                 <Route path="/sign-up" element={<SignUp />} />
                 <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/sign-in" />} />
                 <Route path="/account" element={isAuthenticated ? <Account /> : <Navigate to="/sign-in" />} />
+                <Route path="/how-it-works" element={isAuthenticated ? <HowItWorksDetailed /> : <Navigate to="/sign-in" />} />
                 <Route path="/participant-form/:eventId" element={<ParticipantForm />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

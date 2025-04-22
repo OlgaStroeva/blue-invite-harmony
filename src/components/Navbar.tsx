@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,13 +6,13 @@ import { Menu, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import UserAvatar from "@/components/UserAvatar";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
-  // Mock authentication state - in a real app, this would come from an auth context
-  const isAuthenticated = true;
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -108,12 +107,32 @@ const Navbar = () => {
 
 const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const baseClasses = "transition-all duration-200 hover:text-blue-600";
   const mobileClasses = "block py-2";
   const desktopClasses = "text-sm font-medium text-gray-600";
   
   return (
     <>
+      {isAuthenticated ? (
+        <Link
+          to="/how-it-works"
+          className={`${baseClasses} ${
+            mobile ? mobileClasses : desktopClasses
+          }`}
+        >
+          {t("howItWorks")}
+        </Link>
+      ) : (
+        <Link
+          to="#how-it-works"
+          className={`${baseClasses} ${
+            mobile ? mobileClasses : desktopClasses
+          }`}
+        >
+          {t("howItWorks")}
+        </Link>
+      )}
       <Link
         to="#events"
         className={`${baseClasses} ${
@@ -121,14 +140,6 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
         }`}
       >
         {t("events")}
-      </Link>
-      <Link
-        to="#how-it-works"
-        className={`${baseClasses} ${
-          mobile ? mobileClasses : desktopClasses
-        }`}
-      >
-        {t("howItWorks")}
       </Link>
       <Link
         to="#testimonials"
