@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { User, Settings, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Mock user data - in a real app, this would come from authentication context
 const mockUser = {
@@ -26,13 +27,14 @@ const UserAvatar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   const handleLogout = () => {
     // Perform logout logic
     logout();
     toast({
-      title: "Logged out successfully",
-      description: "You have been signed out",
+      title: t("loggedOutSuccessfully"),
+      description: t("youHaveBeenSignedOut"),
     });
     navigate("/");
   };
@@ -54,7 +56,7 @@ const UserAvatar = () => {
       <HoverCardTrigger asChild>
         <button 
           className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full"
-          aria-label="User menu"
+          aria-label={t("userMenu")}
         >
           <Avatar className="h-9 w-9 cursor-pointer">
             {mockUser.avatar ? (
@@ -91,7 +93,7 @@ const UserAvatar = () => {
             onClick={goToAccount}
           >
             <Settings className="mr-2 h-4 w-4" />
-            Account Settings
+            {t("accountSettings")}
           </Button>
           <Button 
             variant="outline" 
@@ -100,7 +102,7 @@ const UserAvatar = () => {
             onClick={handleLogout}
           >
             <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
+            {t("signOut")}
           </Button>
         </div>
       </HoverCardContent>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -13,6 +12,7 @@ import EmployeeManagementDialog from "@/components/employees/EmployeeManagementD
 import EventStatusButton from "@/components/events/EventStatusButton";
 import { Event } from "@/types/event";
 import EventViewDialog from "@/components/events/EventViewDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const events: Event[] = [
   {
@@ -78,6 +78,7 @@ const Dashboard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -138,8 +139,8 @@ const Dashboard = () => {
       )
     );
     toast({
-      title: "Event Updated",
-      description: "Your event has been updated successfully!",
+      title: t("success"),
+      description: t("eventUpdated"),
     });
   };
 
@@ -151,9 +152,15 @@ const Dashboard = () => {
           : event
       )
     );
+    
+    let statusMessage = "";
+    if (newStatus === "upcoming") statusMessage = t("markedAsUpcoming");
+    else if (newStatus === "in_progress") statusMessage = t("markedAsInProgress");
+    else statusMessage = t("markedAsFinished");
+    
     toast({
-      title: "Event Status Updated",
-      description: `Event has been marked as ${newStatus.replace('_', ' ')}`,
+      title: t("eventStatusUpdated"),
+      description: statusMessage,
     });
   };
 
@@ -173,10 +180,10 @@ const Dashboard = () => {
           <Container>
             <div className="text-center mb-12">
               <h1 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">
-                Your <span className="text-gradient">Events</span>
+                {t("yourEvents")}
               </h1>
               <p className="text-blue-700 max-w-2xl mx-auto">
-                Manage your events and create new invitations
+                {t("manageEvents")}
               </p>
             </div>
 
@@ -191,7 +198,7 @@ const Dashboard = () => {
                       : "bg-white text-blue-700 hover:bg-blue-50"
                   }`}
                 >
-                  {category}
+                  {t(category.toLowerCase())}
                 </button>
               ))}
             </div>
@@ -219,7 +226,7 @@ const Dashboard = () => {
                       
                       <div className="relative z-10">
                         <span className="inline-block px-2 py-1 text-xs font-medium bg-white/80 text-blue-700 rounded-md backdrop-blur-sm">
-                          {event.category}
+                          {t(event.category.toLowerCase())}
                         </span>
                       </div>
                       
@@ -234,7 +241,7 @@ const Dashboard = () => {
                               className="bg-white/90 hover:bg-white text-blue-600 text-xs"
                               onClick={() => handleViewEvent(event)}
                             >
-                              Open
+                              {t("open")}
                             </Button>
                             <EventStatusButton 
                               event={event} 
@@ -254,7 +261,7 @@ const Dashboard = () => {
         <button
           onClick={handleAddEvent}
           className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:shadow-highlight z-20"
-          aria-label="Create new event"
+          aria-label={t("createNewEvent")}
         >
           <Plus className="w-6 h-6" />
         </button>

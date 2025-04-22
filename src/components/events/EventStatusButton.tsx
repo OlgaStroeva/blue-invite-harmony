@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Event } from "@/types/event";
 import { Play, Square, Check } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EventStatusButtonProps {
   event: Event;
@@ -12,6 +13,7 @@ interface EventStatusButtonProps {
 
 const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const { t } = useLanguage();
   
   const handleStatusChange = () => {
     if (event.status === 'upcoming') {
@@ -26,19 +28,19 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
     switch (event.status) {
       case 'upcoming':
         return {
-          text: 'Start',
+          text: t('start'),
           icon: <Play className="h-4 w-4 mr-2" />,
           className: "bg-green-600 hover:bg-green-700"
         };
       case 'in_progress':
         return {
-          text: 'Finish',
+          text: t('finish'),
           icon: <Square className="h-4 w-4 mr-2" />,
           className: "bg-blue-600 hover:bg-blue-700"
         };
       case 'finished':
         return {
-          text: 'Finished',
+          text: t('finished'),
           icon: <Check className="h-4 w-4 mr-2" />,
           className: "bg-gray-500 cursor-not-allowed"
         };
@@ -67,15 +69,15 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Event Status Change</AlertDialogTitle>
+            <AlertDialogTitle>{t("confirmEventStatusChange")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to {event.status === 'upcoming' ? 'start' : 'finish'} this event?
-              {event.status === 'in_progress' && " This action cannot be undone."}
+              {t("areYouSureStatus")} {event.status === 'upcoming' ? t('start') : t('finish')} {t("thisEvent")}
+              {event.status === 'in_progress' && ` ${t("actionCannotBeUndone")}`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStatusChange}>Confirm</AlertDialogAction>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleStatusChange}>{t("confirm")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

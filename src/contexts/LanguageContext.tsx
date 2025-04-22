@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 // Define available languages
@@ -147,6 +148,9 @@ const enTranslations: Record<string, string> = {
   "responseRate": "Response Rate",
   "viewAll": "View All",
   "noEvents": "No events yet. Create your first event!",
+  "manageEvents": "Manage your events and create new invitations",
+  "open": "Open",
+  "createNewEvent": "Create new event",
   
   // Account
   "accountSettings": "Account Settings",
@@ -185,6 +189,27 @@ const enTranslations: Record<string, string> = {
   "cancel": "Cancel",
   "save": "Save",
   "update": "Update",
+  "eventUpdated": "Your event has been updated successfully!",
+  "eventStatusUpdated": "Event Status Updated",
+  "markedAsUpcoming": "Event has been marked as upcoming",
+  "markedAsInProgress": "Event has been marked as in progress",
+  "markedAsFinished": "Event has been marked as finished",
+  
+  // Event Status Button
+  "start": "Start",
+  "finish": "Finish",
+  "finished": "Finished",
+  "confirmEventStatusChange": "Confirm Event Status Change",
+  "areYouSureStatus": "Are you sure you want to",
+  "thisEvent": "this event?",
+  "actionCannotBeUndone": "This action cannot be undone.",
+  "confirm": "Confirm",
+  
+  // User Avatar
+  "userMenu": "User menu",
+  "signOut": "Sign Out",
+  "loggedOutSuccessfully": "Logged out successfully",
+  "youHaveBeenSignedOut": "You have been signed out",
   
   // Invitation templates
   "templateApplied": "Template Applied",
@@ -320,6 +345,9 @@ const ruTranslations: Record<string, string> = {
   "responseRate": "Частота ответов",
   "viewAll": "Посмотреть все",
   "noEvents": "Пока нет событий. Создайте свое первое событие!",
+  "manageEvents": "Управляйте своими событиями и создавайте новые приглашения",
+  "open": "Открыть",
+  "createNewEvent": "Создать новое событие",
   
   // Account
   "accountSettings": "Настройки аккаунта",
@@ -358,6 +386,27 @@ const ruTranslations: Record<string, string> = {
   "cancel": "Отмена",
   "save": "Сохранить",
   "update": "Обновить",
+  "eventUpdated": "Ваше событие было успешно обновлено!",
+  "eventStatusUpdated": "Статус события обновлен",
+  "markedAsUpcoming": "Событие отмечено как предстоящее",
+  "markedAsInProgress": "Событие отмечено как в процессе",
+  "markedAsFinished": "Событие отмечено как завершенное",
+  
+  // Event Status Button
+  "start": "Начать",
+  "finish": "Завершить",
+  "finished": "Завершено",
+  "confirmEventStatusChange": "Подтвердите изменение статуса события",
+  "areYouSureStatus": "Вы уверены, что хотите",
+  "thisEvent": "это событие?",
+  "actionCannotBeUndone": "Это действие нельзя отменить.",
+  "confirm": "Подтвердить",
+  
+  // User Avatar
+  "userMenu": "Меню пользователя",
+  "signOut": "Выйти",
+  "loggedOutSuccessfully": "Выход выполнен успешно",
+  "youHaveBeenSignedOut": "Вы вышли из системы",
   
   // Invitation templates
   "templateApplied": "Шаблон применен",
