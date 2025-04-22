@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/container";
@@ -30,10 +29,8 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      // For demonstration - replace with actual auth logic
       if (email && password) {
-        // Simulate authentication
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 800));
         login();
         toast({
           title: "Signed in successfully",
@@ -56,8 +53,7 @@ const SignIn = () => {
     setError("");
     
     try {
-      // Simulate authentication
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 800));
       login();
       toast({
         title: `Signed in with ${provider}`,
