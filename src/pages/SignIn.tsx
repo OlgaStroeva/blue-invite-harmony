@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { ThirdPartyAuthButton } from "@/components/auth/ThirdPartyAuthButton";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/App";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { login } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +34,7 @@ const SignIn = () => {
       if (email && password) {
         // Simulate authentication
         await new Promise(resolve => setTimeout(resolve, 1000));
+        login();
         toast({
           title: "Signed in successfully",
           description: "Welcome back!",
@@ -55,6 +58,7 @@ const SignIn = () => {
     try {
       // Simulate authentication
       await new Promise(resolve => setTimeout(resolve, 1000));
+      login();
       toast({
         title: `Signed in with ${provider}`,
         description: "Welcome back!",

@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User, Settings, LogOut } from "lucide-react";
+import { useAuth } from "@/App";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock user data - in a real app, this would come from authentication context
 const mockUser = {
@@ -22,10 +24,17 @@ const mockUser = {
 
 const UserAvatar = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { toast } = useToast();
   
   const handleLogout = () => {
-    // In a real app, perform logout logic here
-    navigate("/sign-in");
+    // Perform logout logic
+    logout();
+    toast({
+      title: "Logged out successfully",
+      description: "You have been signed out",
+    });
+    navigate("/");
   };
   
   const goToAccount = () => {

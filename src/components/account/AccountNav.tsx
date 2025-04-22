@@ -8,6 +8,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, User, Lock, Settings, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/App";
+import { useToast } from "@/hooks/use-toast";
 
 interface AccountNavProps {
   activeTab: string;
@@ -17,10 +19,16 @@ interface AccountNavProps {
 const AccountNav = ({ activeTab, onTabChange }: AccountNavProps) => {
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { toast } = useToast();
 
   const handleLogout = () => {
-    // In a real app, perform logout logic here
-    navigate("/sign-in");
+    logout();
+    toast({
+      title: "Logged out successfully",
+      description: "You have been signed out",
+    });
+    navigate("/");
   };
 
   return (
