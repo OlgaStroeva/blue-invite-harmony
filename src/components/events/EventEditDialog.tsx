@@ -24,6 +24,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/contexts/LanguageContext";
+import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
+import ParticipantsTable from "@/components/participants/ParticipantsTable";
+import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
 
 interface Event {
   id: number;
@@ -64,6 +68,7 @@ const EventEditDialog = ({
   const [showEmployeeManagement, setShowEmployeeManagement] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     setTitle(event.title);
