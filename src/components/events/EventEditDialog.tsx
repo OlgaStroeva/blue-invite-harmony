@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { Edit, X, Image as ImageIcon, Tag, Save, Mail, Table, Users, Upload } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Edit, X, Image as ImageIcon, Tag, Save, Mail, Table, Users, Upload, Trash2 } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { 
   Dialog, 
@@ -14,9 +14,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
-import ParticipantsTable from "@/components/participants/ParticipantsTable";
-import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Event {
   id: number;
@@ -35,9 +42,16 @@ interface EventEditDialogProps {
   onOpenChange: (open: boolean) => void;
   event: Event;
   onEventUpdated: (event: Event) => void;
+  onEventDeleted?: (event: Event) => void;
 }
 
-const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEditDialogProps) => {
+const EventEditDialog = ({ 
+  open, 
+  onOpenChange, 
+  event, 
+  onEventUpdated,
+  onEventDeleted 
+}: EventEditDialogProps) => {
   const [title, setTitle] = useState(event.title);
   const [description, setDescription] = useState(event.description || "");
   const [category, setCategory] = useState(event.category);
@@ -48,6 +62,7 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
   const [showInvitationForm, setShowInvitationForm] = useState(false);
   const [showParticipantsTable, setShowParticipantsTable] = useState(false);
   const [showEmployeeManagement, setShowEmployeeManagement] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -132,6 +147,14 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
   const handleOpenEmployeeManagement = () => {
     setShowEmployeeManagement(true);
     onOpenChange(false);
+  };
+
+  const handleDelete = () => {
+    if (onEventDeleted) {
+      onEventDeleted(event);
+      onOpenChange(false);
+    }
+    setShowDeleteConfirm(false);
   };
 
   const categories = ["Wedding", "Birthday", "Corporate", "Party", "Formal"];
@@ -263,25 +286,55 @@ const EventEditDialog = ({ open, onOpenChange, event, onEventUpdated }: EventEdi
             </div>
             
             <DialogFooter className="gap-2 pt-4 border-t border-blue-200">
-              <Button 
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="border-blue-200 bg-blue-50 hover:bg-blue-100"
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                Save Changes
-              </Button>
+              <div className="flex items-center gap-2 w-full justify-between">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="h-9 w-9 text-red-500 hover:text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={() => onOpenChange(false)}
+                    className="border-blue-200 bg-blue-50 hover:bg-blue-100"
+                  >
+                    {t("cancel")}
+                  </Button>
+                  <Button 
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    {t("saveChanges")}
+                  </Button>
+                </div>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("deleteEvent")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("confirmDelete")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t("deleteEvent")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {showInvitationForm && (
         <InvitationFormDialog
