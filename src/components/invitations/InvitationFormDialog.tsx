@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Save } from "lucide-react";
+import { Mail, Save, FileDown, UserPlus, Edit } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Event } from "@/types/event";
 import { FormField } from "@/types/form";
@@ -19,31 +18,6 @@ import { Template } from "@/types/template";
 import FormFieldList from "./FormFieldList";
 import AddFieldForm from "./AddFieldForm";
 import TemplateSelector from "./TemplateSelector";
-
-// Mock templates
-const mockTemplates: Template[] = [
-  {
-    id: 1,
-    name: "Wedding Guest Info",
-    eventId: 1,
-    fields: [
-      { id: "email", name: "Email", type: "email", required: true },
-      { id: "name", name: "Full Name", type: "text", required: true },
-      { id: "dietary", name: "Dietary Restrictions", type: "text", required: false },
-    ]
-  },
-  {
-    id: 2,
-    name: "Corporate RSVP",
-    eventId: 2,
-    fields: [
-      { id: "email", name: "Email", type: "email", required: true },
-      { id: "name", name: "Full Name", type: "text", required: true },
-      { id: "company", name: "Company", type: "text", required: true },
-      { id: "position", name: "Position", type: "text", required: false },
-    ]
-  }
-];
 
 interface InvitationFormDialogProps {
   open: boolean;
@@ -59,8 +33,36 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
   ]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [templates, setTemplates] = useState<Template[]>(mockTemplates);
+  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  const handleSaveAsFile = () => {
+    if (!selectedTemplate) return;
+    
+    const templateData = JSON.stringify(selectedTemplate, null, 2);
+    const blob = new Blob([templateData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedTemplate.name}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: t("templateSaved"),
+      description: t("templateSavedToFile"),
+    });
+  };
+
+  const handleAddParticipant = () => {
+    if (!selectedTemplate) return;
+    navigate(`/participant-form/${event.id}`);
+    onOpenChange(false);
+    if (onClose) onClose();
+  };
 
   const handleAddField = (field: FormField) => {
     setFormFields([...formFields, field]);
@@ -105,6 +107,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
         fields: [...formFields]
       };
       setTemplates([...templates, newTemplate]);
+      setSelectedTemplate(newTemplate);
     }
     
     onOpenChange(false);
@@ -112,6 +115,64 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
     
     navigate(`/participant-form/${event.id}`);
   };
+
+  if (selectedTemplate && !isEditing) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto bg-blue-50 border-blue-200">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-blue-700">
+              <Mail className="h-5 w-5" />
+              {t("templatePreview")} - {selectedTemplate.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            <FormFieldList formFields={selectedTemplate.fields} readOnly />
+          </div>
+
+          <DialogFooter className="gap-2 pt-4 border-t border-blue-200">
+            <div className="flex items-center gap-2 w-full justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="border-blue-200 bg-blue-50 hover:bg-blue-100"
+              >
+                {t("close")}
+              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  {t("edit")}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleAddParticipant}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {t("addParticipant")}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSaveAsFile}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <FileDown className="mr-2 h-4 w-4" />
+                  {t("saveAsFile")}
+                </Button>
+              </div>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -145,10 +206,8 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
             </div>
           </div>
 
-          {/* Fields List */}
           <FormFieldList formFields={formFields} setFormFields={setFormFields} />
 
-          {/* Add New Field */}
           <AddFieldForm onAddField={handleAddField} />
         </div>
 
