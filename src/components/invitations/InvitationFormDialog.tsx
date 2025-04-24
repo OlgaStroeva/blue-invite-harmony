@@ -32,7 +32,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
     { id: "email", name: "Email", type: "email", required: true }
   ]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-  const [templates, setTemplates] = useState<Template[]>(mockTemplates);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
