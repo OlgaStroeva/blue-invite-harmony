@@ -1,7 +1,6 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Mail, Edit, Users, Table, CalendarIcon, MapPin } from "lucide-react";
+import { Mail, Edit, Users, Table, CalendarIcon, MapPin, Trash2 } from "lucide-react";
 import { Event } from "@/types/event";
 import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
 import ParticipantsTable from "@/components/participants/ParticipantsTable";
@@ -9,19 +8,47 @@ import EmployeeManagementDialog from "@/components/employees/EmployeeManagementD
 import EventEditDialog from "./EventEditDialog";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface EventViewDialogProps {
   event: Event;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEventUpdated: (event: Event) => void;
+  onEventDeleted?: (event: Event) => void;
 }
 
-const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventViewDialogProps) => {
+const EventViewDialog = ({ 
+  event, 
+  open, 
+  onOpenChange, 
+  onEventUpdated,
+  onEventDeleted 
+}: EventViewDialogProps) => {
   const [showInvitationForm, setShowInvitationForm] = useState(false);
   const [showParticipantsTable, setShowParticipantsTable] = useState(false);
   const [showEmployeeManagement, setShowEmployeeManagement] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { t } = useLanguage();
+
+  const handleDelete = () => {
+    if (onEventDeleted) {
+      onEventDeleted(event);
+      onOpenChange(false);
+    }
+    setShowDeleteConfirm(false);
+  };
 
   return (
     <>
@@ -45,13 +72,13 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
 
               <div className="grid gap-6">
                 <div>
-                  <h3 className="font-medium text-blue-700">Category</h3>
+                  <h3 className="font-medium text-blue-700">{t("category")}</h3>
                   <p className="mt-1">{event.category}</p>
                 </div>
 
                 {event.description && (
                   <article className="prose prose-blue max-w-none">
-                    <h3 className="font-medium text-blue-700 mb-3">Description</h3>
+                    <h3 className="font-medium text-blue-700 mb-3">{t("eventDescription")}</h3>
                     <div className="rounded-md border p-4">
                       <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
                         {event.description}
@@ -79,13 +106,13 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
             </div>
           </ScrollArea>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-4 border-t mt-4">
             <Button
               onClick={() => setShowEditDialog(true)}
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Edit className="mr-2 h-4 w-4" />
-              Edit
+              {t("editEvent")}
             </Button>
             
             <Button
@@ -93,7 +120,7 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Mail className="mr-2 h-4 w-4" />
-              Invitations
+              {t("invitations")}
             </Button>
             
             <Button
@@ -101,7 +128,7 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Table className="mr-2 h-4 w-4" />
-              Data
+              {t("participants")}
             </Button>
             
             <Button
@@ -109,11 +136,37 @@ const EventViewDialog = ({ event, open, onOpenChange, onEventUpdated }: EventVie
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Users className="mr-2 h-4 w-4" />
-              Staff
+              {t("participants")}
+            </Button>
+
+            <Button
+              onClick={() => setShowDeleteConfirm(true)}
+              variant="destructive"
+              className="w-full"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {t("deleteEvent")}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("deleteEvent")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("confirmDelete")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t("deleteEvent")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {showEditDialog && (
         <EventEditDialog
