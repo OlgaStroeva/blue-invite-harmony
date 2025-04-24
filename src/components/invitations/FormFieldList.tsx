@@ -1,3 +1,4 @@
+
 import { FormField } from "@/types/form";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -54,7 +55,6 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
               <h4 className="font-medium text-blue-700">{field.name}</h4>
               <p className="text-sm text-blue-600">
                 {t("type")}: {field.type}
-                {field.required && ` • ${t("required")}`}
               </p>
             </div>
             {!readOnly && setFormFields && (

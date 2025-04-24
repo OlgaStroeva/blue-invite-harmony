@@ -41,7 +41,8 @@ const AddFieldForm = ({ onAddField }: AddFieldFormProps) => {
     }
 
     const fieldId = newField.name.toLowerCase().replace(/\s+/g, '_');
-    onAddField({ ...newField, id: fieldId });
+    // Always set required to false since we removed the checkbox
+    onAddField({ ...newField, id: fieldId, required: false });
     
     // Reset form
     setNewField({
@@ -55,7 +56,7 @@ const AddFieldForm = ({ onAddField }: AddFieldFormProps) => {
   return (
     <div className="space-y-4 border border-blue-200 rounded-md p-4 bg-blue-100/50">
       <h4 className="font-medium text-blue-700">{t("addNewField")}</h4>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="newFieldName" className="text-sm text-blue-700">{t("fieldName")}</Label>
           <Input
@@ -81,28 +82,16 @@ const AddFieldForm = ({ onAddField }: AddFieldFormProps) => {
             ))}
           </select>
         </div>
-        <div className="flex items-end gap-2">
-          <div className="flex items-center h-10 gap-2">
-            <input
-              type="checkbox"
-              id="newFieldRequired"
-              checked={newField.required}
-              onChange={(e) => setNewField({...newField, required: e.target.checked})}
-              className="rounded border-blue-300"
-            />
-            <Label htmlFor="newFieldRequired" className="text-sm text-blue-700">
-              {t("required")}
-            </Label>
-          </div>
-          <Button
-            type="button"
-            onClick={handleAddField}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            {t("addField")}
-          </Button>
-        </div>
+      </div>
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          onClick={handleAddField}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          {t("addField")}
+        </Button>
       </div>
     </div>
   );
