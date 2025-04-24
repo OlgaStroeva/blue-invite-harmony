@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Dialog, 
@@ -36,6 +37,20 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  // Effect to check for existing templates for this event
+  useEffect(() => {
+    // In a real application, this would be a database query
+    // For now, we'll check the templates state for any template with this event's ID
+    const eventTemplate = templates.find(template => template.eventId === event.id);
+    if (eventTemplate) {
+      setSelectedTemplate(eventTemplate);
+      setFormFields(eventTemplate.fields);
+    } else {
+      setSelectedTemplate(null);
+      setIsEditing(true);
+    }
+  }, [event.id, templates]);
 
   const handleSaveAsFile = () => {
     if (!selectedTemplate) return;
@@ -86,6 +101,8 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
     };
 
     setTemplates([...templates, newTemplate]);
+    setSelectedTemplate(newTemplate);
+    setIsEditing(false);
     
     toast({
       title: t("templateSaved"),
@@ -96,6 +113,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
   const handleApplyTemplate = (template: Template) => {
     setFormFields([...template.fields]);
     setSelectedTemplate(template);
+    setIsEditing(false);
   };
 
   const handleCreateForm = () => {
