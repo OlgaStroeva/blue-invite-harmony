@@ -19,6 +19,7 @@ import { Template } from "@/types/template";
 import FormFieldList from "./FormFieldList";
 import AddFieldForm from "./AddFieldForm";
 import TemplateSelector from "./TemplateSelector";
+import * as XLSX from 'xlsx';
 
 interface InvitationFormDialogProps {
   open: boolean;
@@ -34,6 +35,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
   ]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [isEditMode, setIsEditMode] = useState(true);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -56,16 +58,12 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
 
     setTemplates([...templates, newTemplate]);
     setSelectedTemplate(newTemplate);
+    setIsEditMode(false);
     
     toast({
       title: t("templateSaved"),
       description: t("templateSavedSuccess"),
     });
-
-    // Navigate to the participant form
-    navigate(`/participant-form/${event.id}`);
-    onOpenChange(false);
-    if (onClose) onClose();
   };
 
   const handleAddField = (field: FormField) => {
@@ -76,6 +74,60 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
     setFormFields([...template.fields]);
     setSelectedTemplate(template);
   };
+
+  const handleExportToXLSX = () => {
+    const worksheet = XLSX.utils.json_to_sheet([]);
+    const headers = selectedTemplate?.fields.map(field => field.name) || [];
+    XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: 'A1' });
+    
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Participants');
+    
+    XLSX.writeFile(workbook, `${event.title}-participants.xlsx`);
+  };
+
+  if (!isEditMode && selectedTemplate) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-3xl bg-blue-50 border-blue-200">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-blue-700">
+              <Mail className="h-5 w-5" />
+              {t("invitationPreview")}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            <FormFieldList formFields={selectedTemplate.fields} readOnly />
+            
+            <div className="flex justify-end gap-3 pt-4 border-t border-blue-200">
+              <Button
+                onClick={() => setIsEditMode(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                {t("editForm")}
+              </Button>
+              <Button
+                onClick={() => navigate(`/participant-form/${event.id}`)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                {t("addParticipant")}
+              </Button>
+              <Button
+                onClick={handleExportToXLSX}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <FileDown className="mr-2 h-4 w-4" />
+                {t("exportToExcel")}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -91,43 +143,18 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium text-blue-800">{t("formFields")}</h3>
-            <div className="flex items-center gap-2">
-              <TemplateSelector 
-                templates={templates}
-                onApplyTemplate={handleApplyTemplate}
-              />
-            </div>
-          </div>
-
           <FormFieldList formFields={formFields} setFormFields={setFormFields} />
-
           <AddFieldForm onAddField={handleAddField} />
         </div>
 
-        <DialogFooter className="gap-2 pt-4 border-t border-blue-200">
-          <div className="flex items-center w-full justify-between">
-            <Button 
-              type="button"
-              variant="outline"
-              onClick={() => {
-                onOpenChange(false);
-                if (onClose) onClose();
-              }}
-              className="border-blue-200 bg-blue-50 hover:bg-blue-100"
-            >
-              {t("close")}
-            </Button>
-            <Button 
-              type="button" 
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={handleSaveTemplate}
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {t("save")}
-            </Button>
-          </div>
+        <DialogFooter className="pt-4 border-t border-blue-200">
+          <Button 
+            onClick={handleSaveTemplate}
+            className="bg-blue-600 hover:bg-blue-700 ml-auto"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {t("save")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
