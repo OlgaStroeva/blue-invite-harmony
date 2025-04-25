@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -114,27 +115,16 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
   
   return (
     <>
-      {isAuthenticated ? (
-        <Link
-          to="/how-it-works"
-          className={`${baseClasses} ${
-            mobile ? mobileClasses : desktopClasses
-          }`}
-        >
-          {t("howItWorks")}
-        </Link>
-      ) : (
-        <Link
-          to="#how-it-works"
-          className={`${baseClasses} ${
-            mobile ? mobileClasses : desktopClasses
-          }`}
-        >
-          {t("howItWorks")}
-        </Link>
-      )}
       <Link
-        to="#events"
+        to={isAuthenticated ? "/how-it-works" : "#how-it-works"}
+        className={`${baseClasses} ${
+          mobile ? mobileClasses : desktopClasses
+        }`}
+      >
+        {t("howItWorks")}
+      </Link>
+      <Link
+        to={isAuthenticated ? "/dashboard" : "#events"}
         className={`${baseClasses} ${
           mobile ? mobileClasses : desktopClasses
         }`}
