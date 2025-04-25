@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Input } from "@/components/ui/input";
-import { Edit, Check } from "lucide-react";
+import { Edit, Check, FileType } from "lucide-react";
 
 interface FormFieldListProps {
   formFields: FormField[];
@@ -17,6 +17,7 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState<string>("");
+  const [editedType, setEditedType] = useState<"text" | "email" | "tel" | "number" | "date">("text");
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedIndex(index);
@@ -44,9 +45,10 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
   const startEditing = (index: number) => {
     setEditingFieldIndex(index);
     setEditedName(formFields[index].name);
+    setEditedType(formFields[index].type);
   };
 
-  const saveFieldName = () => {
+  const saveFieldEdit = () => {
     if (editingFieldIndex === null) return;
     
     // Only update if there's actually a name entered
@@ -54,13 +56,22 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
       const updatedFields = [...formFields];
       updatedFields[editingFieldIndex] = {
         ...updatedFields[editingFieldIndex],
-        name: editedName
+        name: editedName,
+        type: editedType
       };
       setFormFields?.(updatedFields);
     }
     
     setEditingFieldIndex(null);
   };
+
+  const fieldTypes = [
+    { value: "text", label: t("text") },
+    { value: "email", label: t("email") },
+    { value: "tel", label: t("phone") },
+    { value: "number", label: t("number") },
+    { value: "date", label: t("date") }
+  ];
 
   return (
     <div className="space-y-4">
@@ -78,23 +89,39 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
           <div className="flex items-center justify-between">
             <div className="flex-1">
               {!readOnly && editingFieldIndex === index ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                    className="border-blue-200"
-                    autoFocus
-                    onKeyDown={(e) => e.key === 'Enter' && saveFieldName()}
-                  />
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={saveFieldName}
-                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={editedName}
+                      onChange={(e) => setEditedName(e.target.value)}
+                      className="border-blue-200"
+                      autoFocus
+                      onKeyDown={(e) => e.key === 'Enter' && saveFieldEdit()}
+                      placeholder={t("fieldNamePlaceholder")}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={editedType}
+                      onChange={(e) => setEditedType(e.target.value as "text" | "email" | "tel" | "number" | "date")}
+                      className="w-full rounded-md border border-blue-200 px-3 py-2 text-sm bg-white focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    >
+                      {fieldTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={saveFieldEdit}
+                      className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
