@@ -380,7 +380,7 @@ const ruTranslations: Record<string, string> = {
   "notAttending": "Не посетят",
   "pending": "Ожидается",
   "sendInvitation": "Отправить приглашение",
-  "editEvent": "Редактировать событие",
+  "editEvent": "Редактировать",
   "deleteEvent": "Удалить событие",
   "confirmDelete": "Вы уверены, что хотите удалить это событие?",
   "cancel": "Отмена",
