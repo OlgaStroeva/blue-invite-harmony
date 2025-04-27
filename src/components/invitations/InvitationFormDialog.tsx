@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Save, FileDown, UserPlus, Edit, Trash2 } from "lucide-react";
+import { Mail, Save, FileDown, UserPlus, Edit, Trash2, FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Event } from "@/types/event";
 import { FormField } from "@/types/form";
@@ -83,6 +83,10 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
   const handleApplyTemplate = (template: Template) => {
     setFormFields([...template.fields]);
     setSelectedTemplate(template);
+    toast({
+      title: t("templateApplied"),
+      description: `${t("theTemplate")} "${template.name}" ${t("hasBeenApplied")}.`,
+    });
   };
 
   const handleExportToXLSX = () => {
@@ -196,6 +200,9 @@ const InvitationFormDialog = ({ open, onOpenChange, event, onClose }: Invitation
         </DialogHeader>
 
         <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <TemplateSelector templates={templates} onApplyTemplate={handleApplyTemplate} />
+          </div>
           <FormFieldList formFields={formFields} setFormFields={setFormFields} />
           <AddFieldForm onAddField={handleAddField} />
         </div>
