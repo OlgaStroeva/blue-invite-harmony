@@ -20,6 +20,9 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
   const [editedType, setEditedType] = useState<"text" | "email" | "tel" | "number" | "date">("text");
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
+    // Prevent dragging the email field
+    if (index === 0) return;
+    
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', index.toString());
@@ -31,8 +34,11 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
 
   const handleDrop = (e: React.DragEvent, targetIndex: number) => {
     e.preventDefault();
+    // Prevent dropping on or before the email field
+    if (targetIndex === 0) return;
+    
     const sourceIndex = Number(e.dataTransfer.getData('text/plain'));
-    if (sourceIndex === targetIndex) return;
+    if (sourceIndex === targetIndex || sourceIndex === 0) return;
 
     const newFields = [...formFields];
     const [draggedField] = newFields.splice(sourceIndex, 1);
@@ -43,6 +49,9 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
   };
 
   const startEditing = (index: number) => {
+    // Prevent editing the email field
+    if (index === 0) return;
+    
     setEditingFieldIndex(index);
     setEditedName(formFields[index].name);
     setEditedType(formFields[index].type);
@@ -79,9 +88,9 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
         <div
           key={field.id}
           className={`p-4 bg-white rounded-lg border ${
-            readOnly ? 'border-blue-100' : 'border-blue-200 cursor-move'
+            readOnly ? 'border-blue-100' : index === 0 ? 'border-blue-300' : 'border-blue-200 cursor-move'
           } ${draggedIndex === index ? 'opacity-50' : ''}`}
-          draggable={!readOnly}
+          draggable={!readOnly && index !== 0}
           onDragStart={!readOnly ? (e) => handleDragStart(e, index) : undefined}
           onDragOver={!readOnly ? handleDragOver : undefined}
           onDrop={!readOnly ? (e) => handleDrop(e, index) : undefined}
@@ -126,7 +135,7 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
               ) : (
                 <div className="flex items-center gap-2">
                   <h4 className="font-medium text-blue-700">{field.name}</h4>
-                  {!readOnly && setFormFields && (
+                  {!readOnly && setFormFields && index !== 0 && (
                     <Button
                       type="button"
                       size="sm"
@@ -143,7 +152,7 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
                 {t("type")}: {field.type}
               </p>
             </div>
-            {!readOnly && setFormFields && (
+            {!readOnly && setFormFields && index !== 0 && (
               <Button
                 type="button"
                 variant="ghost"
