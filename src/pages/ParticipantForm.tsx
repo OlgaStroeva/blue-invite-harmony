@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -35,19 +34,46 @@ const mockFormTemplates = [
     id: 1,
     eventId: 1,
     fields: [
-      { id: "email", name: "email", type: "email" as const, required: true },
-      { id: "name", name: "fullName", type: "text" as const, required: true },
-      { id: "dietary", name: "dietary", type: "text" as const, required: false },
+      { id: "email", name: "Email", type: "email" as const, required: true },
+      { id: "name", name: "Full Name", type: "text" as const, required: true },
+      { id: "dietary", name: "Dietary Requirements", type: "text" as const, required: false },
+      { id: "plus_one", name: "Plus One Name", type: "text" as const, required: false },
+      { id: "attendance", name: "Attending", type: "text" as const, required: true },
     ]
   },
   {
     id: 2,
     eventId: 2,
     fields: [
-      { id: "email", name: "email", type: "email" as const, required: true },
-      { id: "name", name: "fullName", type: "text" as const, required: true },
-      { id: "company", name: "company", type: "text" as const, required: true },
-      { id: "position", name: "position", type: "text" as const, required: false },
+      { id: "email", name: "Email", type: "email" as const, required: true },
+      { id: "name", name: "Full Name", type: "text" as const, required: true },
+      { id: "company", name: "Company", type: "text" as const, required: true },
+      { id: "position", name: "Position", type: "text" as const, required: false },
+      { id: "device", name: "Device Requirements", type: "text" as const, required: false },
+      { id: "workshop", name: "Workshop Selection", type: "text" as const, required: true },
+    ]
+  },
+  {
+    id: 3,
+    eventId: 1,
+    fields: [
+      { id: "email", name: "Email", type: "email" as const, required: true },
+      { id: "name", name: "Full Name", type: "text" as const, required: true },
+      { id: "phone", name: "Phone Number", type: "tel" as const, required: true },
+      { id: "dress_code", name: "Dress Size", type: "text" as const, required: false },
+      { id: "dance", name: "Dance Preferences", type: "text" as const, required: false },
+    ]
+  },
+  {
+    id: 4,
+    eventId: 2,
+    fields: [
+      { id: "email", name: "Email", type: "email" as const, required: true },
+      { id: "name", name: "Full Name", type: "text" as const, required: true },
+      { id: "job_title", name: "Job Title", type: "text" as const, required: true },
+      { id: "experience", name: "Years of Experience", type: "number" as const, required: true },
+      { id: "skills", name: "Technical Skills", type: "text" as const, required: true },
+      { id: "session", name: "Preferred Session", type: "text" as const, required: true },
     ]
   }
 ];
