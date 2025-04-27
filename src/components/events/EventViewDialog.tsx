@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Mail, Edit, Users, Table, CalendarIcon, MapPin } from "lucide-react";
@@ -6,7 +7,7 @@ import InvitationFormDialog from "@/components/invitations/InvitationFormDialog"
 import ParticipantsTable from "@/components/participants/ParticipantsTable";
 import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
 import EventEditDialog from "./EventEditDialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -29,23 +30,34 @@ const EventViewDialog = ({
   const [showParticipantsTable, setShowParticipantsTable] = useState(false);
   const [showEmployeeManagement, setShowEmployeeManagement] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<Event>(event);
   const { t } = useLanguage();
+  
+  // Update the local event state whenever the prop changes
+  useEffect(() => {
+    setCurrentEvent(event);
+  }, [event]);
+
+  const handleEventUpdated = (updatedEvent: Event) => {
+    setCurrentEvent(updatedEvent);
+    onEventUpdated(updatedEvent);
+  };
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-blue-700">{event.title}</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-blue-700">{currentEvent.title}</DialogTitle>
           </DialogHeader>
 
           <ScrollArea className="max-h-[70vh]">
             <div className="space-y-6 pr-4">
-              {event.image && (
+              {currentEvent.image && (
                 <div className="rounded-lg overflow-hidden">
                   <img 
-                    src={event.image} 
-                    alt={event.title} 
+                    src={currentEvent.image} 
+                    alt={currentEvent.title} 
                     className="w-full object-cover"
                   />
                 </div>
@@ -54,32 +66,32 @@ const EventViewDialog = ({
               <div className="grid gap-6">
                 <div>
                   <h3 className="font-medium text-blue-700">{t("category")}</h3>
-                  <p className="mt-1">{event.category}</p>
+                  <p className="mt-1">{currentEvent.category}</p>
                 </div>
 
-                {event.description && (
+                {currentEvent.description && (
                   <article className="prose prose-blue max-w-none">
                     <h3 className="font-medium text-blue-700 mb-3">{t("eventDescription")}</h3>
                     <div className="rounded-md border p-4">
                       <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                        {event.description}
+                        {currentEvent.description}
                       </div>
                     </div>
                   </article>
                 )}
 
                 <div className="flex flex-col gap-2">
-                  {event.date && (
+                  {currentEvent.date && (
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="h-4 w-4 text-blue-600" />
-                      <span>{new Date(event.date).toLocaleString()}</span>
+                      <span>{new Date(currentEvent.date).toLocaleString()}</span>
                     </div>
                   )}
 
-                  {event.place && (
+                  {currentEvent.place && (
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-blue-600" />
-                      <span>{event.place}</span>
+                      <span>{currentEvent.place}</span>
                     </div>
                   )}
                 </div>
@@ -130,8 +142,8 @@ const EventViewDialog = ({
             setShowEditDialog(open);
             if (!open) onOpenChange(true);
           }}
-          event={event}
-          onEventUpdated={onEventUpdated}
+          event={currentEvent}
+          onEventUpdated={handleEventUpdated}
           onEventDeleted={onEventDeleted}
         />
       )}
@@ -143,7 +155,7 @@ const EventViewDialog = ({
             setShowInvitationForm(open);
             if (!open) onOpenChange(true);
           }}
-          event={event}
+          event={currentEvent}
         />
       )}
 
@@ -154,7 +166,7 @@ const EventViewDialog = ({
             setShowParticipantsTable(open);
             if (!open) onOpenChange(true);
           }}
-          event={event}
+          event={currentEvent}
         />
       )}
 
@@ -165,7 +177,7 @@ const EventViewDialog = ({
             setShowEmployeeManagement(open);
             if (!open) onOpenChange(true);
           }}
-          event={event}
+          event={currentEvent}
         />
       )}
     </>
