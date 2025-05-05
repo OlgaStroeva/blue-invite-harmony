@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (!email.endsWith("@gmail.com")) {
       return { 
         success: false, 
-        message: "Only gmail.com email addresses are allowed" 
+        message: "Invalid email" 
       };
     }
     
