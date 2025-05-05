@@ -10,6 +10,7 @@ import EventEditDialog from "./EventEditDialog";
 import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface EventViewDialogProps {
   event: Event;
@@ -32,6 +33,7 @@ const EventViewDialog = ({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event>(event);
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   
   // Update the local event state whenever the prop changes
   useEffect(() => {
@@ -100,21 +102,25 @@ const EventViewDialog = ({
           </ScrollArea>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t mt-4">
-            <Button
-              onClick={() => setShowEditDialog(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              {t("editEvent")}
-            </Button>
+            {isAuthenticated && (
+              <Button
+                onClick={() => setShowEditDialog(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                {t("editEvent")}
+              </Button>
+            )}
             
-            <Button
-              onClick={() => setShowInvitationForm(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              {t("invitations")}
-            </Button>
+            {isAuthenticated && (
+              <Button
+                onClick={() => setShowInvitationForm(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                {t("invitations")}
+              </Button>
+            )}
             
             <Button
               onClick={() => setShowParticipantsTable(true)}
@@ -124,13 +130,15 @@ const EventViewDialog = ({
               {t("participants")}
             </Button>
             
-            <Button
-              onClick={() => setShowEmployeeManagement(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-            >
-              <Users className="mr-2 h-4 w-4" />
-              {t("participants")}
-            </Button>
+            {isAuthenticated && (
+              <Button
+                onClick={() => setShowEmployeeManagement(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                <Users className="mr-2 h-4 w-4" />
+                {t("employees")}
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>

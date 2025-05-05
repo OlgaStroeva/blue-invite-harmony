@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, FileDown, UserPlus, Edit, Trash2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Event } from "@/types/event";
 import { Template } from "@/types/template";
 import FormFieldList from "./FormFieldList";
@@ -46,6 +47,7 @@ const InvitationFormPreview = ({
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
 
   const handleExportToXLSX = () => {
     const worksheet = XLSX.utils.json_to_sheet([]);
@@ -56,7 +58,15 @@ const InvitationFormPreview = ({
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Participants');
     
     XLSX.writeFile(workbook, `${event.title}-participants.xlsx`);
+    
+    toast({
+      title: t("fileExported"),
+      description: t("downloadStarted"),
+    });
   };
+
+  // Only show employer-specific features if authenticated
+  const showEmployerFeatures = isAuthenticated;
 
   return (
     <>
@@ -96,22 +106,28 @@ const InvitationFormPreview = ({
             <FormFieldList formFields={selectedTemplate.fields} readOnly />
             
             <div className="flex justify-between gap-3 pt-4 border-t border-blue-200">
-              <Button
-                onClick={() => setShowDeleteAlert(true)}
-                variant="destructive"
-                className="bg-[#ea384c] hover:bg-[#ea384c]/90"
-              >
-                <Trash2 className="h-4 w-4 text-white" />
-                <span className="ml-2">{t("deleteForm")}</span>
-              </Button>
-              <div className="flex gap-3">
+              {showEmployerFeatures && (
                 <Button
-                  onClick={onEditMode}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() => setShowDeleteAlert(true)}
+                  variant="destructive"
+                  className="bg-[#ea384c] hover:bg-[#ea384c]/90"
                 >
-                  <Edit className="mr-2 h-4 w-4" />
-                  {t("editForm")}
+                  <Trash2 className="h-4 w-4 text-white" />
+                  <span className="ml-2">{t("deleteForm")}</span>
                 </Button>
+              )}
+              
+              <div className="flex gap-3 ml-auto">
+                {showEmployerFeatures && (
+                  <Button
+                    onClick={onEditMode}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    {t("editForm")}
+                  </Button>
+                )}
+                
                 <Button
                   onClick={() => navigate(`/participant-form/${event.id}`)}
                   className="bg-blue-600 hover:bg-blue-700"
@@ -119,13 +135,16 @@ const InvitationFormPreview = ({
                   <UserPlus className="mr-2 h-4 w-4" />
                   {t("addParticipant")}
                 </Button>
-                <Button
-                  onClick={handleExportToXLSX}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <FileDown className="mr-2 h-4 w-4" />
-                  {t("exportToExcel")}
-                </Button>
+                
+                {showEmployerFeatures && (
+                  <Button
+                    onClick={handleExportToXLSX}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <FileDown className="mr-2 h-4 w-4" />
+                    {t("exportToExcel")}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

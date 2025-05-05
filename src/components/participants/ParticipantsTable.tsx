@@ -1,9 +1,12 @@
+
 import { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Edit, Table as TableIcon, Mail, Check, X, Upload } from "lucide-react";
+import { Edit, Table as TableIcon, Mail, Check, X, Upload, Download, FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import * as XLSX from 'xlsx';
 
 interface Participant {
@@ -42,6 +45,8 @@ interface ParticipantsTableProps {
 
 const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
 
   const [participants, setParticipants] = useState<Participant[]>([
     {
@@ -77,14 +82,25 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     setParticipants(prev => 
       prev.map(p => 
         p.id === participantId 
-          ? { ...p, invitationSent: true }
+          ? { ...p, invitationSent: !p.invitationSent }
           : p
       )
     );
-    toast({
-      title: "Invitation Sent",
-      description: "The participant has been notified via email",
-    });
+    
+    const participant = participants.find(p => p.id === participantId);
+    if (participant) {
+      if (!participant.invitationSent) {
+        toast({
+          title: t("invitationSent"),
+          description: t("participantNotified"),
+        });
+      } else {
+        toast({
+          title: t("invitationCanceled"),
+          description: t("participantRemovedNotification"),
+        });
+      }
+    }
   };
 
   const handleToggleAttendance = (participantId: number) => {
@@ -95,6 +111,11 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
           : p
       )
     );
+    
+    toast({
+      title: t("attendanceUpdated"),
+      description: t("participantStatusChanged"),
+    });
   };
 
   const handleXlsxUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,15 +128,44 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       const wb = XLSX.read(bstr, { type: 'binary' });
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws);
+      const data = XLSX.utils.sheet_to_json<Participant>(ws);
       
-      console.log("Imported data:", data);
+      // Add generated IDs and set initial invitation/attendance status
+      const newParticipants = data.map((item, index) => ({
+        ...item,
+        id: participants.length + index + 1,
+        invitationSent: false,
+        attended: false
+      }));
+      
+      setParticipants([...participants, ...newParticipants]);
+      
       toast({
-        title: "Data imported",
-        description: `Successfully imported ${data.length} records`,
+        title: t("dataImported"),
+        description: `${t("successfullyImported")} ${newParticipants.length} ${t("records")}`,
       });
     };
     reader.readAsBinaryString(file);
+  };
+
+  const handleDownloadXlsx = () => {
+    // Create worksheet from participants data
+    const worksheet = XLSX.utils.json_to_sheet(participants.map(p => {
+      const { id, invitationSent, attended, ...rest } = p;
+      return rest;
+    }));
+    
+    // Create workbook and append worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Participants');
+    
+    // Write and download file
+    XLSX.writeFile(workbook, `${event.title}-participants.xlsx`);
+    
+    toast({
+      title: t("dataExported"),
+      description: t("fileDownloaded"),
+    });
   };
 
   const allKeys = Array.from(
@@ -128,7 +178,10 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     )
   );
 
-  const isEventFinished = false;
+  const isEventFinished = event.status === 'finished';
+  
+  // Only show employer-specific features if authenticated
+  const showEmployerFeatures = isAuthenticated;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -136,60 +189,73 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-blue-700">
             <TableIcon className="h-5 w-5" /> 
-            Participants for {event.title}
+            {t("participantsFor")} {event.title}
           </DialogTitle>
           <DialogDescription className="text-blue-600">
-            View and manage all participant registrations for this event
+            {t("viewAndManageParticipants")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="mt-4">
           {participants.length === 0 ? (
             <div className="text-center p-8 bg-blue-100/50 rounded-lg">
-              <div className="mb-4">
-                <input
-                  id="xlsx"
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleXlsxUpload}
-                  className="hidden"
-                />
-                <label 
-                  htmlFor="xlsx" 
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
-                >
-                  <Upload className="h-4 w-4" />
-                  Import XLSX
-                </label>
-              </div>
+              {showEmployerFeatures && (
+                <div className="mb-4">
+                  <input
+                    id="xlsx"
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleXlsxUpload}
+                    className="hidden"
+                  />
+                  <label 
+                    htmlFor="xlsx" 
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                  >
+                    <Upload className="h-4 w-4" />
+                    {t("importXLSX")}
+                  </label>
+                </div>
+              )}
               <Mail className="h-10 w-10 mx-auto text-blue-400 mb-2" />
-              <h3 className="text-lg font-medium text-blue-700">No participants yet</h3>
+              <h3 className="text-lg font-medium text-blue-700">{t("noParticipantsYet")}</h3>
               <p className="text-blue-600 mt-1">
-                Share your invitation form or import data to collect participant information
+                {t("shareInvitationFormOrImport")}
               </p>
             </div>
           ) : (
             <div>
-              <div className="mb-4 flex justify-end">
-                <input
-                  id="xlsx"
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleXlsxUpload}
-                  className="hidden"
-                />
-                <label 
-                  htmlFor="xlsx" 
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
-                >
-                  <Upload className="h-4 w-4" />
-                  Import XLSX
-                </label>
-              </div>
+              {showEmployerFeatures && (
+                <div className="mb-4 flex justify-between">
+                  <input
+                    id="xlsx"
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleXlsxUpload}
+                    className="hidden"
+                  />
+                  <label 
+                    htmlFor="xlsx" 
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                  >
+                    <Upload className="h-4 w-4" />
+                    {t("importXLSX")}
+                  </label>
+                  
+                  <Button 
+                    onClick={handleDownloadXlsx}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <FileDown className="mr-2 h-4 w-4" />
+                    {t("exportToExcel")}
+                  </Button>
+                </div>
+              )}
+              
               <div className="border border-blue-200 rounded-md bg-white overflow-hidden">
                 <Table>
                   <TableCaption>
-                    Total participants: {participants.length}
+                    {t("totalParticipants")}: {participants.length}
                   </TableCaption>
                   <TableHeader>
                     <TableRow className="bg-blue-50">
@@ -198,11 +264,15 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </TableHead>
                       ))}
-                      <TableHead className="text-blue-700">Invite</TableHead>
-                      {isEventFinished && (
-                        <TableHead className="text-blue-700">Attended</TableHead>
+                      {showEmployerFeatures && (
+                        <>
+                          <TableHead className="text-blue-700">{t("invite")}</TableHead>
+                          {isEventFinished && (
+                            <TableHead className="text-blue-700">{t("attended")}</TableHead>
+                          )}
+                          <TableHead className="text-right text-blue-700">{t("actions")}</TableHead>
+                        </>
                       )}
-                      <TableHead className="text-right text-blue-700">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -213,47 +283,54 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                             {participant[key] !== undefined ? String(participant[key]) : '—'}
                           </TableCell>
                         ))}
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => !participant.invitationSent && handleSendInvite(participant.id)}
-                            className={participant.invitationSent ? "text-red-600" : "text-blue-600"}
-                          >
-                            {participant.invitationSent ? (
-                              <>
-                                <X className="h-4 w-4 mr-1" />
-                                Cancel
-                              </>
-                            ) : (
-                              <>
-                                <Mail className="h-4 w-4 mr-1" />
-                                Invite
-                              </>
+                        
+                        {showEmployerFeatures && (
+                          <>
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleSendInvite(participant.id)}
+                                className={participant.invitationSent ? "text-red-600" : "text-blue-600"}
+                              >
+                                {participant.invitationSent ? (
+                                  <>
+                                    <X className="h-4 w-4 mr-1" />
+                                    {t("cancel")}
+                                  </>
+                                ) : (
+                                  <>
+                                    <Mail className="h-4 w-4 mr-1" />
+                                    {t("invite")}
+                                  </>
+                                )}
+                              </Button>
+                            </TableCell>
+                            
+                            {isEventFinished && (
+                              <TableCell>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleToggleAttendance(participant.id)}
+                                  className={participant.attended ? "text-green-600" : "text-gray-400"}
+                                >
+                                  <Check className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
                             )}
-                          </Button>
-                        </TableCell>
-                        {isEventFinished && (
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleToggleAttendance(participant.id)}
-                              className={participant.attended ? "text-green-600" : "text-gray-400"}
-                            >
-                              <Check className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
+                            
+                            <TableCell className="text-right">
+                              <Button 
+                                variant="ghost" 
+                                className="h-8 w-8 p-0" 
+                                aria-label="Edit participant"
+                              >
+                                <Edit className="h-4 w-4 text-blue-600" />
+                              </Button>
+                            </TableCell>
+                          </>
                         )}
-                        <TableCell className="text-right">
-                          <Button 
-                            variant="ghost" 
-                            className="h-8 w-8 p-0" 
-                            aria-label="Edit participant"
-                          >
-                            <Edit className="h-4 w-4 text-blue-600" />
-                          </Button>
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
