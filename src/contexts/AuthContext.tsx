@@ -61,13 +61,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
   
   const registerUser = async (email: string, password: string) => {
-    // Validate email domain - allow only gmail.com
-    if (!email.endsWith("@gmail.com")) {
-      return { 
-        success: false, 
-        message: "Invalid email" 
-      };
-    }
+    // Removed email domain validation - allow any email format
     
     // Check if email already exists
     if (registeredUsers.some(user => user.email === email)) {
