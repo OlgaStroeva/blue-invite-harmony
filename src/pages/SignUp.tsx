@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { ThirdPartyAuthButton } from "@/components/auth/ThirdPartyAuthButton";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -21,6 +22,7 @@ const SignUp = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { registerUser } = useAuth();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,20 +36,23 @@ const SignUp = () => {
     setIsLoading(true);
 
     try {
-      // For demonstration - replace with actual auth logic
       if (name && email && password) {
-        // Simulate registration
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        toast({
-          title: "Account created successfully",
-          description: "You have been signed up!",
-        });
-        navigate("/");
+        const result = await registerUser(email, password);
+        
+        if (result.success) {
+          toast({
+            title: "Account created successfully",
+            description: "You have been signed up!",
+          });
+          navigate("/sign-in");
+        } else {
+          setError(result.message || "Failed to create account");
+        }
       } else {
         setError("Please fill in all fields");
       }
     } catch (err) {
-      setError("Failed to create account");
+      setError("An error occurred during registration");
       console.error(err);
     } finally {
       setIsLoading(false);

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/container";
@@ -30,18 +31,22 @@ const SignIn = () => {
 
     try {
       if (email && password) {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        login();
-        toast({
-          title: "Signed in successfully",
-          description: "Welcome back!",
-        });
-        navigate("/dashboard");
+        const result = await login(email, password);
+        
+        if (result.success) {
+          toast({
+            title: "Signed in successfully",
+            description: "Welcome back!",
+          });
+          navigate("/dashboard");
+        } else {
+          setError(result.message || "Invalid email or password");
+        }
       } else {
         setError("Please fill in all fields");
       }
     } catch (err) {
-      setError("Invalid email or password");
+      setError("An error occurred during sign in");
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -54,7 +59,8 @@ const SignIn = () => {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 800));
-      login();
+      // For demo purposes, we'll just simulate a successful login
+      login("demo@gmail.com", "demopass");
       toast({
         title: `Signed in with ${provider}`,
         description: "Welcome back!",
