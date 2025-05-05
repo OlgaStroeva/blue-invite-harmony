@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import * as XLSX from 'xlsx';
+import { Event } from "@/types/event";
 
 interface Participant {
   id: number;
@@ -26,15 +26,6 @@ interface FormField {
   type: 'text' | 'email' | 'tel' | 'number' | 'date';
   required: boolean;
   options?: string[];
-}
-
-interface Event {
-  id: number;
-  title: string;
-  category: string;
-  description?: string;
-  image: string;
-  gradient: string;
 }
 
 interface ParticipantsTableProps {
