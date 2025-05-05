@@ -9,4 +9,5 @@ export interface Event {
   date?: string;
   place?: string;
   status?: 'upcoming' | 'in_progress' | 'finished';
+  organizerId?: number; // ID of the user who created the event
 }
