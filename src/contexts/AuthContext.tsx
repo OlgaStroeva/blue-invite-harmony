@@ -40,17 +40,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [registeredUsers, setRegisteredUsers] = useState(REGISTERED_USERS);
   
   const login = async (email: string, password: string) => {
-    // Check if the user exists and password matches
-    const user = registeredUsers.find(user => user.email === email);
-    
-    if (user && user.password === password) {
+    // For testing: accept any email and password
+    if (email && password) {
       setIsAuthenticated(true);
       localStorage.setItem('isAuthenticated', 'true');
       return { success: true };
     } else {
       return { 
         success: false, 
-        message: "Invalid email or password" 
+        message: "Please provide both email and password" 
       };
     }
   };
@@ -61,13 +59,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
   
   const registerUser = async (email: string, password: string) => {
-    // Removed email domain validation - allow any email format
-    
-    // Check if email already exists
-    if (registeredUsers.some(user => user.email === email)) {
+    // For testing: accept any email and password without validation
+    if (!email || !password) {
       return { 
         success: false, 
-        message: "Email is already registered" 
+        message: "Email and password are required" 
       };
     }
     
