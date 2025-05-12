@@ -1,12 +1,29 @@
 
-import { useState } from "react";
-import { PlusCircle, X, Image as ImageIcon, Tag } from "lucide-react";
+import { useState, useEffect } from "react";
+import { PlusCircle, X, Image as ImageIcon, Tag, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 interface EventFormDialogProps {
   open: boolean;
@@ -18,10 +35,17 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
   const [step, setStep] = useState<'title' | 'details'>('title');
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Wedding");
+  const [category, setCategory] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
   const { toast } = useToast();
+
+  // Get all unique categories from existing events
+  const [existingCategories, setExistingCategories] = useState<string[]>([
+    "Wedding", "Birthday", "Corporate", "Party", "Formal"
+  ]);
 
   const handleContinue = () => {
     if (!title.trim()) {
@@ -47,10 +71,23 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
     }
   };
 
+  const handleCategoryChange = (value: string) => {
+    if (value === "custom") {
+      setShowCustomCategory(true);
+      setCategory("");
+    } else {
+      setShowCustomCategory(false);
+      setCategory(value);
+      setCustomCategory("");
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title.trim() || !category) {
+    const finalCategory = showCustomCategory ? customCategory : category;
+    
+    if (!title.trim() || !finalCategory.trim()) {
       toast({
         title: "Missing information",
         description: "Please ensure you've filled in the required fields",
@@ -64,17 +101,24 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
       id: Date.now(),
       title,
       description,
-      category,
+      category: finalCategory,
       image: imagePreview,
       gradient: !imagePreview ? `from-blue-${Math.floor(Math.random() * 5 + 2)}00 to-blue-${Math.floor(Math.random() * 5 + 4)}00` : "",
     };
+
+    // If using a new category, add it to existing categories
+    if (showCustomCategory && customCategory && !existingCategories.includes(customCategory)) {
+      setExistingCategories(prev => [...prev, customCategory]);
+    }
 
     onEventCreated(newEvent);
     
     // Reset form and close dialog
     setTitle("");
     setDescription("");
-    setCategory("Wedding");
+    setCategory("");
+    setCustomCategory("");
+    setShowCustomCategory(false);
     setImage(null);
     setImagePreview("");
     setStep('title');
@@ -85,8 +129,6 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
       description: "Your new event has been created successfully!",
     });
   };
-
-  const categories = ["Wedding", "Birthday", "Corporate", "Party", "Formal"];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -138,22 +180,34 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
             
             <div className="space-y-2">
               <Label htmlFor="category" className="text-blue-700">Category</Label>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((cat) => (
-                  <Button
-                    key={cat}
-                    type="button"
-                    variant={category === cat ? "default" : "outline"}
-                    className={category === cat 
-                      ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                      : "hover:bg-blue-50 border-blue-200"
-                    }
-                    onClick={() => setCategory(cat)}
-                  >
-                    <Tag className="mr-1 h-4 w-4" />
-                    {cat}
-                  </Button>
-                ))}
+              <div className="grid gap-2">
+                <Select onValueChange={handleCategoryChange}>
+                  <SelectTrigger className="border-blue-200 focus-visible:ring-blue-400">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {existingCategories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="custom" className="text-blue-600 font-medium">
+                      + Add custom category
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {showCustomCategory && (
+                  <div className="mt-2">
+                    <Input
+                      value={customCategory}
+                      onChange={(e) => setCustomCategory(e.target.value)}
+                      placeholder="Enter custom category..."
+                      className="border-blue-200 focus-visible:ring-blue-400"
+                      autoFocus
+                    />
+                  </div>
+                )}
               </div>
             </div>
             
