@@ -8,13 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Form,
   FormControl,
   FormField,
@@ -36,10 +29,10 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [customCategory, setCustomCategory] = useState("");
+  const [showTagInput, setShowTagInput] = useState(false);
+  const [newTag, setNewTag] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
-  const [showCustomCategory, setShowCustomCategory] = useState(false);
   const { toast } = useToast();
 
   // Get all unique categories from existing events
@@ -71,23 +64,44 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
     }
   };
 
-  const handleCategoryChange = (value: string) => {
-    if (value === "custom") {
-      setShowCustomCategory(true);
-      setCategory("");
-    } else {
-      setShowCustomCategory(false);
-      setCategory(value);
-      setCustomCategory("");
+  const handleCategoryClick = (selectedCategory: string) => {
+    setCategory(selectedCategory);
+  };
+
+  const handleAddNewTag = () => {
+    setShowTagInput(true);
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && newTag.trim()) {
+      e.preventDefault();
+      if (!existingCategories.includes(newTag)) {
+        setExistingCategories(prev => [...prev, newTag]);
+      }
+      setCategory(newTag);
+      setNewTag("");
+      setShowTagInput(false);
+    } else if (e.key === 'Escape') {
+      setShowTagInput(false);
+      setNewTag("");
     }
+  };
+
+  const handleTagInputBlur = () => {
+    if (newTag.trim()) {
+      if (!existingCategories.includes(newTag)) {
+        setExistingCategories(prev => [...prev, newTag]);
+      }
+      setCategory(newTag);
+    }
+    setShowTagInput(false);
+    setNewTag("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const finalCategory = showCustomCategory ? customCategory : category;
-    
-    if (!title.trim() || !finalCategory.trim()) {
+    if (!title.trim() || !category.trim()) {
       toast({
         title: "Missing information",
         description: "Please ensure you've filled in the required fields",
@@ -101,15 +115,10 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
       id: Date.now(),
       title,
       description,
-      category: finalCategory,
+      category,
       image: imagePreview,
       gradient: !imagePreview ? `from-blue-${Math.floor(Math.random() * 5 + 2)}00 to-blue-${Math.floor(Math.random() * 5 + 4)}00` : "",
     };
-
-    // If using a new category, add it to existing categories
-    if (showCustomCategory && customCategory && !existingCategories.includes(customCategory)) {
-      setExistingCategories(prev => [...prev, customCategory]);
-    }
 
     onEventCreated(newEvent);
     
@@ -117,8 +126,8 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
     setTitle("");
     setDescription("");
     setCategory("");
-    setCustomCategory("");
-    setShowCustomCategory(false);
+    setNewTag("");
+    setShowTagInput(false);
     setImage(null);
     setImagePreview("");
     setStep('title');
@@ -179,34 +188,45 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="category" className="text-blue-700">Category</Label>
-              <div className="grid gap-2">
-                <Select onValueChange={handleCategoryChange}>
-                  <SelectTrigger className="border-blue-200 focus-visible:ring-blue-400">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {existingCategories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value="custom" className="text-blue-600 font-medium">
-                      + Add custom category
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {showCustomCategory && (
-                  <div className="mt-2">
+              <Label className="text-blue-700">Category</Label>
+              <div className="flex flex-wrap gap-2">
+                {existingCategories.map((cat) => (
+                  <Button
+                    key={cat}
+                    type="button"
+                    variant={category === cat ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleCategoryClick(cat)}
+                    className={category === cat 
+                      ? "bg-blue-600 text-white" 
+                      : "border-blue-200 text-blue-700"}
+                  >
+                    {cat} {category === cat && <Check className="ml-1 w-3 h-3" />}
+                  </Button>
+                ))}
+                
+                {showTagInput ? (
+                  <div className="relative">
                     <Input
-                      value={customCategory}
-                      onChange={(e) => setCustomCategory(e.target.value)}
-                      placeholder="Enter custom category..."
-                      className="border-blue-200 focus-visible:ring-blue-400"
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onKeyDown={handleTagInputKeyDown}
+                      onBlur={handleTagInputBlur}
+                      placeholder="Add new category..."
+                      className="border-blue-200 focus-visible:ring-blue-400 py-1 h-9 min-w-[150px]"
                       autoFocus
                     />
                   </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddNewTag}
+                    className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-50"
+                  >
+                    <Tag className="mr-1 h-3 w-3" /> Add tag
+                  </Button>
                 )}
               </div>
             </div>
