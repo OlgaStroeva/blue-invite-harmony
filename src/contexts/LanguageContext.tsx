@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 // Define available languages
@@ -136,6 +135,16 @@ const enTranslations: Record<string, string> = {
   "privacyPolicy": "Privacy Policy",
   "createAccountButton": "Create Account",
   "creatingAccount": "Creating account...",
+  
+  // Password Reset
+  "resetPassword": "Reset Password",
+  "enterEmailForPasswordReset": "Enter your email address and we'll send you a link to reset your password.",
+  "emailRequired": "Please enter your email address",
+  "passwordResetEmailSent": "Password reset email sent",
+  "checkInboxForInstructions": "Check your inbox for instructions to reset your password.",
+  "failedToSendResetEmail": "Failed to send password reset email. Please try again.",
+  "passwordResetEmailSentSuccess": "Password reset email sent successfully!",
+  "sending": "Sending...",
   
   // Dashboard
   "welcome": "Welcome",
@@ -333,6 +342,16 @@ const ruTranslations: Record<string, string> = {
   "privacyPolicy": "Политика конфиденциальности",
   "createAccountButton": "Создать аккаунт",
   "creatingAccount": "Создание аккаунта...",
+  
+  // Password Reset
+  "resetPassword": "Сбросить пароль",
+  "enterEmailForPasswordReset": "Введите ваш email, и мы отправим вам ссылку для сброса пароля.",
+  "emailRequired": "Пожалуйста, введите ваш email",
+  "passwordResetEmailSent": "Письмо для сброса пароля отправлено",
+  "checkInboxForInstructions": "Проверьте вашу почту для получения инструкций по сбросу пароля.",
+  "failedToSendResetEmail": "Не удалось отправить письмо для сброса пароля. Пожалуйста, попробуйте снова.",
+  "passwordResetEmailSentSuccess": "Письмо для сброса пароля успешно отправлено!",
+  "sending": "Отправка...",
   
   // Dashboard
   "welcome": "Добро пожаловать",

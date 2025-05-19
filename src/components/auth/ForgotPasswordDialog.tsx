@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ForgotPasswordDialogProps {
   open: boolean;
@@ -19,6 +20,7 @@ const ForgotPasswordDialog = ({ open, onOpenChange }: ForgotPasswordDialogProps)
   const [resetSuccess, setResetSuccess] = useState(false);
   const [resetError, setResetError] = useState("");
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ const ForgotPasswordDialog = ({ open, onOpenChange }: ForgotPasswordDialogProps)
     try {
       // This is a mock implementation - in a real app, you would call an API to handle password reset
       if (!resetEmail) {
-        setResetError("Please enter your email address");
+        setResetError(t("emailRequired"));
         return;
       }
 
@@ -39,8 +41,8 @@ const ForgotPasswordDialog = ({ open, onOpenChange }: ForgotPasswordDialogProps)
       // For demo purposes, we'll just show a success message
       setResetSuccess(true);
       toast({
-        title: "Password reset email sent",
-        description: "Check your inbox for instructions to reset your password.",
+        title: t("passwordResetEmailSent"),
+        description: t("checkInboxForInstructions"),
       });
       
       // Close the dialog after a short delay
@@ -49,7 +51,7 @@ const ForgotPasswordDialog = ({ open, onOpenChange }: ForgotPasswordDialogProps)
         setResetEmail("");
       }, 3000);
     } catch (err) {
-      setResetError("Failed to send password reset email. Please try again.");
+      setResetError(t("failedToSendResetEmail"));
       console.error(err);
     } finally {
       setIsResetLoading(false);
@@ -60,9 +62,9 @@ const ForgotPasswordDialog = ({ open, onOpenChange }: ForgotPasswordDialogProps)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Reset Password</DialogTitle>
+          <DialogTitle>{t("resetPassword")}</DialogTitle>
           <DialogDescription>
-            Enter your email address and we'll send you a link to reset your password.
+            {t("enterEmailForPasswordReset")}
           </DialogDescription>
         </DialogHeader>
         
@@ -77,12 +79,12 @@ const ForgotPasswordDialog = ({ open, onOpenChange }: ForgotPasswordDialogProps)
           {resetSuccess && (
             <Alert className="bg-green-50 border-green-200">
               <CheckCircle className="h-4 w-4 text-green-500" />
-              <AlertDescription className="text-green-700">Password reset email sent successfully!</AlertDescription>
+              <AlertDescription className="text-green-700">{t("passwordResetEmailSentSuccess")}</AlertDescription>
             </Alert>
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="reset-email">Email</Label>
+            <Label htmlFor="reset-email">{t("email")}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
@@ -105,14 +107,14 @@ const ForgotPasswordDialog = ({ open, onOpenChange }: ForgotPasswordDialogProps)
               onClick={() => onOpenChange(false)}
               disabled={isResetLoading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button 
               type="submit" 
               disabled={isResetLoading || resetSuccess}
               className="bg-blue-gradient"
             >
-              {isResetLoading ? "Sending..." : "Reset Password"}
+              {isResetLoading ? t("sending") : t("resetPassword")}
             </Button>
           </DialogFooter>
         </form>
