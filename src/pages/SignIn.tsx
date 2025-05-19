@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Mail, Lock, ArrowLeft, KeyRound } from "lucide-react";
+import { AlertCircle, Mail, Lock, ArrowLeft, KeyRound, CheckCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -248,7 +248,7 @@ const SignIn = () => {
             
             {resetSuccess && (
               <Alert className="bg-green-50 border-green-200">
-                <Check className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-4 w-4 text-green-500" />
                 <AlertDescription className="text-green-700">Password reset email sent successfully!</AlertDescription>
               </Alert>
             )}
