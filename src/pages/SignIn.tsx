@@ -6,19 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Mail, Lock, ArrowLeft } from "lucide-react";
+import { AlertCircle, Mail, Lock, ArrowLeft, KeyRound } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { ThirdPartyAuthButton } from "@/components/auth/ThirdPartyAuthButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [isResetLoading, setIsResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -50,6 +56,42 @@ const SignIn = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError("");
+    setResetSuccess(false);
+    setIsResetLoading(true);
+
+    try {
+      // This is a mock implementation - in a real app, you would call an API to handle password reset
+      if (!resetEmail) {
+        setResetError("Please enter your email address");
+        return;
+      }
+
+      // Simulate API call with a delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      // For demo purposes, we'll just show a success message
+      setResetSuccess(true);
+      toast({
+        title: "Password reset email sent",
+        description: "Check your inbox for instructions to reset your password.",
+      });
+      
+      // Close the dialog after a short delay
+      setTimeout(() => {
+        setForgotPasswordOpen(false);
+        setResetEmail("");
+      }, 3000);
+    } catch (err) {
+      setResetError("Failed to send password reset email. Please try again.");
+      console.error(err);
+    } finally {
+      setIsResetLoading(false);
     }
   };
 
@@ -120,12 +162,14 @@ const SignIn = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">{t("password")}</Label>
-                  <Link 
-                    to="#" 
-                    className="text-sm text-blue-600 hover:text-blue-800"
+                  <Button 
+                    variant="link" 
+                    type="button"
+                    className="text-sm text-blue-600 hover:text-blue-800 p-0 h-auto"
+                    onClick={() => setForgotPasswordOpen(true)}
                   >
                     {t("forgotPassword")}
-                  </Link>
+                  </Button>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -184,6 +228,68 @@ const SignIn = () => {
           </CardFooter>
         </Card>
       </Container>
+
+      <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription>
+              Enter your email address and we'll send you a link to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            {resetError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{resetError}</AlertDescription>
+              </Alert>
+            )}
+            
+            {resetSuccess && (
+              <Alert className="bg-green-50 border-green-200">
+                <Check className="h-4 w-4 text-green-500" />
+                <AlertDescription className="text-green-700">Password reset email sent successfully!</AlertDescription>
+              </Alert>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="reset-email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  id="reset-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  className="pl-10"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  disabled={isResetLoading || resetSuccess}
+                  required
+                />
+              </div>
+            </div>
+            
+            <DialogFooter className="sm:justify-end">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setForgotPasswordOpen(false)}
+                disabled={isResetLoading}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={isResetLoading || resetSuccess}
+                className="bg-blue-gradient"
+              >
+                {isResetLoading ? "Sending..." : "Reset Password"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
