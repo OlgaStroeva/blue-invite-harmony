@@ -6,95 +6,104 @@ import { Image } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Event {
-  id: number;
-  title: string;
-  category: string;
-  image: string;
-  gradient: string;
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+    createdBy: number;
+    dateTime: string;
+    category: string;
+    location: string;
+    status: string;
 }
+const blueGradients = [
+    "from-blue-100 to-blue-200",
+    "from-blue-300 to-blue-400",
+    "from-blue-500 to-blue-600",
+    "from-blue-700 to-blue-800",
+    "from-blue-900 to-blue-950"
+];
+
+const events: Event[] = await fetch("https://localhost:7291/api/events/my-events", {
+    headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json"
+    }
+})
+    .then((res) => res.json())
+    .then((data) =>
+        data.map((event: any, index: number) => ({
+            id: event.id,
+            title: event.name, // если приходит "name", а не "title"
+            category: event.category || "Uncategorized",
+            description: event.description || "",
+            image: event.imageBase64 || "",
+            gradient: blueGradients[index % blueGradients.length]
+        }))
+    )
+    .catch((err) => {
+        console.error("Ошибка загрузки мероприятий:", err);
+        return [];
+    });
+
+const categories: string[] = await fetch("https://localhost:7291/api/events/my-events", {
+    headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json"
+    }
+})
+    .then((res) => res.json())
+    .then((data) => {
+        const rawCategories = data.map((event: any) => event.category);
+        const rawStatuses = data.map((event: any) => event.status);
+
+        const combined = [...rawCategories, ...rawStatuses].filter(
+            (v) => typeof v === "string" && v.trim() !== ""
+        );
+
+        return ["All", ...Array.from(new Set(combined))];
+    })
+    .catch((err) => {
+        console.error("Ошибка загрузки категорий и статусов:", err);
+        return [];
+    });
 
 const Events = () => {
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [animatedItems, setAnimatedItems] = useState<number[]>([]);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const { t } = useLanguage();
+    const [activeCategory, setActiveCategory] = useState("All");
+    const [animatedItems, setAnimatedItems] = useState<number[]>([]);
+    const sectionRef = useRef<HTMLDivElement>(null);
+    const { t } = useLanguage();
 
-  const events: Event[] = [
-    {
-      id: 1,
-      title: "Elegant Blue",
-      category: t("wedding"),
-      image: "",
-      gradient: "from-blue-100 to-blue-200",
-    },
-    {
-      id: 2,
-      title: "Modern Sapphire",
-      category: t("corporate"),
-      image: "",
-      gradient: "from-blue-600 to-blue-800",
-    },
-    {
-      id: 3,
-      title: "Sky Celebration",
-      category: t("birthday"),
-      image: "",
-      gradient: "from-blue-300 to-blue-500",
-    },
-    {
-      id: 4,
-      title: "Ocean Waves",
-      category: t("party"),
-      image: "",
-      gradient: "from-blue-400 to-blue-600",
-    },
-    {
-      id: 5,
-      title: "Azure Delight",
-      category: t("wedding"),
-      image: "",
-      gradient: "from-blue-200 to-blue-400",
-    },
-    {
-      id: 6,
-      title: "Navy Elegance",
-      category: t("formal"),
-      image: "",
-      gradient: "from-blue-700 to-blue-900",
-    },
-  ];
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        events.forEach((_, index) => {
+                            setTimeout(() => {
+                                setAnimatedItems((prev) => [...prev, index]);
+                            }, 150 * index);
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            events.forEach((_, index) => {
-              setTimeout(() => {
-                setAnimatedItems((prev) => [...prev, index]);
-              }, 150 * index);
-            });
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+        return () => observer.disconnect();
+    }, [events]);
+    
+    const filteredEvents = activeCategory === t("all")
+        ? events
+        : events.filter(event => event.category === activeCategory);
 
-    return () => observer.disconnect();
-  }, [events]);
-
-  const categories = [t("all"), t("wedding"), t("birthday"), t("corporate"), t("party"), t("formal")];
-  const filteredEvents = activeCategory === t("all") 
-    ? events 
-    : events.filter(event => event.category === activeCategory);
-
-  return (
-    <section id="events" className="py-20 relative bg-gradient-to-b from-blue-200 to-blue-100" ref={sectionRef}>
+    return (
+        <section id="events" className="py-20 relative bg-gradient-to-b from-blue-200 to-blue-100" ref={sectionRef}>
       <div className="absolute top-1/2 right-0 w-1/3 h-1/3 bg-blue-300/40 rounded-full blur-[100px]" />
       <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-blue-200/30 rounded-full blur-[80px]" />
       

@@ -14,16 +14,48 @@ import { FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { FormField } from "@/types/form";
 import { Template } from "@/types/template";
+import { useEffect } from "react";
 
 interface TemplateSelectorProps {
-  templates: Template[];
   onApplyTemplate: (template: Template) => void;
 }
 
-const TemplateSelector = ({ templates, onApplyTemplate }: TemplateSelectorProps) => {
+const TemplateSelector = ({ onApplyTemplate }: TemplateSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
   const { toast } = useToast();
+  const [templates, setTemplates] = useState<Template[]>([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    fetch("https://localhost:7291/api/forms/my-templates", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+        .then(res => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            const normalized = data.map(template => ({
+              ...template,
+              fields: Array.isArray(template.fields)
+                  ? template.fields.map(f =>
+                      typeof f === "string"
+                          ? { name: f, type: "text" }
+                          : { name: f.name || "", type: f.type || "text" }
+                  )
+                  : []
+            }));
+            setTemplates(normalized);
+          }
+        })
+        .catch(err => console.error("Ошибка загрузки шаблонов:", err));
+  }, []);
+
+
+
 
   const handleApplyTemplate = (template: Template) => {
     onApplyTemplate(template);

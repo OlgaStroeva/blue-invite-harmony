@@ -10,11 +10,12 @@ export const useInvitationForm = (event: Event) => {
   const [formFields, setFormFields] = useState<FormField[]>([
     { id: "email", name: "Email", type: "email", required: true }
   ]);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [isEditMode, setIsEditMode] = useState(true);
   const { toast } = useToast();
   const { t } = useLanguage();
+  const [isEditMode, setIsEditMode] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+
 
   const handleSaveTemplate = () => {
     if (formFields.length <= 1) {
@@ -63,6 +64,10 @@ export const useInvitationForm = (event: Event) => {
   };
 
   return {
+    isEditMode,
+    setIsEditMode,
+    selectedTemplate,
+    setSelectedTemplate,
     formFields,
     setFormFields,
     selectedTemplate,

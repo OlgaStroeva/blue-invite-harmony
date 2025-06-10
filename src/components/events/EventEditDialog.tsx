@@ -75,8 +75,30 @@ const EventEditDialog = ({
 
   // Get all unique categories from existing events
   const [existingCategories, setExistingCategories] = useState<string[]>([
-    "Wedding", "Birthday", "Corporate", "Party", "Formal"
+    // Get all unique categories from existing events
   ]);
+
+  useEffect(() => {
+    fetch("https://localhost:7291/api/events/my-events", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json"
+      }
+    })
+        .then((res) => res.json())
+        .then((data) => {
+          const unique = Array.from(
+              new Set(
+                  data
+                      .map((event: any) => event.category)
+                      .filter((cat) => typeof cat === "string" && cat.trim() !== "")
+              )
+          );
+          setExistingCategories(unique);
+        })
+        .catch(console.error);
+  }, []);
+
 
   useEffect(() => {
     setTitle(event.title);
@@ -100,27 +122,7 @@ const EventEditDialog = ({
       reader.readAsDataURL(file);
     }
   };
-
-  const handleXlsxUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const bstr = evt.target?.result;
-      const wb = XLSX.read(bstr, { type: 'binary' });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws);
-      
-      console.log("Imported data:", data);
-      toast({
-        title: "Data imported",
-        description: `Successfully imported ${data.length} records`,
-      });
-    };
-    reader.readAsBinaryString(file);
-  };
+  
 
   const handleCategoryClick = (selectedCategory: string) => {
     setCategory(selectedCategory);
@@ -156,10 +158,10 @@ const EventEditDialog = ({
     setNewTag("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!title.trim() || !category.trim()) {
+
+    if (!title.trim()) {
       toast({
         title: "Missing information",
         description: "Please ensure you've filled in the required fields",
@@ -168,19 +170,60 @@ const EventEditDialog = ({
       return;
     }
 
-    const updatedEvent = {
-      ...event,
-      title,
-      description,
-      category,
-      date,
-      place,
-      image: imagePreview,
-      gradient: !imagePreview ? event.gradient : "",
-    };
+    try {
+      const response = await fetch(`https://localhost:7291/api/events/update/${event.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          name: title,
+          description,
+          imageBase64: imagePreview || "",
+          dateTime: date || "",
+          category,
+          location: place,
+          status: event.status
+        }),
+      });
 
-    onEventUpdated(updatedEvent);
-    onOpenChange(false);
+      const result = await response.json();
+
+      if (response.ok) {
+        // Обновлённые данные с сервера (включая ID)
+        onEventUpdated({
+          ...event,
+          title,
+          description,
+          category,
+          date,
+          place,
+          image: imagePreview,
+          status: result.status
+        });
+
+        onOpenChange(false);
+
+        toast({
+          title: "Мероприятие обновлено",
+          description: "Изменения успешно сохранены.",
+        });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: result.message || "Не удалось обновить мероприятие",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Ошибка при обновлении:", error);
+      toast({
+        title: "Ошибка сети",
+        description: "Сервер не отвечает",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleOpenInvitationForm = () => {

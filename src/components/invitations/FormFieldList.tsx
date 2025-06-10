@@ -5,19 +5,24 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Input } from "@/components/ui/input";
 import { Edit, Check, FileType } from "lucide-react";
+import { Event } from "@/types/event";
 
 interface FormFieldListProps {
   formFields: FormField[];
   setFormFields?: (fields: FormField[]) => void;
+  currentEvent: Event;
   readOnly?: boolean;
 }
 
-const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFieldListProps) => {
+const FormFieldList = ({ formFields, setFormFields, currentEvent, readOnly = false }: FormFieldListProps) => {
   const { t } = useLanguage();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState<string>("");
   const [editedType, setEditedType] = useState<"text" | "email" | "tel" | "number" | "date">("text");
+  //const eventId = currentEvent.id; // ID текущего мероприятия
+  //const formId = currentEvent.formId; // может быть undefined/null, если анкета ещё не создана
+
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     // Prevent dragging the email field
@@ -57,9 +62,10 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
     setEditedType(formFields[index].type);
   };
 
+
   const saveFieldEdit = () => {
     if (editingFieldIndex === null) return;
-    
+
     // Only update if there's actually a name entered
     if (editedName.trim()) {
       const updatedFields = [...formFields];
@@ -70,7 +76,7 @@ const FormFieldList = ({ formFields, setFormFields, readOnly = false }: FormFiel
       };
       setFormFields?.(updatedFields);
     }
-    
+
     setEditingFieldIndex(null);
   };
 

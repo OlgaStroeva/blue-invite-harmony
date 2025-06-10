@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -8,6 +8,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import * as XLSX from 'xlsx';
 import { Event } from "@/types/event";
+import {useEffect, useState} from "react";
+import { Loader2 } from "lucide-react";
 
 interface Participant {
   id: number;
@@ -39,60 +41,102 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
 
-  const [participants, setParticipants] = useState<Participant[]>([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      company: "Acme Inc",
-      dietaryRestrictions: "Vegetarian",
-      invitationSent: false,
-      attended: false
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      company: "Globex Corp",
-      dietaryRestrictions: "None",
-      invitationSent: false,
-      attended: false
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      company: "Wayne Enterprises",
-      dietaryRestrictions: "Gluten-free",
-      invitationSent: false,
-      attended: false
-    }
-  ]);
+  const [participants, setParticipants] = useState<Participant[]>([]);
 
-  const handleSendInvite = (participantId: number) => {
-    setParticipants(prev => 
-      prev.map(p => 
-        p.id === participantId 
-          ? { ...p, invitationSent: !p.invitationSent }
-          : p
-      )
-    );
-    
-    const participant = participants.find(p => p.id === participantId);
-    if (participant) {
-      if (!participant.invitationSent) {
-        toast({
-          title: t("invitationSent"),
-          description: t("participantNotified"),
-        });
-      } else {
-        toast({
-          title: t("invitationCanceled"),
-          description: t("participantRemovedNotification"),
-        });
+  const [sendingInvites, setSendingInvites] = useState<Record<number, boolean>>({});
+
+  const handleSendInvite = async (participantId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token || !event?.id) return;
+
+    try {
+      // Устанавливаем состояние загрузки для конкретного участника
+      setSendingInvites(prev => ({ ...prev, [participantId]: true }));
+
+      // 1. Сначала получаем formId для события
+      const formRes = await fetch(`https://localhost:7291/api/forms/get-by-event/${event.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!formRes.ok) throw new Error("Failed to get form data");
+      const { id: formId } = await formRes.json();
+
+      // 2. Отправляем приглашение
+      const inviteRes = await fetch(`https://localhost:7291/api/invitations/send/${formId}/${participantId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!inviteRes.ok) {
+        const errorData = await inviteRes.json();
+        throw new Error(errorData.message || "Failed to send invitation");
       }
+
+      // 3. Обновляем состояние участника
+      setParticipants(prev =>
+          prev.map(p =>
+              p.id === participantId
+                  ? { ...p, invitationSent: true }
+                  : p
+          )
+      );
+
+      toast({
+        title: t("invitationSent"),
+        description: t("invitationSentSuccessfully"),
+      });
+
+    } catch (err) {
+      console.error("Error sending invitation:", err);
+      toast({
+        title: t("error"),
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
+      // Сбрасываем состояние загрузки
+      setSendingInvites(prev => ({ ...prev, [participantId]: false }));
     }
   };
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token || !event?.id) return;
+
+    fetch(`https://localhost:7291/api/forms/participants/${event.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+        .then(async res => {
+          //console.error(res.json());
+          if (!res.ok) throw new Error("Ошибка при получении участников");
+          return res.json();
+        })
+        .then(data => {
+          const mapped = data.map((p: any) => ({
+            id: p.id,
+            ...p.data,
+            invitationSent: p.attended ?? false,
+            haveQr: p.qrCode
+          }));
+          console.error(data);
+          setParticipants(mapped);
+        })
+        .catch(err => {
+          console.error("Ошибка загрузки участников:", err);
+          toast({
+            title: "Ошибка",
+            description: "Не удалось загрузить участников",
+            variant: "destructive"
+          });
+        });
+  }, [event]);
 
   const handleToggleAttendance = (participantId: number) => {
     setParticipants(prev => 
@@ -109,35 +153,52 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     });
   };
 
-  const handleXlsxUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleXlsxUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !event?.id) return;
 
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const bstr = evt.target?.result;
-      const wb = XLSX.read(bstr, { type: 'binary' });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json<Participant>(ws);
-      
-      // Add generated IDs and set initial invitation/attendance status
-      const newParticipants = data.map((item, index) => ({
-        ...item,
-        id: participants.length + index + 1,
-        invitationSent: false,
-        attended: false
-      }));
-      
-      setParticipants([...participants, ...newParticipants]);
-      
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch(`https://localhost:7291/api/forms/upload-participants/${event.id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        console.error("Ошибка при загрузке:", result.errors || result.message);
+        toast({
+          title: t("uploadError"),
+          description: result.errors?.join(", ") || result.message || t("tryAgain"),
+          variant: "destructive"
+        });
+        return;
+      }
+
       toast({
         title: t("dataImported"),
-        description: `${t("successfullyImported")} ${newParticipants.length} ${t("records")}`,
+        description: result.message || `${t("successfullyImported")} ${result.count} ${t("records")}`,
       });
-    };
-    reader.readAsBinaryString(file);
+
+      // Обновим список участников после импорта
+      // или вызови вручную обновление списка, если есть функция
+    } catch (err) {
+      console.error("Ошибка отправки файла:", err);
+      toast({
+        title: t("error"),
+        description: t("fileUploadFailed"),
+        variant: "destructive"
+      });
+    }
   };
+
 
   const handleDownloadXlsx = () => {
     // Create worksheet from participants data
@@ -168,11 +229,48 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       )
     )
   );
+  const updateParticipantOnServer = async (participantId: number, updatedData: Record<string, string>) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`https://localhost:7291/api/forms/update/${participantId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedData)
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        console.error("Ошибка при обновлении:", result.message);
+      } else {
+        console.log("Участник обновлён:", result);
+      }
+    } catch (error) {
+      console.error("Сетевая ошибка при обновлении участника:", error);
+    }
+  };
+  const handleFieldChange = (id: number, key: string, value: string) => {
+    setParticipants(prev =>
+        prev.map(participant => {
+          if (participant.id === id) {
+            const updated = { ...participant, [key]: value };
+
+            
+            updateParticipantOnServer(id, {
+              ...updated.Data,
+              [key]: value
+            });
+
+            return updated;
+          }
+          return participant;
+        })
+    );
+  };
 
   const isEventFinished = event.status === 'finished';
-  
-  // Only show employer-specific features if authenticated
-  const showEmployerFeatures = isAuthenticated;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -190,7 +288,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
         <div className="mt-4">
           {participants.length === 0 ? (
             <div className="text-center p-8 bg-blue-100/50 rounded-lg">
-              {showEmployerFeatures && (
                 <div className="mb-4">
                   <input
                     id="xlsx"
@@ -207,7 +304,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                     {t("importXLSX")}
                   </label>
                 </div>
-              )}
               <Mail className="h-10 w-10 mx-auto text-blue-400 mb-2" />
               <h3 className="text-lg font-medium text-blue-700">{t("noParticipantsYet")}</h3>
               <p className="text-blue-600 mt-1">
@@ -216,7 +312,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
             </div>
           ) : (
             <div>
-              {showEmployerFeatures && (
+
                 <div className="mb-4 flex justify-between">
                   <input
                     id="xlsx"
@@ -241,7 +337,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                     {t("exportToExcel")}
                   </Button>
                 </div>
-              )}
               
               <div className="border border-blue-200 rounded-md bg-white overflow-hidden">
                 <Table>
@@ -250,12 +345,14 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                   </TableCaption>
                   <TableHeader>
                     <TableRow className="bg-blue-50">
-                      {allKeys.map((key) => (
+                      {allKeys
+                          .filter(key => key !== 'haveQr') // Исключаем поле haveQr
+                          .map((key) => (
                         <TableHead key={key} className="capitalize text-blue-700">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </TableHead>
                       ))}
-                      {showEmployerFeatures && (
+
                         <>
                           <TableHead className="text-blue-700">{t("invite")}</TableHead>
                           {isEventFinished && (
@@ -263,37 +360,54 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                           )}
                           <TableHead className="text-right text-blue-700">{t("actions")}</TableHead>
                         </>
-                      )}
+
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {participants.map((participant) => (
                       <TableRow key={participant.id} className="hover:bg-blue-50">
-                        {allKeys.map((key) => (
+                        {allKeys
+                            .filter(key => key !== 'haveQr') // Исключаем поле haveQr
+                            .map((key) => (
                           <TableCell key={`${participant.id}-${key}`}>
                             {participant[key] !== undefined ? String(participant[key]) : '—'}
                           </TableCell>
                         ))}
                         
-                        {showEmployerFeatures && (
                           <>
                             <TableCell>
                               <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleSendInvite(participant.id)}
-                                className={participant.invitationSent ? "text-red-600" : "text-blue-600"}
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleSendInvite(participant.id)}
+                                  disabled={sendingInvites[participant.id] || !participant.haveQr}
+                                  className={
+                                    participant.invitationSent
+                                        ? "text-red-600"
+                                        : sendingInvites[participant.id] && !participant.haveQr && !participant.invitationSent
+                                            ? "text-gray-400 cursor-not-allowed"
+                                            : "text-blue-600 hover:text-blue-700"
+                                  }
+                                  title={
+                                    !participant.haveQr
+                                        ? t("qrCodeRequired")
+                                        : sendingInvites[participant.id]
+                                            ? t("sending")
+                                            : ""
+                                  }
                               >
-                                {participant.invitationSent ? (
-                                  <>
-                                    <X className="h-4 w-4 mr-1" />
-                                    {t("cancel")}
-                                  </>
+                                {sendingInvites[participant.id] ? (
+                                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                ) : participant.invitationSent ? (
+                                    <>
+                                      <X className="h-4 w-4 mr-1" />
+                                      {t("cancel")}
+                                    </>
                                 ) : (
-                                  <>
-                                    <Mail className="h-4 w-4 mr-1" />
-                                    {t("invite")}
-                                  </>
+                                    <>
+                                      <Mail className="h-4 w-4 mr-1" />
+                                      {t("invite")}
+                                    </>
                                 )}
                               </Button>
                             </TableCell>
@@ -316,12 +430,12 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                                 variant="ghost" 
                                 className="h-8 w-8 p-0" 
                                 aria-label="Edit participant"
+                                onClick={() => handleEditParticipant(participant)}
                               >
                                 <Edit className="h-4 w-4 text-blue-600" />
                               </Button>
                             </TableCell>
                           </>
-                        )}
                       </TableRow>
                     ))}
                   </TableBody>

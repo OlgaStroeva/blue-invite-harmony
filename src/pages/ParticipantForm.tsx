@@ -9,75 +9,6 @@ import SuccessMessage from "@/components/participant/SuccessMessage";
 import EventNotFound from "@/components/participant/EventNotFound";
 import RegistrationForm from "@/components/participant/RegistrationForm";
 
-// Mock events and form templates - in a real app, this would come from a database
-const mockEvents = [
-  {
-    id: 1,
-    title: "Summer Wedding",
-    category: "Wedding",
-    description: "Join us for our special day!",
-    image: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=2070&auto=format&fit=crop",
-    gradient: "from-rose-400 to-orange-300",
-  },
-  {
-    id: 2,
-    title: "Annual Tech Conference",
-    category: "Corporate",
-    description: "The biggest tech event of the year",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop",
-    gradient: "from-blue-400 to-indigo-500",
-  }
-];
-
-const mockFormTemplates = [
-  {
-    id: 1,
-    eventId: 1,
-    fields: [
-      { id: "email", name: "Email", type: "email" as const, required: true },
-      { id: "name", name: "Full Name", type: "text" as const, required: true },
-      { id: "dietary", name: "Dietary Requirements", type: "text" as const, required: false },
-      { id: "plus_one", name: "Plus One Name", type: "text" as const, required: false },
-      { id: "attendance", name: "Attending", type: "text" as const, required: true },
-    ]
-  },
-  {
-    id: 2,
-    eventId: 2,
-    fields: [
-      { id: "email", name: "Email", type: "email" as const, required: true },
-      { id: "name", name: "Full Name", type: "text" as const, required: true },
-      { id: "company", name: "Company", type: "text" as const, required: true },
-      { id: "position", name: "Position", type: "text" as const, required: false },
-      { id: "device", name: "Device Requirements", type: "text" as const, required: false },
-      { id: "workshop", name: "Workshop Selection", type: "text" as const, required: true },
-    ]
-  },
-  {
-    id: 3,
-    eventId: 1,
-    fields: [
-      { id: "email", name: "Email", type: "email" as const, required: true },
-      { id: "name", name: "Full Name", type: "text" as const, required: true },
-      { id: "phone", name: "Phone Number", type: "tel" as const, required: true },
-      { id: "dress_code", name: "Dress Size", type: "text" as const, required: false },
-      { id: "dance", name: "Dance Preferences", type: "text" as const, required: false },
-    ]
-  },
-  {
-    id: 4,
-    eventId: 2,
-    fields: [
-      { id: "email", name: "Email", type: "email" as const, required: true },
-      { id: "name", name: "Full Name", type: "text" as const, required: true },
-      { id: "job_title", name: "Job Title", type: "text" as const, required: true },
-      { id: "experience", name: "Years of Experience", type: "number" as const, required: true },
-      { id: "skills", name: "Technical Skills", type: "text" as const, required: true },
-      { id: "session", name: "Preferred Session", type: "text" as const, required: true },
-    ]
-  }
-];
-
 const ParticipantForm = () => {
   const { eventId } = useParams();
   const { toast } = useToast();
@@ -85,36 +16,103 @@ const ParticipantForm = () => {
   const [event, setEvent] = useState<Event | null>(null);
   const [formFields, setFormFields] = useState<FormField[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [formId, setFormId] = useState<number | null>(null);
+
 
   useEffect(() => {
-    // Find event and its form template
+    const token = localStorage.getItem("token");
+
     if (eventId) {
-      const foundEvent = mockEvents.find(e => e.id.toString() === eventId);
-      if (foundEvent) {
-        setEvent(foundEvent);
-        
-        // Find form template for this event
-        const template = mockFormTemplates.find(t => t.eventId.toString() === eventId);
-        if (template) {
-          setFormFields(template.fields);
-        }
-      }
+      // Получаем данные мероприятия
+      fetch(`https://localhost:7291/api/events/${eventId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data) {
+              setEvent({
+                id: data.id,
+                title: data.name,
+                category: data.category,
+                description: data.description,
+                image: data.imageBase64,
+                gradient: "from-blue-100 to-blue-300" // Пример градиента
+              });
+            }
+          });
+
+      // Получаем шаблон анкеты
+      fetch(`https://localhost:7291/api/forms/get-by-event/${eventId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data && data.fields) {
+              const fieldsWithIds = data.fields.map((f: any, i: number) => ({
+                id: `field-${i}`,
+                name: f.name,
+                type: f.type,
+                required: f.name.toLowerCase() === "email" // или f.required
+              }));
+
+              setFormFields(fieldsWithIds);
+              setFormId(data.id); // 👈 сохраняем formId
+            }
+          });
     }
   }, [eventId]);
 
-  const handleSubmit = (data: Record<string, string | number>) => {
-    console.log("Form submitted:", data);
-    
-    // Display success toast and set submitted state
-    toast({
-      title: t("registrationComplete"),
-      description: "Your information has been submitted",
-    });
-    
-    setSubmitted(true);
-    
-    // In a real app, you would send this data to your backend
+
+  const handleSubmit = async (data: Record<string, string>) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const mappedData: Record<string, string> = {};
+
+      formFields.forEach((field) => {
+        const fieldName = field.name;
+        const value = data[field.id]; // field.id из input формы, например: field-0
+        if (value !== undefined) {
+          mappedData[fieldName] = value;
+        }
+      });
+
+      const response = await fetch(`https://localhost:7291/api/forms/add-participant/${formId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          data: [mappedData]
+        })
+      });
+
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: t("registrationComplete"),
+          description: "Your information has been submitted"
+        });
+        setSubmitted(true);
+      } else {
+        toast({
+          title: t("error"),
+          description: result.message || "Submission failed",
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      toast({
+        title: t("error"),
+        description: "Network issue",
+        variant: "destructive"
+      });
+    }
   };
+
 
   if (!event) {
     return <EventNotFound />;

@@ -24,7 +24,7 @@ const SuccessMessage = ({ eventTitle }: SuccessMessageProps) => {
         </p>
         <Button 
           className="mt-6 bg-blue-600 hover:bg-blue-700"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard")}
         >
           {t("returnHome")}
         </Button>

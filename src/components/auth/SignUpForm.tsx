@@ -24,29 +24,43 @@ const SignUpForm = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-    
+
+    if (!name || !email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      if (name && email && password) {
-        const result = await registerUser(email, password);
-        
-        if (result.success) {
-          toast({
-            title: "Account created successfully",
-            description: "You have been signed up!",
-          });
-          navigate("/sign-in");
-        } else {
-          setError(result.message || "Failed to create account");
-        }
-      } else {
-        setError("Please fill in all fields");
+      const response = await fetch("http://localhost:5212/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        toast({
+          title: "Account created successfully",
+          description: result.message || "You have been signed up!",
+        });
+        navigate("/sign-in");
+      } else if (result.message == "Письмо с подтверждением отправлено на email."){
+        toast({
+          title: "Приглашение отправлено на электронную почту",
+          status: "success",
+        });
+      } else{
+        setError(result.message || "Failed to create account");
       }
     } catch (err) {
       setError("An error occurred during registration");
@@ -55,6 +69,7 @@ const SignUpForm = () => {
       setIsLoading(false);
     }
   };
+
 
   return (
     <>

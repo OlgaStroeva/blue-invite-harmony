@@ -33,8 +33,33 @@ const EventViewDialog = ({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event>(event);
   const { t } = useLanguage();
-  const { isAuthenticated } = useAuth();
-  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<{ id: number; name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    fetch("https://localhost:7291/api/auth/me", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+        .then((res) => {
+          if (!res.ok) throw new Error("Not authenticated");
+          return res.json();
+        })
+        .then((data) => {
+          setUser(data);
+          setIsAuthenticated(true);
+        })
+        .catch(() => {
+          setIsAuthenticated(false);
+          setUser(null);
+        });
+  }, []);
+
   // Update the local event state whenever the prop changes
   useEffect(() => {
     setCurrentEvent(event);
@@ -102,7 +127,7 @@ const EventViewDialog = ({
           </ScrollArea>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t mt-4">
-            {isAuthenticated && (
+            {isAuthenticated && event.createdBy === user.id &&  (
               <Button
                 onClick={() => setShowEditDialog(true)}
                 className="w-full bg-blue-600 hover:bg-blue-700"
@@ -127,10 +152,10 @@ const EventViewDialog = ({
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Table className="mr-2 h-4 w-4" />
-              {t("participants")}
+              {t("staff")}
             </Button>
             
-            {isAuthenticated && (
+            {isAuthenticated && event.createdBy === user.id && (
               <Button
                 onClick={() => setShowEmployeeManagement(true)}
                 className="w-full bg-blue-600 hover:bg-blue-700"

@@ -16,6 +16,8 @@ import { Event } from "@/types/event";
 import FormFieldList from "./FormFieldList";
 import AddFieldForm from "./AddFieldForm";
 import TemplateSelector from "./TemplateSelector";
+import {useToast} from "@/hooks/use-toast.ts";
+import {useEffect, useState} from "react";
 
 interface InvitationFormEditorProps {
   open: boolean;
@@ -24,21 +26,115 @@ interface InvitationFormEditorProps {
   formFields: FormField[];
   setFormFields: (fields: FormField[]) => void;
   templates: Template[];
-  onSaveTemplate: () => void;
+  
   onApplyTemplate: (template: Template) => void;
+  isEditMode: boolean;
+  
+  selectedTemplate: Template | null;
+  setSelectedTemplate: (template: Template) => void;
+  onSaveTemplate: (template: Template) => void; // Теперь принимает Template
+  setIsEditMode: (val: boolean) => void; // Добавляем обязательный пропс
 }
 
 const InvitationFormEditor = ({
-  open,
-  onOpenChange,
-  event,
-  formFields,
-  setFormFields,
-  templates,
-  onSaveTemplate,
-  onApplyTemplate
-}: InvitationFormEditorProps) => {
+                                open,
+                                onOpenChange,
+                                event,
+                                formFields,
+                                setFormFields,
+                                templates,
+                                onApplyTemplate,
+                                onSaveTemplate, // Получаем из пропсов
+                                setIsEditMode // Получаем из пропсов
+                              }: InvitationFormEditorProps) => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  //const [isEditMode, setIsEditMode] = useState(false);
+
+  const handleSaveTemplate = async () => {
+    const eventId = event?.id;
+    if (!eventId) {
+      console.error("Событие не определено:", event);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    let formId: number;
+
+    try {
+      // Пытаемся получить существующий шаблон
+      const formRes = await fetch(`https://localhost:7291/api/forms/get-by-event/${eventId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (formRes.ok) {
+        const form = await formRes.json();
+        formId = form.id;
+      } else {
+        // Если не найден — создаём новый шаблон
+        const createRes = await fetch(`https://localhost:7291/api/forms/create/${eventId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const createResult = await createRes.json();
+
+        //if (!createRes.ok) {
+         // throw new Error(createResult.message || "Ошибка при создании шаблона");
+       // }
+
+        formId = createResult.formId ?? createResult.id;
+      }
+      
+
+      try {
+        const response = await fetch(`https://localhost:7291/api/forms/update-form/${formId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            fields: formFields.map(field => ({
+              name: field.name,
+              type: field.type
+            }))
+          })
+        });
+
+        const result = await response.json(); // ✅ result, не data
+
+        if (response.ok) {
+          const savedTemplate = {
+            id: formId,
+            fields: formFields,
+            name: "Current Template"
+          };
+
+          onSaveTemplate(savedTemplate); // Передаем сохраненный шаблон
+          setIsEditMode(false); // ✅ Явно переключаем режим
+
+          toast({
+            title: t("formSaved"),
+            description: t("formSavedSuccessfully")
+          });
+        }
+      } catch (error) {
+        console.error("Ошибка при сохранении шаблона:", error);
+
+        return null;
+      }
+    
+  } catch (err) {
+    console.error("Ошибка:", err);
+
+  }
+};
   
   const handleAddField = (field: FormField) => {
     setFormFields([...formFields, field]);
@@ -61,13 +157,15 @@ const InvitationFormEditor = ({
           <div className="flex justify-between items-center">
             <TemplateSelector templates={templates} onApplyTemplate={onApplyTemplate} />
           </div>
-          <FormFieldList formFields={formFields} setFormFields={setFormFields} />
+          {event && (
+          <FormFieldList formFields={formFields} setFormFields={setFormFields} currentEvent={event}/>
+          )}
           <AddFieldForm onAddField={handleAddField} />
         </div>
 
         <DialogFooter className="pt-4 border-t border-blue-200">
           <Button 
-            onClick={onSaveTemplate}
+            onClick={handleSaveTemplate}
             className="bg-blue-600 hover:bg-blue-700 ml-auto"
           >
             <Save className="mr-2 h-4 w-4" />

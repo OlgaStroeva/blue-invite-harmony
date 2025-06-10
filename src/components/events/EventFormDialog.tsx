@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import EventEditDialog from "./EventEditDialog";
+import {Result} from "postcss";
 
 interface EventFormDialogProps {
   open: boolean;
@@ -26,7 +27,7 @@ interface EventFormDialogProps {
 }
 
 const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialogProps) => {
-  const [title, setTitle] = useState("");
+  const [Name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [showTagInput, setShowTagInput] = useState(false);
@@ -35,6 +36,7 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
   const [imagePreview, setImagePreview] = useState<string>("");
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [tempEvent, setTempEvent] = useState<any>(null);
+  const [user, setUser] = useState<{ id: number; name: string; email: string } | null>(null);
   const { toast } = useToast();
 
   // Get all unique categories from existing events
@@ -42,8 +44,8 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
     "Wedding", "Birthday", "Corporate", "Party", "Formal"
   ]);
 
-  const handleContinue = () => {
-    if (!title.trim()) {
+  const handleContinue = async () => {
+    if (!Name.trim()) {
       toast({
         title: "Title required",
         description: "Please enter a title for your event",
@@ -51,23 +53,48 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
       });
       return;
     }
-    
-    // Create a temporary event object with just the title
-    const newEvent = {
-      id: Date.now(),
-      title,
-      description: "",
-      category: "",
-      image: "",
-      gradient: `from-blue-${Math.floor(Math.random() * 5 + 2)}00 to-blue-${Math.floor(Math.random() * 5 + 4)}00`,
-      status: 'upcoming' as 'upcoming'
-    };
-    
-    setTempEvent(newEvent);
-    
-    // Close this dialog and open the edit dialog
-    onOpenChange(false);
-    setShowEditDialog(true);
+
+    try {
+      const response = await fetch("https://localhost:7291/api/events/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ Name : Name })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        const newEvent = {
+          id: result.eventId,
+          title: Name,
+          description: "",
+          image: "",
+          datetime: "",
+          category: "",
+          location: "",
+          status: 'upcoming'
+        };
+        setTempEvent(newEvent); // используем данные с сервера
+        onOpenChange(false);
+        setShowEditDialog(true);
+      } else {
+        toast({
+          title: "Ошибка",
+          description: result.message || "Не удалось создать мероприятие",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Ошибка создания мероприятия:", error);
+      toast({
+        title: "Ошибка сети",
+        description: "Сервер не отвечает",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,7 +152,7 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
   };
   
   const resetForm = () => {
-    setTitle("");
+    setName("");
     setDescription("");
     setCategory("");
     setNewTag("");
@@ -159,8 +186,8 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
               <Label htmlFor="title" className="text-blue-700">Event Title</Label>
               <Input 
                 id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={Name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Enter event title..."
                 className="border-blue-200 focus-visible:ring-blue-400"
                 autoFocus

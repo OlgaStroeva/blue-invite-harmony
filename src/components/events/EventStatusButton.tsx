@@ -5,17 +5,57 @@ import { useState } from "react";
 import { Event } from "@/types/event";
 import { Play, Square, Check } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface EventStatusButtonProps {
   event: Event;
   onStatusChange: (event: Event, newStatus: 'upcoming' | 'in_progress' | 'finished') => void;
 }
 
-const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) => {
+const EventStatusButton = ({ event}: EventStatusButtonProps) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { t } = useLanguage();
-  
+  const { toast } = useToast();
+  const onStatusChange = async (event: Event, newStatus: 'upcoming' | 'in_progress' | 'finished') => {
+    try {
+      const response = await fetch(`https://localhost:7291/api/events/update/${event.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+          name: event.title,
+          description: event.description || "",
+          imageBase64: event.image || "",
+          dateTime: event.date || "",
+          category: event.category || "",
+          location: event.place || "",
+          status: newStatus
+        })
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Ошибка обновления");
+      }
+      event.status = newStatus;
+      toast({
+        title: "Статус обновлён",
+        description: `Событие переведено в режим: ${newStatus}`
+      });
+
+    } catch (error) {
+      console.error("Ошибка при обновлении:", error);
+      toast({
+        title: "Ошибка",
+        description: error.message || "Не удалось обновить статус",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleStatusChange = () => {
+    
     if (event.status === 'upcoming') {
       onStatusChange(event, 'in_progress');
     } else if (event.status === 'in_progress') {
@@ -63,7 +103,7 @@ const EventStatusButton = ({ event, onStatusChange }: EventStatusButtonProps) =>
         disabled={event.status === 'finished'}
       >
         {buttonContent.icon}
-        {buttonContent.text}
+        {event.status === 'upcoming' ? t('start') : t('finish')}
       </Button>
 
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>

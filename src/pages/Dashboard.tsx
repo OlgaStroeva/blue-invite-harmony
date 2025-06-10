@@ -14,59 +14,96 @@ import { Event } from "@/types/event";
 import EventViewDialog from "@/components/events/EventViewDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const events: Event[] = [
-  {
-    id: 1,
-    title: "Elegant Blue",
-    category: "Wedding",
-    image: "",
-    gradient: "from-blue-100 to-blue-200",
-    status: "upcoming"
-  },
-  {
-    id: 2,
-    title: "Modern Sapphire",
-    category: "Corporate",
-    image: "",
-    gradient: "from-blue-600 to-blue-800",
-    status: "upcoming"
-  },
-  {
-    id: 3,
-    title: "Sky Celebration",
-    category: "Birthday",
-    image: "",
-    gradient: "from-blue-300 to-blue-500",
-    status: "in_progress"
-  },
-  {
-    id: 4,
-    title: "Ocean Waves",
-    category: "Party",
-    image: "",
-    gradient: "from-blue-400 to-blue-600",
-    status: "finished"
-  },
-  {
-    id: 5,
-    title: "Azure Delight",
-    category: "Wedding",
-    image: "",
-    gradient: "from-blue-200 to-blue-400",
-    status: "upcoming"
-  },
-  {
-    id: 6,
-    title: "Navy Elegance",
-    category: "Formal",
-    image: "",
-    gradient: "from-blue-700 to-blue-900",
-    status: "in_progress"
-  },
+interface Event {
+  id: number;
+  title: string;
+  category: string;
+  description?: string;
+  image: string;
+  gradient: string;
+}
+const blueGradients = [
+  "from-blue-100 to-blue-200",
+  "from-blue-300 to-blue-400",
+  "from-blue-500 to-blue-600",
+  "from-blue-700 to-blue-800",
+  "from-blue-900 to-blue-950"
 ];
+
+const events: Event[] = await fetch("https://localhost:7291/api/events/my-events", {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+    "Content-Type": "application/json"
+  }
+})
+    .then((res) => res.json())
+    .then((data) =>
+        data.map((event: any, index: number) => ({
+          id: event.id,
+          title: event.name, // если приходит "name", а не "title"
+          category: event.category || "Uncategorized",
+          description: event.description || "",
+          image: event.imageBase64 || "",
+          gradient: blueGradients[index % blueGradients.length],
+          status: event.status,
+          createdBy : event.createdBy
+        }))
+    )
+    .catch((err) => {
+      console.error("Ошибка загрузки мероприятий:", err);
+      return [];
+    });
+
+const categories: string[] = await fetch("https://localhost:7291/api/events/my-events", {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+    "Content-Type": "application/json"
+  }
+})
+    .then((res) => res.json())
+    .then((data) => {
+      const rawCategories = data.map((event: any) => event.category);
+      const rawStatuses = data.map((event: any) => event.status);
+
+      const combined = [...rawCategories, ...rawStatuses].filter(
+          (v) => typeof v === "string" && v.trim() !== ""
+      );
+
+      return ["All", ...Array.from(new Set(combined))];
+    })
+    .catch((err) => {
+      console.error("Ошибка загрузки категорий и статусов:", err);
+      return [];
+    });
+
 
 const Dashboard = () => {
   const [userEvents, setUserEvents] = useState<Event[]>(events);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              // Start animating items sequentially
+              userEvents.forEach((_, index) => {
+                setTimeout(() => {
+                  setAnimatedItems((prev) => [...prev, index]);
+                }, 150 * index);
+              });
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [userEvents]);  
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [animatedItems, setAnimatedItems] = useState<number[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -79,32 +116,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            userEvents.forEach((_, index) => {
-              setTimeout(() => {
-                setAnimatedItems((prev) => [...prev, index]);
-              }, 150 * index);
-            });
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [userEvents]);
-
-  const categories = ["All", "Wedding", "Birthday", "Corporate", "Party", "Formal"];
+  
   const filteredEvents = activeCategory === "All" 
     ? userEvents 
     : userEvents.filter(event => event.category === activeCategory);
@@ -122,26 +134,32 @@ const Dashboard = () => {
     setCurrentEvent(event);
     setIsInvitationDialogOpen(true);
   };
-  
-  const handleOpenEmployees = (event: Event) => {
-    setCurrentEvent(event);
-    setIsEmployeeDialogOpen(true);
-  };
 
   const handleEventCreated = (newEvent: Event) => {
-    setUserEvents((prev) => [newEvent, ...prev]);
+    setUserEvents((prev) => {
+      const exists = prev.some(e => e.id === newEvent.id);
+      return exists ? prev : [newEvent, ...prev];
+    });
+
   };
 
   const handleEventUpdated = (updatedEvent: Event) => {
-    setUserEvents((prev) => 
-      prev.map((event) => 
-        event.id === updatedEvent.id ? updatedEvent : event
-      )
+    setUserEvents((prev) =>
+        prev.map((event) =>
+            event.id === updatedEvent.id ? updatedEvent : event
+        )
     );
     toast({
-      title: t("success"),
-      description: t("eventUpdated"),
+      title: "Event Updated",
+      description: "Your event has been updated successfully!",
     });
+  };
+  const handleStatusChange = (eventId: number, newStatus: string) => {
+    setUserEvents(prev =>
+        prev.map(e =>
+            e.id === eventId ? { ...e, status: newStatus } : e
+        )
+    );
   };
 
   const handleEventStatusChange = (eventToUpdate: Event, newStatus: 'upcoming' | 'in_progress' | 'finished') => {
@@ -198,7 +216,7 @@ const Dashboard = () => {
                       : "bg-white text-blue-700 hover:bg-blue-50"
                   }`}
                 >
-                  {t(category.toLowerCase())}
+                  {t(category?.toLowerCase?.() || category || "unknown")}
                 </button>
               ))}
             </div>

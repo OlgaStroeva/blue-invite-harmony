@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Dialog, 
@@ -34,6 +34,8 @@ interface InvitationFormPreviewProps {
   selectedTemplate: Template;
   onEditMode: () => void;
   onClose?: () => void;
+  setTemplate: () => void;
+  user : number;
 }
 
 const InvitationFormPreview = ({ 
@@ -41,13 +43,14 @@ const InvitationFormPreview = ({
   onOpenChange, 
   event, 
   selectedTemplate,
-  onEditMode
+  onEditMode, user
 }: InvitationFormPreviewProps) => {
   const navigate = useNavigate();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  
+  const [isAuthenticated] = useState(false);
 
   const handleExportToXLSX = () => {
     const worksheet = XLSX.utils.json_to_sheet([]);
@@ -65,6 +68,105 @@ const InvitationFormPreview = ({
     });
   };
 
+  const handleDeleteForm = async () => {
+    const token = localStorage.getItem("token");
+    let formId;
+
+    try {
+      // Пытаемся получить существующий шаблон
+      const formRes = await fetch(`https://localhost:7291/api/forms/get-by-event/${event.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (formRes.ok) {
+        const form = await formRes.json();
+        formId = form.id;
+      }
+      const res = await fetch(`https://localhost:7291/api/forms/delete/${formId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        toast({
+          title: t("error"),
+          description: result.message || t("deleteFailed"),
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: t("formDeleted"),
+        description: t("formDeletedSuccessfully")
+      });
+
+      // Закрываем предпросмотр и сбрасываем шаблон
+      onOpenChange(false);
+      // 👇 Предположим, что setTemplate передан, как reset
+      // setTemplate(null); // ← раскомментируйте, если нужно
+    } catch (err) {
+      toast({
+        title: t("error"),
+        description: t("networkError"),
+        variant: "destructive"
+      });
+      console.error("Ошибка при удалении шаблона:", err);
+    }
+  };
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    fetch("https://localhost:7291/api/forms/my-templates", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+        .then(async (res) => {
+          if (!res.ok) {
+            const text = await res.text();
+            console.error("Ошибка сервера:", text);
+            return;
+          }
+
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            const text = await res.text();
+            console.error("Не JSON:", text);
+            return;
+          }
+
+          const data = await res.json();
+
+          // обработка и нормализация
+          const normalized = data.map(template => ({
+            ...template,
+            fields: Array.isArray(template.fields)
+                ? template.fields.map(f =>
+                    typeof f === "string"
+                        ? { name: f, type: "text"}
+                        : { name: f.name || "", type: f.type || "text" }
+                )
+                : []
+          }));
+
+          //setTemplate(normalized);
+        })
+        .catch(err => {
+          console.error("Ошибка загрузки шаблонов:", err);
+        });
+  }, []);
+  
   // Only show employer-specific features if authenticated
   const showEmployerFeatures = isAuthenticated;
 
@@ -80,12 +182,13 @@ const InvitationFormPreview = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setShowDeleteAlert(false);
-                onEditMode();
-              }}
-              className="bg-red-500 hover:bg-red-600 text-white"
+            <AlertDialogAction 
+                onClick={async () => {
+                  setShowDeleteAlert(false);
+                  await handleDeleteForm();
+                }}
+
+                className="bg-red-500 hover:bg-red-600 text-white"
             >
               {t("delete")}
             </AlertDialogAction>
@@ -106,7 +209,7 @@ const InvitationFormPreview = ({
             <FormFieldList formFields={selectedTemplate.fields} readOnly />
             
             <div className="flex justify-between gap-3 pt-4 border-t border-blue-200">
-              {showEmployerFeatures && (
+              {event.createdBy === user! && (
                 <Button
                   onClick={() => setShowDeleteAlert(true)}
                   variant="destructive"
@@ -118,13 +221,13 @@ const InvitationFormPreview = ({
               )}
               
               <div className="flex gap-3 ml-auto">
-                {showEmployerFeatures && (
-                  <Button
-                    onClick={onEditMode}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
-                    {t("editForm")}
+                {event.createdBy === user! && (
+                    <Button
+                        onClick={() => onEditMode()} // Просто вызываем переданный колбэк
+                        className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      {t("editForm")}
                   </Button>
                 )}
                 
@@ -136,7 +239,6 @@ const InvitationFormPreview = ({
                   {t("addParticipant")}
                 </Button>
                 
-                {showEmployerFeatures && (
                   <Button
                     onClick={handleExportToXLSX}
                     className="bg-blue-600 hover:bg-blue-700"
@@ -144,7 +246,6 @@ const InvitationFormPreview = ({
                     <FileDown className="mr-2 h-4 w-4" />
                     {t("exportToExcel")}
                   </Button>
-                )}
               </div>
             </div>
           </div>

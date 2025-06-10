@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   registeredUsers: REGISTERED_USERS,
 });
 
-export const useAuth = () => useContext(AuthContext);
+export let useAuth = () => useContext(AuthContext);
 
 interface AuthProviderProps {
   children: ReactNode;

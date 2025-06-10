@@ -19,14 +19,14 @@ const queryClient = new QueryClient();
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/sign-in" />;
-  }
-  
-  return <>{children}</>;
-}
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        return <Navigate to="/sign-in" />;
+    }
+
+    return <>{children}</>;
+};
 
 const AppRoutes = () => {
   return (

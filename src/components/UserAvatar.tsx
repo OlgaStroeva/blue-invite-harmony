@@ -15,20 +15,40 @@ import { User, Settings, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-
-// Mock user data - in a real app, this would come from authentication context
-const mockUser = {
-  name: "Jane Smith",
-  email: "jane.smith@example.com",
-  avatar: "" // Add image URL here if available
-};
-
+import { useEffect, useState } from "react";
 const UserAvatar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { toast } = useToast();
   const { t } = useLanguage();
   
+
+  type User = {
+    id: number;
+    name: string;
+    email: string;
+    canBeStaff: boolean;
+    isEmailConfirmed: boolean;
+  };
+
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5212/api/auth/me", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
+        .then(res => res.json())
+        .then(data => {
+          setUser(data);
+          console.log("User data:", data);
+        })
+        .catch(err => {
+          console.error("Failed to fetch user:", err);
+        });
+  }, []);
+
   const handleLogout = () => {
     // Perform logout logic
     logout();
@@ -60,10 +80,10 @@ const UserAvatar = () => {
         >
           <Avatar className="h-9 w-9 cursor-pointer">
             {mockUser.avatar ? (
-              <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
+              <AvatarImage src={User.avatar} alt={User.name} />
             ) : (
               <AvatarFallback className="bg-blue-500 text-white">
-                {getInitials(mockUser.name)}
+                {getInitials(User.name)}
               </AvatarFallback>
             )}
           </Avatar>

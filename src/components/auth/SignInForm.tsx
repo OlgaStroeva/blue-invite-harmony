@@ -1,5 +1,3 @@
-
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -13,6 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import ForgotPasswordDialog from "./ForgotPasswordDialog";
 import ThirdPartyAuth from "./ThirdPartyAuth";
+import React, { useState, useEffect } from "react";
+
 
 const SignInForm = () => {
   const [email, setEmail] = useState("");
@@ -23,7 +23,30 @@ const SignInForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
-  const { login } = useAuth();
+  const {login} = useAuth();
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("confirm");
+
+    if (token) {
+      fetch("https://localhost:7291/api/auth/confirm-email?token=" + token, {
+        method: "GET"
+      })
+          .then(async (res) => {
+            const result = await res.json();
+            if (res.ok && result.success) {
+              toast({ title: "Email подтвержден", description: result.message });
+            } else {
+              toast({ title: "Ошибка подтверждения", description: result.message });
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            toast({ title: "Ошибка сервера" });
+          });
+    }
+  }, []);
+
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +55,21 @@ const SignInForm = () => {
 
     try {
       if (email && password) {
-        const result = await login(email, password);
-        
-        if (result.success) {
+        const response = await fetch("http://localhost:5212/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem("token", result.token);// сохранить токен
           toast({
             title: "Signed in successfully",
-            description: "Welcome back!",
+            description: result.message || "Welcome back!",
           });
           navigate("/dashboard");
         } else {
@@ -53,6 +85,7 @@ const SignInForm = () => {
       setIsLoading(false);
     }
   };
+
 
   return (
     <Card className="w-full">
