@@ -30,10 +30,26 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<User | null>(null);
   // Check if user was previously authenticated from localStorage
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const savedAuth = localStorage.getItem('isAuthenticated');
-    return savedAuth === 'true';
+    fetch("https://localhost:7291/api/auth/me", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
+        .then(res => res.json())
+        .then(data => {
+          setUser(data);
+          console.log("User data:", data);
+          localStorage.setItem('isAuthenticated', 'true');
+          return 'true';
+        })
+        .catch(err => {
+          console.error("Failed to fetch user:", err);
+          localStorage.setItem('isAuthenticated', 'false');
+          return 'false';
+        });
   });
   
   // Store registered users for our test

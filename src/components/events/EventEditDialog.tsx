@@ -241,12 +241,50 @@ const EventEditDialog = ({
     onOpenChange(false);
   };
 
-  const handleDelete = () => {
-    if (onEventDeleted) {
-      onEventDeleted(event);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !event?.id) return;
+
+    try {
+      setIsDeleting(true);
+
+      const response = await fetch(`https://localhost:7291/api/events/delete/${event.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete event");
+      }
+
+      // Успешное удаление
+      toast({
+        title: t("eventDeleted"),
+        description: t("eventDeletedSuccessfully"),
+      });
+      
+      if (onEventDeleted) {
+        onEventDeleted(event);
+      }
       onOpenChange(false);
+
+    } catch (err) {
+      console.error("Error deleting event:", err);
+      toast({
+        title: t("error"),
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+      window.location.reload();
     }
-    setShowDeleteConfirm(false);
   };
 
   return (

@@ -138,6 +138,7 @@ const Dashboard = () => {
   const handleEventCreated = (newEvent: Event) => {
     setUserEvents((prev) => {
       const exists = prev.some(e => e.id === newEvent.id);
+      window.location.reload();
       return exists ? prev : [newEvent, ...prev];
     });
 

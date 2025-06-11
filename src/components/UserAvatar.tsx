@@ -16,6 +16,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
+
+
+
 const UserAvatar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -31,10 +34,11 @@ const UserAvatar = () => {
     isEmailConfirmed: boolean;
   };
 
-  const [user, setUser] = useState<User | null>(null);
 
+  const [user, setUser] = useState<User | null>(null);
+  
   useEffect(() => {
-    fetch("http://localhost:5212/api/auth/me", {
+    fetch("https://localhost:7291/api/auth/me", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`
       }

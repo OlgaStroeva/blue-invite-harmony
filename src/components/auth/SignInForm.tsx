@@ -71,6 +71,7 @@ const SignInForm = () => {
             title: "Signed in successfully",
             description: result.message || "Welcome back!",
           });
+          localStorage.setItem('isAuthenticated', 'true');
           navigate("/dashboard");
         } else {
           setError(result.message || "Invalid email or password");

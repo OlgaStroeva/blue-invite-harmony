@@ -21,13 +21,32 @@ const AccountNav = ({ activeTab, onTabChange }: AccountNavProps) => {
   const { logout } = useAuth();
   const { toast } = useToast();
 
-  const handleLogout = () => {
-    logout();
-    toast({
-      title: "Logged out successfully",
-      description: "You have been signed out",
-    });
-    navigate("/");
+  const handleLogout = (): void => {
+    try {
+      // 1. Удаляем токен из localStorage
+      localStorage.removeItem('authToken'); // или 'token', в зависимости от того, как он у вас хранится
+
+      // 2. Показываем уведомление об успешном выходе
+      toast({
+        title: "Logged out successfully",
+        description: "You have been signed out",
+        variant: "default", // или "destructive" если хотите другой стиль
+      });
+
+      // 3. Перенаправляем на главную страницу
+      const navigate = useNavigate();
+      navigate("/");
+
+      // 4. Дополнительно: можно обновить страницу, чтобы сбросить состояние приложения
+      window.location.reload();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      toast({
+        title: "Logout error",
+        description: "An error occurred while signing out",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
