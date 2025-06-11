@@ -252,7 +252,16 @@ const enTranslations: Record<string, string> = {
   "logout": "Log Out",
   "dashboard": "Dashboard",
   "settings": "Settings",
-  "search": "Search"
+  "search": "Search",
+  
+  // Additional registration translations
+  "passwordsDoNotMatch": "Passwords do not match",
+  "registrationSuccessful": "Registration Successful",
+  "youCanNowSignIn": "You can now sign in to your account",
+  "registrationFailed": "Registration failed",
+  "somethingWentWrong": "Something went wrong",
+  "enterYourEmailAndPassword": "Enter your email and password to create account",
+  "signingUp": "Signing up...",
 };
 
 // Russian translations
@@ -349,7 +358,7 @@ const ruTranslations: Record<string, string> = {
   "emailRequired": "Пожалуйста, введите ваш email",
   "passwordResetEmailSent": "Письмо для сброса пароля отправлено",
   "checkInboxForInstructions": "Проверьте вашу почту для получения инструкций по сбросу пароля.",
-  "failedToSendResetEmail": "Не удалось отправить письмо для сброса пароля. Пожалуйста, попробуйте снова.",
+  "failedToSendResetEmail": "Не удалось отправить письмо для сброса пароль. Пожалуйста, попробуйте снова.",
   "passwordResetEmailSentSuccess": "Письмо для сброса пароля успешно отправлено!",
   "sending": "Отправка...",
   
@@ -459,5 +468,14 @@ const ruTranslations: Record<string, string> = {
   "logout": "Выйти",
   "dashboard": "Панель управления",
   "settings": "Настройки",
-  "search": "Поиск"
+  "search": "Поиск",
+  
+  // Additional registration translations
+  "passwordsDoNotMatch": "Пароли не совпадают",
+  "registrationSuccessful": "Регистрация успешна",
+  "youCanNowSignIn": "Теперь вы можете войти в свой аккаунт",
+  "registrationFailed": "Регистрация не удалась",
+  "somethingWentWrong": "Что-то пошло не так",
+  "enterYourEmailAndPassword": "Введите email и пароль для создания аккаунта",
+  "signingUp": "Регистрация...",
 };

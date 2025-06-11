@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Card,
   CardContent,
@@ -14,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
+import { Loader2 } from "lucide-react";
 
 interface SignUpFormProps {
   className?: string;
@@ -29,7 +30,7 @@ const SignUpForm = () => {
   const navigate = useNavigate();
   const { registerUser } = useAuth();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,60 +63,50 @@ const SignUpForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>{t("createAccount")}</CardTitle>
-        <CardDescription>{t("enterYourEmailAndPassword")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("email")}</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="mail@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">{t("password")}</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
-          {error && <p className="text-red-500">{error}</p>}
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-end">
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Spinner size="sm" className="mr-2" />
-              {t("signingUp")}
-            </>
-          ) : (
-            t("signUp")
-          )}
-        </Button>
-      </CardFooter>
-    </Card>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="email">{t("email")}</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="mail@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="password">{t("password")}</Label>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
+        <Input
+          id="confirmPassword"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+      </div>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      <Button type="submit" disabled={isLoading} className="w-full">
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {t("creatingAccount")}
+          </>
+        ) : (
+          t("signUp")
+        )}
+      </Button>
+    </form>
   );
 };
 
