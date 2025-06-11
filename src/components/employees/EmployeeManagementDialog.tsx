@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Dialog, 
@@ -13,8 +13,8 @@ import { Users } from "lucide-react";
 import EmployeeSearchInput from "./EmployeeSearchInput";
 import EmployeeSearchResult from "./EmployeeSearchResult";
 import EmployeeList from "./EmployeeList";
-import { Employee, EventEmployee } from "@/types/employee";
 import { Event } from "@/types/event";
+import { StaffService, StaffSearchResult } from "@/services/staffService";
 
 interface EmployeeManagementDialogProps {
   open: boolean;
@@ -22,84 +22,110 @@ interface EmployeeManagementDialogProps {
   event: Event;
 }
 
-// Mock data - in a real app this would come from your backend
-const mockEmployees: Employee[] = [
-  { id: 1, name: "Jane Cooper", email: "jane@example.com", role: "Event Manager" },
-  { id: 2, name: "Robert Fox", email: "robert@example.com", role: "Coordinator" },
-  { id: 3, name: "Esther Howard", email: "esther@example.com", role: "Assistant" }
-];
-
 const EmployeeManagementDialog = ({ 
   open, 
   onOpenChange, 
   event 
 }: EmployeeManagementDialogProps) => {
-  const [searchResult, setSearchResult] = useState<Employee | null>(null);
+  const [searchResults, setSearchResults] = useState<StaffSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [eventEmployees, setEventEmployees] = useState<EventEmployee[]>([
-    { 
-      id: 1, 
-      eventId: event.id, 
-      employeeId: 1, 
-      employee: mockEmployees[0], 
-      assignedAt: new Date().toISOString() 
-    }
-  ]);
+  const [eventStaffIds, setEventStaffIds] = useState<number[]>([]);
+  const [isLoadingStaff, setIsLoadingStaff] = useState(true);
   const { toast } = useToast();
 
-  const handleSearch = (email: string) => {
+  useEffect(() => {
+    if (open) {
+      loadEventStaff();
+    }
+  }, [open, event.id]);
+
+  const loadEventStaff = async () => {
+    try {
+      setIsLoadingStaff(true);
+      const staffIds = await StaffService.getEventStaff(event.id);
+      setEventStaffIds(staffIds);
+    } catch (error) {
+      console.error("Error loading event staff:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load event staff",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingStaff(false);
+    }
+  };
+
+  const handleSearch = async (emailPart: string) => {
     setIsSearching(true);
     setSearchError(null);
-    setSearchResult(null);
+    setSearchResults([]);
     
-    // Simulate API call with setTimeout
-    setTimeout(() => {
-      const employee = mockEmployees.find(emp => emp.email.toLowerCase() === email.toLowerCase());
+    try {
+      const results = await StaffService.findStaff(emailPart);
       
-      if (employee) {
-        // Check if employee is already assigned to this event
-        const alreadyAssigned = eventEmployees.some(ee => ee.employeeId === employee.id);
-        
-        if (alreadyAssigned) {
-          setSearchError("This employee is already assigned to this event");
-        } else {
-          setSearchResult(employee);
-        }
+      // Filter out staff already assigned to this event
+      const filteredResults = results.filter(staff => !eventStaffIds.includes(staff.id));
+      
+      if (filteredResults.length === 0) {
+        setSearchError("No available staff found with that email");
       } else {
-        setSearchError("No employee found with that email");
+        setSearchResults(filteredResults);
       }
-      
+    } catch (error) {
+      console.error("Error searching staff:", error);
+      setSearchError("Failed to search for staff");
+    } finally {
       setIsSearching(false);
-    }, 1000);
+    }
   };
 
-  const handleAssignEmployee = (employee: Employee) => {
-    const newEventEmployee: EventEmployee = {
-      id: Date.now(), // Just for mock data, in a real app this would come from the backend
-      eventId: event.id,
-      employeeId: employee.id,
-      employee,
-      assignedAt: new Date().toISOString(),
-      role: employee.role
-    };
-    
-    setEventEmployees(prev => [...prev, newEventEmployee]);
-    setSearchResult(null);
-    
-    toast({
-      title: "Employee assigned",
-      description: `${employee.name} has been assigned to this event`,
-    });
+  const handleAssignEmployee = async (employee: StaffSearchResult) => {
+    try {
+      await StaffService.assignStaff({
+        eventId: event.id,
+        userId: employee.id
+      });
+      
+      setEventStaffIds(prev => [...prev, employee.id]);
+      setSearchResults(prev => prev.filter(s => s.id !== employee.id));
+      
+      toast({
+        title: "Staff assigned",
+        description: `${employee.name} has been assigned to this event`,
+      });
+    } catch (error) {
+      console.error("Error assigning staff:", error);
+      toast({
+        title: "Error",
+        description: "Failed to assign staff member",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleRemoveEmployee = (eventEmployeeId: number) => {
-    setEventEmployees(prev => prev.filter(ee => ee.id !== eventEmployeeId));
-    
-    toast({
-      title: "Employee removed",
-      description: "The employee has been removed from this event",
-    });
+  const handleRemoveEmployee = async (userId: number) => {
+    try {
+      await StaffService.removeStaff({
+        eventId: event.id,
+        userId: userId
+      });
+      
+      setEventStaffIds(prev => prev.filter(id => id !== userId));
+      
+      toast({
+        title: "Staff removed",
+        description: "The staff member has been removed from this event",
+      });
+    } catch (error) {
+      console.error("Error removing staff:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove staff member",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -108,20 +134,20 @@ const EmployeeManagementDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-blue-700">
             <Users className="h-5 w-5" /> 
-            Manage Employees
+            Manage Staff
           </DialogTitle>
           <DialogDescription className="text-blue-600">
-            Assign and manage employees for {event.title}
+            Assign and manage staff for {event.title}
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="assign" className="mt-4">
           <TabsList className="grid grid-cols-2 bg-blue-100">
             <TabsTrigger value="assign" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              Assign Employees
+              Assign Staff
             </TabsTrigger>
             <TabsTrigger value="view" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              View Assigned ({eventEmployees.length})
+              View Assigned ({eventStaffIds.length})
             </TabsTrigger>
           </TabsList>
           
@@ -131,9 +157,23 @@ const EmployeeManagementDialog = ({
               isLoading={isSearching} 
             />
             
-            {(searchResult || isSearching || searchError) && (
+            {searchResults.length > 0 && (
+              <div className="space-y-2">
+                {searchResults.map((employee) => (
+                  <EmployeeSearchResult 
+                    key={employee.id}
+                    employee={employee}
+                    isLoading={false}
+                    error={null}
+                    onAssign={handleAssignEmployee}
+                  />
+                ))}
+              </div>
+            )}
+            
+            {(isSearching || searchError) && (
               <EmployeeSearchResult 
-                employee={searchResult}
+                employee={null}
                 isLoading={isSearching}
                 error={searchError}
                 onAssign={handleAssignEmployee}
@@ -144,8 +184,9 @@ const EmployeeManagementDialog = ({
           <TabsContent value="view" className="py-4">
             <EmployeeList 
               eventId={event.id}
-              eventEmployees={eventEmployees}
+              staffIds={eventStaffIds}
               onRemoveEmployee={handleRemoveEmployee}
+              isLoading={isLoadingStaff}
             />
           </TabsContent>
         </Tabs>

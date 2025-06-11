@@ -1,159 +1,121 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Mail, Lock, User } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import ThirdPartyAuth from "./ThirdPartyAuth";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+
+interface SignUpFormProps {
+  className?: string;
+}
 
 const SignUpForm = () => {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { registerUser } = useAuth();
+  const { toast } = useToast();
+  const { t } = useTranslation();
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("passwordsDoNotMatch"));
+      setIsLoading(false);
       return;
     }
-
-    if (!name || !email || !password) {
-      setError("Please fill in all fields");
-      return;
-    }
-
-    setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5212/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ name, email, password })
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      const result = await registerUser(email, password);
+      
+      if (result.success) {
         toast({
-          title: "Account created successfully",
-          description: result.message || "You have been signed up!",
+          title: t("registrationSuccessful"),
+          description: t("youCanNowSignIn"),
         });
         navigate("/sign-in");
-      } else if (result.message == "Письмо с подтверждением отправлено на email."){
-        toast({
-          title: "Приглашение отправлено на электронную почту",
-          status: "success",
-        });
-      } else{
-        setError(result.message || "Failed to create account");
+      } else {
+        setError(result.message || t("registrationFailed"));
       }
-    } catch (err) {
-      setError("An error occurred during registration");
-      console.error(err);
+    } catch (error) {
+      setError(t("somethingWentWrong"));
     } finally {
       setIsLoading(false);
     }
   };
 
-
   return (
-    <>
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      
-      <form onSubmit={handleSignUp} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Full Name</Label>
-          <div className="relative">
-            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input 
-              id="name"
-              type="text"
-              placeholder="John Doe"
-              className="pl-10"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input 
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>{t("createAccount")}</CardTitle>
+        <CardDescription>{t("enterYourEmailAndPassword")}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">{t("email")}</Label>
+            <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
-              className="pl-10"
+              placeholder="mail@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input 
+          <div className="space-y-2">
+            <Label htmlFor="password">{t("password")}</Label>
+            <Input
               id="password"
               type="password"
-              className="pl-10"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input 
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
+            <Input
               id="confirmPassword"
               type="password"
-              className="pl-10"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
-        </div>
-        
-        <Button 
-          type="submit" 
-          className="w-full bg-blue-gradient" 
-          disabled={isLoading}
-        >
-          {isLoading ? "Creating account..." : "Create Account"}
+          {error && <p className="text-red-500">{error}</p>}
+        </form>
+      </CardContent>
+      <CardFooter className="flex justify-end">
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Spinner size="sm" className="mr-2" />
+              {t("signingUp")}
+            </>
+          ) : (
+            t("signUp")
+          )}
         </Button>
-      </form>
-
-      <ThirdPartyAuth isLoading={isLoading} />
-    </>
+      </CardFooter>
+    </Card>
   );
 };
 
