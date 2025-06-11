@@ -1,29 +1,32 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
-// Sample registered users for testing purposes
-const REGISTERED_USERS = [
-  { email: "test@gmail.com", password: "password123" },
-  { email: "user@gmail.com", password: "userpass" }
-];
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  canBeStaff: boolean;
+  isEmailConfirmed: boolean;
+  avatar?: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   registerUser: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
-  registeredUsers: { email: string; password: string }[];
 }
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
+  user: null,
   login: async () => ({ success: false }),
   logout: () => {},
   registerUser: async () => ({ success: false }),
-  registeredUsers: REGISTERED_USERS,
 });
 
-export let useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -31,70 +34,136 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  // Check if user was previously authenticated from localStorage
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    fetch("https://localhost:7291/api/auth/me", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    })
-        .then(res => res.json())
-        .then(data => {
-          setUser(data);
-          console.log("User data:", data);
-          localStorage.setItem('isAuthenticated', 'true');
-          return 'true';
-        })
-        .catch(err => {
-          console.error("Failed to fetch user:", err);
-          localStorage.setItem('isAuthenticated', 'false');
-          return 'false';
-        });
+    return !!localStorage.getItem("token");
   });
   
-  // Store registered users for our test
-  const [registeredUsers, setRegisteredUsers] = useState(REGISTERED_USERS);
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setIsAuthenticated(false);
+        setUser(null);
+        return;
+      }
+
+      try {
+        const response = await fetch("https://localhost:7291/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+          setIsAuthenticated(true);
+          console.log("Auth check successful:", userData);
+        } else {
+          console.error("Auth check failed:", response.status);
+          localStorage.removeItem("token");
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+        setUser(null);
+      }
+    };
+
+    if (localStorage.getItem("token")) {
+      checkAuth();
+    }
+  }, []);
   
   const login = async (email: string, password: string) => {
-    // For testing: accept any email and password
-    if (email && password) {
-      setIsAuthenticated(true);
-      localStorage.setItem('isAuthenticated', 'true');
-      return { success: true };
-    } else {
+    try {
+      const response = await fetch("https://localhost:7291/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          setIsAuthenticated(true);
+          // Fetch user data after successful login
+          const userResponse = await fetch("https://localhost:7291/api/auth/me", {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+              "Content-Type": "application/json"
+            }
+          });
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            setUser(userData);
+          }
+          return { success: true };
+        }
+      }
+      
+      const errorData = await response.json();
       return { 
         success: false, 
-        message: "Please provide both email and password" 
+        message: errorData.message || "Login failed" 
+      };
+    } catch (error) {
+      console.error("Login error:", error);
+      return { 
+        success: false, 
+        message: "Network error. Please try again." 
       };
     }
   };
   
   const logout = () => {
+    localStorage.removeItem("token");
     setIsAuthenticated(false);
-    localStorage.setItem('isAuthenticated', 'false');
+    setUser(null);
   };
   
   const registerUser = async (email: string, password: string) => {
-    // For testing: accept any email and password without validation
-    if (!email || !password) {
+    try {
+      const response = await fetch("https://localhost:7291/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+        return { success: true };
+      }
+      
+      const errorData = await response.json();
       return { 
         success: false, 
-        message: "Email and password are required" 
+        message: errorData.message || "Registration failed" 
+      };
+    } catch (error) {
+      console.error("Registration error:", error);
+      return { 
+        success: false, 
+        message: "Network error. Please try again." 
       };
     }
-    
-    // Register the new user
-    setRegisteredUsers([...registeredUsers, { email, password }]);
-    return { success: true };
   };
   
   return (
     <AuthContext.Provider value={{ 
       isAuthenticated, 
+      user,
       login, 
       logout,
-      registerUser,
-      registeredUsers
+      registerUser
     }}>
       {children}
     </AuthContext.Provider>

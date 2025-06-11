@@ -17,44 +17,63 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 
-
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  canBeStaff: boolean;
+  isEmailConfirmed: boolean;
+  avatar?: string;
+};
 
 const UserAvatar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { toast } = useToast();
   const { t } = useLanguage();
-  
-
-  type User = {
-    id: number;
-    name: string;
-    email: string;
-    canBeStaff: boolean;
-    isEmailConfirmed: boolean;
-  };
-
-
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    fetch("https://localhost:7291/api/auth/me", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    })
-        .then(res => res.json())
-        .then(data => {
-          setUser(data);
-          console.log("User data:", data);
-        })
-        .catch(err => {
-          console.error("Failed to fetch user:", err);
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setIsLoading(false);
+          return;
+        }
+
+        const response = await fetch("https://localhost:7291/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
         });
-  }, []);
+
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+          console.log("User data loaded:", userData);
+        } else {
+          console.error("Failed to fetch user data:", response.status);
+          // If unauthorized, clear token and logout
+          if (response.status === 401) {
+            localStorage.removeItem("token");
+            logout();
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [logout]);
 
   const handleLogout = () => {
-    // Perform logout logic
+    localStorage.removeItem("token");
     logout();
     toast({
       title: t("loggedOutSuccessfully"),
@@ -68,12 +87,24 @@ const UserAvatar = () => {
   };
 
   const getInitials = (name: string) => {
+    if (!name) return "U";
     return name
       .split(" ")
       .map(part => part[0])
       .join("")
-      .toUpperCase();
+      .toUpperCase()
+      .slice(0, 2);
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-9 w-9 rounded-full bg-gray-200 animate-pulse" />
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <HoverCard>
@@ -83,11 +114,11 @@ const UserAvatar = () => {
           aria-label={t("userMenu")}
         >
           <Avatar className="h-9 w-9 cursor-pointer">
-            {mockUser.avatar ? (
-              <AvatarImage src={User.avatar} alt={User.name} />
+            {user.avatar ? (
+              <AvatarImage src={user.avatar} alt={user.name} />
             ) : (
               <AvatarFallback className="bg-blue-500 text-white">
-                {getInitials(User.name)}
+                {getInitials(user.name)}
               </AvatarFallback>
             )}
           </Avatar>
@@ -96,18 +127,18 @@ const UserAvatar = () => {
       <HoverCardContent className="w-56 p-3">
         <div className="flex justify-center mb-2">
           <Avatar className="h-16 w-16">
-            {mockUser.avatar ? (
-              <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
+            {user.avatar ? (
+              <AvatarImage src={user.avatar} alt={user.name} />
             ) : (
               <AvatarFallback className="bg-blue-500 text-white text-lg">
-                {getInitials(mockUser.name)}
+                {getInitials(user.name)}
               </AvatarFallback>
             )}
           </Avatar>
         </div>
         <div className="text-center mb-3">
-          <h4 className="font-medium">{mockUser.name}</h4>
-          <p className="text-sm text-muted-foreground">{mockUser.email}</p>
+          <h4 className="font-medium">{user.name}</h4>
+          <p className="text-sm text-muted-foreground">{user.email}</p>
         </div>
         <div className="flex flex-col gap-2">
           <Button 
