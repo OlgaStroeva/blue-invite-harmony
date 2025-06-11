@@ -16,32 +16,27 @@ const EventStatusButton = ({ event}: EventStatusButtonProps) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { t } = useLanguage();
   const { toast } = useToast();
-  const onStatusChange = async (event: Event, newStatus: 'upcoming' | 'in_progress' | 'finished') => {
+  const onStatusChange = async (event: Event, status: 'upcoming' | 'in_progress' | 'finished') => {
     try {
-      const response = await fetch(`https://localhost:7291/api/events/update/${event.id}`, {
+      console.error(status);
+      const response = await fetch(`https://localhost:7291/api/events/${event.id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({
-          name: event.title,
-          description: event.description || "",
-          imageBase64: event.image || "",
-          dateTime: event.date || "",
-          category: event.category || "",
-          location: event.place || "",
-          status: newStatus
+          status
         })
       });
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Ошибка обновления");
       }
-      event.status = newStatus;
+      event.status = status;
       toast({
         title: "Статус обновлён",
-        description: `Событие переведено в режим: ${newStatus}`
+        description: `Событие переведено в режим: ${status}`
       });
 
     } catch (error) {
