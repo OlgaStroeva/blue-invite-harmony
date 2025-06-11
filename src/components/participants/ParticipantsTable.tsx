@@ -42,7 +42,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
   const { isAuthenticated } = useAuth();
 
   const [participants, setParticipants] = useState<Participant[]>([]);
-
   const [sendingInvites, setSendingInvites] = useState<Record<number, boolean>>({});
 
   const handleSendInvite = async (participantId: number) => {
@@ -50,10 +49,8 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     if (!token || !event?.id) return;
 
     try {
-      // Устанавливаем состояние загрузки для конкретного участника
       setSendingInvites(prev => ({ ...prev, [participantId]: true }));
 
-      // 1. Сначала получаем formId для события
       const formRes = await fetch(`https://localhost:7291/api/forms/get-by-event/${event.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -63,7 +60,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       if (!formRes.ok) throw new Error("Failed to get form data");
       const { id: formId } = await formRes.json();
 
-      // 2. Отправляем приглашение
       const inviteRes = await fetch(`https://localhost:7291/api/invitations/send/${formId}/${participantId}`, {
         method: "POST",
         headers: {
@@ -77,7 +73,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
         throw new Error(errorData.message || "Failed to send invitation");
       }
 
-      // 3. Обновляем состояние участника
       setParticipants(prev =>
           prev.map(p =>
               p.id === participantId
@@ -91,7 +86,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
         description: t("invitationSentSuccessfully"),
       });
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error sending invitation:", err);
       toast({
         title: t("error"),
@@ -99,7 +94,60 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
         variant: "destructive"
       });
     } finally {
-      // Сбрасываем состояние загрузки
+      setSendingInvites(prev => ({ ...prev, [participantId]: false }));
+    }
+  };
+
+  const handleCancelInvite = async (participantId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token || !event?.id) return;
+
+    try {
+      setSendingInvites(prev => ({ ...prev, [participantId]: true }));
+
+      const formRes = await fetch(`https://localhost:7291/api/forms/get-by-event/${event.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!formRes.ok) throw new Error("Failed to get form data");
+      const { id: formId } = await formRes.json();
+
+      const cancelRes = await fetch(`https://localhost:7291/api/invitations/cancel/${formId}/${participantId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!cancelRes.ok) {
+        const errorData = await cancelRes.json();
+        throw new Error(errorData.message || "Failed to cancel invitation");
+      }
+
+      setParticipants(prev =>
+          prev.map(p =>
+              p.id === participantId
+                  ? { ...p, invitationSent: false }
+                  : p
+          )
+      );
+
+      toast({
+        title: t("invitationCancelled"),
+        description: t("invitationCancelledSuccessfully"),
+      });
+
+    } catch (err: any) {
+      console.error("Error cancelling invitation:", err);
+      toast({
+        title: t("error"),
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
       setSendingInvites(prev => ({ ...prev, [participantId]: false }));
     }
   };
@@ -114,7 +162,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       }
     })
         .then(async res => {
-          //console.error(res.json());
           if (!res.ok) throw new Error("Ошибка при получении участников");
           return res.json();
         })
@@ -187,8 +234,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
         description: result.message || `${t("successfullyImported")} ${result.count} ${t("records")}`,
       });
 
-      // Обновим список участников после импорта
-      // или вызови вручную обновление списка, если есть функция
     } catch (err) {
       console.error("Ошибка отправки файла:", err);
       toast({
@@ -199,19 +244,15 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     }
   };
 
-
   const handleDownloadXlsx = () => {
-    // Create worksheet from participants data
     const worksheet = XLSX.utils.json_to_sheet(participants.map(p => {
       const { id, invitationSent, attended, ...rest } = p;
       return rest;
     }));
     
-    // Create workbook and append worksheet
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Participants');
     
-    // Write and download file
     XLSX.writeFile(workbook, `${event.title}-participants.xlsx`);
     
     toast({
@@ -229,6 +270,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       )
     )
   );
+
   const updateParticipantOnServer = async (participantId: number, updatedData: Record<string, string>) => {
     const token = localStorage.getItem("token");
     try {
@@ -251,15 +293,14 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       console.error("Сетевая ошибка при обновлении участника:", error);
     }
   };
+
   const handleFieldChange = (id: number, key: string, value: string) => {
     setParticipants(prev =>
         prev.map(participant => {
           if (participant.id === id) {
             const updated = { ...participant, [key]: value };
-
             
             updateParticipantOnServer(id, {
-              ...updated.Data,
               [key]: value
             });
 
@@ -312,7 +353,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
             </div>
           ) : (
             <div>
-
                 <div className="mb-4 flex justify-between">
                   <input
                     id="xlsx"
@@ -346,7 +386,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                   <TableHeader>
                     <TableRow className="bg-blue-50">
                       {allKeys
-                          .filter(key => key !== 'haveQr') // Исключаем поле haveQr
+                          .filter(key => key !== 'haveQr')
                           .map((key) => (
                         <TableHead key={key} className="capitalize text-blue-700">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
@@ -367,7 +407,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                     {participants.map((participant) => (
                       <TableRow key={participant.id} className="hover:bg-blue-50">
                         {allKeys
-                            .filter(key => key !== 'haveQr') // Исключаем поле haveQr
+                            .filter(key => key !== 'haveQr')
                             .map((key) => (
                           <TableCell key={`${participant.id}-${key}`}>
                             {participant[key] !== undefined ? String(participant[key]) : '—'}
@@ -379,7 +419,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                               <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleSendInvite(participant.id)}
+                                  onClick={() => participant.invitationSent ? handleCancelInvite(participant.id) : handleSendInvite(participant.id)}
                                   disabled={sendingInvites[participant.id] || !participant.haveQr}
                                   className={
                                     participant.invitationSent
@@ -430,7 +470,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                                 variant="ghost" 
                                 className="h-8 w-8 p-0" 
                                 aria-label="Edit participant"
-                                onClick={() => handleEditParticipant(participant)}
                               >
                                 <Edit className="h-4 w-4 text-blue-600" />
                               </Button>
