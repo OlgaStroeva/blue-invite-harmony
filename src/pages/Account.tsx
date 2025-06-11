@@ -75,19 +75,31 @@ const Account = () => {
   const handlePersonalInfoSubmit = async (values: z.infer<typeof personalInfoSchema>) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem("token");
+      const response = await fetch("https://localhost:7291/api/auth/change-name", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: values.name
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update name");
+      }
       
       toast({
         title: "Profile updated",
         description: "Your personal information has been updated successfully.",
       });
-
-      // In a real app, you would update the user info in your backend
     } catch (error) {
       toast({
         title: "An error occurred",
-        description: "Failed to update profile information.",
+        description: error.message || "Failed to update profile information.",
         variant: "destructive",
       });
     } finally {
@@ -98,8 +110,23 @@ const Account = () => {
   const handlePasswordSubmit = async (values: z.infer<typeof passwordSchema>) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem("token");
+      const response = await fetch("https://localhost:7291/api/auth/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          oldPassword: values.currentPassword,
+          newPassword: values.newPassword
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to change password");
+      }
       
       toast({
         title: "Password updated",
@@ -114,7 +141,7 @@ const Account = () => {
     } catch (error) {
       toast({
         title: "An error occurred",
-        description: "Failed to update password.",
+        description: error.message || "Failed to update password.",
         variant: "destructive",
       });
     } finally {
@@ -125,8 +152,19 @@ const Account = () => {
   const handleAssignmentPreferenceChange = async (value: boolean) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://localhost:7291/api/staff/toggle-can-be-staff/${currentUser.id}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update preferences");
+      }
       
       setAllowAssignments(value);
       
@@ -136,12 +174,10 @@ const Account = () => {
           ? "Other users can now assign you to events" 
           : "Other users can no longer assign you to events",
       });
-
-      // In a real app, you would update the user preferences in your backend
     } catch (error) {
       toast({
         title: "An error occurred",
-        description: "Failed to update assignment preferences.",
+        description: error.message || "Failed to update assignment preferences.",
         variant: "destructive",
       });
     } finally {
