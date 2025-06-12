@@ -96,7 +96,7 @@ const Dashboard = () => {
         },
         { threshold: 0.1 }
     );
-
+  console.error(events);
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }

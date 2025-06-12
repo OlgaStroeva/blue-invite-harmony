@@ -74,6 +74,7 @@ const UserAvatar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    
     logout();
     toast({
       title: t("loggedOutSuccessfully"),

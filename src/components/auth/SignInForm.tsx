@@ -71,7 +71,6 @@ const SignInForm = () => {
             title: "Signed in successfully",
             description: result.message || "Welcome back!",
           });
-          localStorage.setItem('isAuthenticated', 'true');
           navigate("/dashboard");
         } else {
           setError(result.message || "Invalid email or password");
@@ -89,90 +88,90 @@ const SignInForm = () => {
 
 
   return (
-    <Card className="w-full">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl text-center">{t("signInHeading")}</CardTitle>
-        <CardDescription className="text-center">
-          {t("enterCredentials")}
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        <form onSubmit={handleSignIn} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("email")}</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input 
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                className="pl-10"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">{t("password")}</Label>
-              <Button 
-                variant="link" 
-                type="button"
-                className="text-sm text-blue-600 hover:text-blue-800 p-0 h-auto"
-                onClick={() => setForgotPasswordOpen(true)}
-              >
-                {t("forgotPassword")}
-              </Button>
-            </div>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input 
-                id="password"
-                type="password"
-                className="pl-10"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-          
-          <Button 
-            type="submit" 
-            className="w-full bg-blue-gradient" 
-            disabled={isLoading}
-          >
-            {isLoading ? t("signingIn") : t("logIn")}
-          </Button>
-        </form>
-        
-        <ThirdPartyAuth isLoading={isLoading} />
-      </CardContent>
-      
-      <CardFooter className="flex justify-center">
-        <p className="text-center text-sm text-muted-foreground">
-          {t("dontHaveAccount")}{" "}
-          <Link to="/sign-up" className="text-blue-600 hover:text-blue-800 font-medium">
-            {t("signUp")}
-          </Link>
-        </p>
-      </CardFooter>
+      <Card className="w-full">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center">{t("signInHeading")}</CardTitle>
+          <CardDescription className="text-center">
+            {t("enterCredentials")}
+          </CardDescription>
+        </CardHeader>
 
-      <ForgotPasswordDialog 
-        open={forgotPasswordOpen}
-        onOpenChange={setForgotPasswordOpen}
-      />
-    </Card>
+        <CardContent className="space-y-4">
+          {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+          )}
+
+          <form onSubmit={handleSignIn} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">{t("email")}</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    className="pl-10"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">{t("password")}</Label>
+                <Button
+                    variant="link"
+                    type="button"
+                    className="text-sm text-blue-600 hover:text-blue-800 p-0 h-auto"
+                    onClick={() => setForgotPasswordOpen(true)}
+                >
+                  {t("forgotPassword")}
+                </Button>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                    id="password"
+                    type="password"
+                    className="pl-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+              </div>
+            </div>
+
+            <Button
+                type="submit"
+                className="w-full bg-blue-gradient"
+                disabled={isLoading}
+            >
+              {isLoading ? t("signingIn") : t("logIn")}
+            </Button>
+          </form>
+
+          <ThirdPartyAuth isLoading={isLoading} />
+        </CardContent>
+
+        <CardFooter className="flex justify-center">
+          <p className="text-center text-sm text-muted-foreground">
+            {t("dontHaveAccount")}{" "}
+            <Link to="/sign-up" className="text-blue-600 hover:text-blue-800 font-medium">
+              {t("signUp")}
+            </Link>
+          </p>
+        </CardFooter>
+
+        <ForgotPasswordDialog
+            open={forgotPasswordOpen}
+            onOpenChange={setForgotPasswordOpen}
+        />
+      </Card>
   );
 };
 

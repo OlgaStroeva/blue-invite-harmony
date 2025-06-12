@@ -123,7 +123,7 @@ const Account = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch("https://localhost:7291/api/auth/change-name", {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
@@ -163,7 +163,7 @@ const Account = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch("https://localhost:7291/api/auth/change-password", {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
@@ -207,7 +207,7 @@ const Account = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`https://localhost:7291/api/staff/toggle-can-be-staff/${userData.id}`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"
