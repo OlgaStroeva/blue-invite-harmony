@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/container";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { User, Lock, ShieldAlert } from "lucide-react";
+import { User, Lock, ShieldAlert, Loader2 } from "lucide-react";
 import { 
   Form,
   FormControl,
@@ -25,7 +25,7 @@ import * as z from "zod";
 
 const personalInfoSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }).readonly(),
+  email: z.string().email({ message: "Please enter a valid email address" }),
 });
 
 const passwordSchema = z.object({
@@ -37,29 +37,27 @@ const passwordSchema = z.object({
   path: ["confirmPassword"],
 });
 
+interface UserData {
+  id: number;
+  name: string;
+  email: string;
+  canBeStaff: boolean;
+  isEmailConfirmed: boolean;
+}
+
 const Account = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [allowAssignments, setAllowAssignments] = useState(true);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [allowAssignments, setAllowAssignments] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  // In a real app, you would fetch this from your authentication service
-  const currentUser = {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: "Admin",
-    avatar: "",
-    assignmentPreferences: {
-      allowAssignmentByOthers: true
-    }
-  };
 
   const personalInfoForm = useForm<z.infer<typeof personalInfoSchema>>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: {
-      name: currentUser.name,
-      email: currentUser.email,
+      name: "",
+      email: "",
     },
   });
 
@@ -71,6 +69,54 @@ const Account = () => {
       confirmPassword: "",
     },
   });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/sign-in");
+          return;
+        }
+
+        const response = await fetch("https://localhost:7291/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (response.ok) {
+          const data: UserData = await response.json();
+          setUserData(data);
+          setAllowAssignments(data.canBeStaff);
+          
+          // Update form with real data
+          personalInfoForm.reset({
+            name: data.name,
+            email: data.email,
+          });
+        } else {
+          console.error("Failed to fetch user data:", response.status);
+          if (response.status === 401) {
+            localStorage.removeItem("token");
+            navigate("/sign-in");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load user data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate, personalInfoForm, toast]);
 
   const handlePersonalInfoSubmit = async (values: z.infer<typeof personalInfoSchema>) => {
     setIsLoading(true);
@@ -92,11 +138,16 @@ const Account = () => {
         throw new Error(error.message || "Failed to update name");
       }
       
+      // Update local state
+      if (userData) {
+        setUserData({ ...userData, name: values.name });
+      }
+      
       toast({
         title: "Profile updated",
         description: "Your personal information has been updated successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "An error occurred",
         description: error.message || "Failed to update profile information.",
@@ -138,7 +189,7 @@ const Account = () => {
         newPassword: "",
         confirmPassword: "",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "An error occurred",
         description: error.message || "Failed to update password.",
@@ -150,10 +201,12 @@ const Account = () => {
   };
 
   const handleAssignmentPreferenceChange = async (value: boolean) => {
+    if (!userData) return;
+    
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://localhost:7291/api/staff/toggle-can-be-staff/${currentUser.id}`, {
+      const response = await fetch(`https://localhost:7291/api/staff/toggle-can-be-staff/${userData.id}`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -167,6 +220,7 @@ const Account = () => {
       }
       
       setAllowAssignments(value);
+      setUserData({ ...userData, canBeStaff: value });
       
       toast({
         title: "Preferences updated",
@@ -174,7 +228,7 @@ const Account = () => {
           ? "Other users can now assign you to events" 
           : "Other users can no longer assign you to events",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "An error occurred",
         description: error.message || "Failed to update assignment preferences.",
@@ -184,6 +238,27 @@ const Account = () => {
       setIsLoading(false);
     }
   };
+
+  if (isLoadingUser) {
+    return (
+      <Container className="py-10">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </Container>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <Container className="py-10">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600">Error loading account</h1>
+          <p className="text-muted-foreground mt-2">Please try refreshing the page</p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-10">
