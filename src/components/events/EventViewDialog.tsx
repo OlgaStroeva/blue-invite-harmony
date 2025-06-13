@@ -141,7 +141,7 @@ const EventViewDialog = ({
               </Button>
             )}
             
-            {canEdit && (
+            {canEdit &&  (
               <Button
                 onClick={() => setShowInvitationForm(true)}
                 className="w-full bg-blue-600 hover:bg-blue-700"
