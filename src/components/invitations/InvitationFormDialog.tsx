@@ -1,5 +1,6 @@
 
 import { Event } from "@/types/event";
+import { Template } from "@/types/template";
 import { useInvitationForm } from "@/hooks/useInvitationForm";
 import InvitationFormEditor from "./InvitationFormEditor";
 import InvitationFormPreview from "./InvitationFormPreview";
@@ -74,6 +75,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, canEdit }: Invitation
               setFormFields(fieldsWithKeys);
               setSelectedTemplate({
                 id: data.id,
+                eventId: event.id,
                 fields: fieldsWithKeys,
                 name: "Current Template"
               });
@@ -113,6 +115,9 @@ const InvitationFormDialog = ({ open, onOpenChange, event, canEdit }: Invitation
           formFields={formFields}
           setFormFields={setFormFields}
           templates={templates}
+          isEditMode={isEditMode}
+          selectedTemplate={selectedTemplate}
+          setSelectedTemplate={setSelectedTemplate}
           setIsEditMode={setIsEditMode}
           onSaveTemplate={(template) => {
             setSelectedTemplate(template);

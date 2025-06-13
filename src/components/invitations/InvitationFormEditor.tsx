@@ -82,10 +82,6 @@ const InvitationFormEditor = ({
 
         const createResult = await createRes.json();
 
-        //if (!createRes.ok) {
-         // throw new Error(createResult.message || "Ошибка при создании шаблона");
-       // }
-
         formId = createResult.formId ?? createResult.id;
       }
       
@@ -105,17 +101,18 @@ const InvitationFormEditor = ({
           })
         });
 
-        const result = await response.json(); // ✅ result, не data
+        const result = await response.json();
 
         if (response.ok) {
           const savedTemplate = {
             id: formId,
+            eventId: eventId,
             fields: formFields,
             name: "Current Template"
           };
 
-          onSaveTemplate(savedTemplate); // Передаем сохраненный шаблон
-          setIsEditMode(false); // ✅ Явно переключаем режим
+          onSaveTemplate(savedTemplate);
+          setIsEditMode(false);
 
           toast({
             title: t("formSaved"),
@@ -124,13 +121,11 @@ const InvitationFormEditor = ({
         }
       } catch (error) {
         console.error("Ошибка при сохранении шаблона:", error);
-
         return null;
       }
     
   } catch (err) {
     console.error("Ошибка:", err);
-
   }
 };
   
@@ -156,7 +151,7 @@ const InvitationFormEditor = ({
         <div className="space-y-6">
           {canEdit && (
             <div className="flex justify-between items-center">
-              <TemplateSelector templates={templates} onApplyTemplate={onApplyTemplate} />
+              <TemplateSelector onApplyTemplate={onApplyTemplate} />
             </div>
           )}
           {event && (

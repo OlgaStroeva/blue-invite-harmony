@@ -1,4 +1,3 @@
-
 import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -31,11 +30,11 @@ interface InvitationFormPreviewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   event: Event;
-  selectedTemplate: Template;
+  selectedTemplate: Template | null;
   onEditMode: () => void;
   onClose?: () => void;
-  setTemplate: () => void;
-  user : number;
+  user: number | undefined;
+  canEdit: boolean;
 }
 
 const InvitationFormPreview = ({ 
@@ -43,7 +42,9 @@ const InvitationFormPreview = ({
   onOpenChange, 
   event, 
   selectedTemplate,
-  onEditMode, user
+  onEditMode, 
+  user,
+  canEdit
 }: InvitationFormPreviewProps) => {
   const navigate = useNavigate();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
@@ -170,6 +171,36 @@ const InvitationFormPreview = ({
   // Only show employer-specific features if authenticated
   const showEmployerFeatures = isAuthenticated;
 
+  // If no template exists, show a message
+  if (!selectedTemplate) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-3xl bg-blue-50 border-blue-200">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-blue-700">
+              <Mail className="h-5 w-5" />
+              {t("invitationPreview")}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            <div className="text-center p-8">
+              <p className="text-blue-600">{t("noFormAvailable")}</p>
+              {canEdit && (
+                <Button
+                  onClick={onEditMode}
+                  className="mt-4 bg-blue-600 hover:bg-blue-700"
+                >
+                  {t("createForm")}
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <>
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
@@ -187,7 +218,6 @@ const InvitationFormPreview = ({
                   setShowDeleteAlert(false);
                   await handleDeleteForm();
                 }}
-
                 className="bg-red-500 hover:bg-red-600 text-white"
             >
               {t("delete")}
@@ -206,10 +236,10 @@ const InvitationFormPreview = ({
           </DialogHeader>
 
           <div className="space-y-6">
-            <FormFieldList formFields={selectedTemplate.fields} readOnly />
+            <FormFieldList formFields={selectedTemplate.fields} currentEvent={event} readOnly />
             
             <div className="flex justify-between gap-3 pt-4 border-t border-blue-200">
-              {event.createdBy === user! && (
+              {event.createdBy === user && (
                 <Button
                   onClick={() => setShowDeleteAlert(true)}
                   variant="destructive"
@@ -221,9 +251,9 @@ const InvitationFormPreview = ({
               )}
               
               <div className="flex gap-3 ml-auto">
-                {event.createdBy === user! && (
+                {event.createdBy === user && canEdit && (
                     <Button
-                        onClick={() => onEditMode()} // Просто вызываем переданный колбэк
+                        onClick={() => onEditMode()}
                         className="bg-blue-600 hover:bg-blue-700"
                     >
                       <Edit className="mr-2 h-4 w-4" />

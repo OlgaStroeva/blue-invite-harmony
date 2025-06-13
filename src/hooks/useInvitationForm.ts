@@ -16,7 +16,6 @@ export const useInvitationForm = (event: Event) => {
   const [isEditMode, setIsEditMode] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
-
   const handleSaveTemplate = () => {
     if (formFields.length <= 1) {
       toast({
@@ -64,15 +63,13 @@ export const useInvitationForm = (event: Event) => {
   };
 
   return {
+    formFields,
+    setFormFields,
+    templates,
     isEditMode,
     setIsEditMode,
     selectedTemplate,
     setSelectedTemplate,
-    formFields,
-    setFormFields,
-    selectedTemplate,
-    templates,
-    isEditMode,
     handleSaveTemplate,
     handleApplyTemplate,
     handleDeleteForm,
