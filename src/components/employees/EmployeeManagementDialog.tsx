@@ -20,12 +20,14 @@ interface EmployeeManagementDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   event: Event;
+  canEdit: boolean;
 }
 
 const EmployeeManagementDialog = ({ 
   open, 
   onOpenChange, 
-  event 
+  event,
+  canEdit
 }: EmployeeManagementDialogProps) => {
   const [searchResults, setSearchResults] = useState<StaffSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -134,59 +136,64 @@ const EmployeeManagementDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-blue-700">
             <Users className="h-5 w-5" /> 
-            Manage Staff
+            {canEdit ? "Manage Staff" : "View Staff"}
           </DialogTitle>
           <DialogDescription className="text-blue-600">
-            Assign and manage staff for {event.title}
+            {canEdit ? "Assign and manage staff for" : "View staff for"} {event.title}
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="assign" className="mt-4">
+        <Tabs defaultValue={canEdit ? "assign" : "view"} className="mt-4">
           <TabsList className="grid grid-cols-2 bg-blue-100">
-            <TabsTrigger value="assign" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              Assign Staff
-            </TabsTrigger>
+            {canEdit && (
+              <TabsTrigger value="assign" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Assign Staff
+              </TabsTrigger>
+            )}
             <TabsTrigger value="view" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              View Assigned ({eventStaffIds.length})
+              {canEdit ? "View Assigned" : "Staff"} ({eventStaffIds.length})
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="assign" className="space-y-4 py-4">
-            <EmployeeSearchInput 
-              onSearch={handleSearch} 
-              isLoading={isSearching} 
-            />
-            
-            {searchResults.length > 0 && (
-              <div className="space-y-2">
-                {searchResults.map((employee) => (
-                  <EmployeeSearchResult 
-                    key={employee.id}
-                    employee={employee}
-                    isLoading={false}
-                    error={null}
-                    onAssign={handleAssignEmployee}
-                  />
-                ))}
-              </div>
-            )}
-            
-            {(isSearching || searchError) && (
-              <EmployeeSearchResult 
-                employee={null}
-                isLoading={isSearching}
-                error={searchError}
-                onAssign={handleAssignEmployee}
+          {canEdit && (
+            <TabsContent value="assign" className="space-y-4 py-4">
+              <EmployeeSearchInput 
+                onSearch={handleSearch} 
+                isLoading={isSearching} 
               />
-            )}
-          </TabsContent>
+              
+              {searchResults.length > 0 && (
+                <div className="space-y-2">
+                  {searchResults.map((employee) => (
+                    <EmployeeSearchResult 
+                      key={employee.id}
+                      employee={employee}
+                      isLoading={false}
+                      error={null}
+                      onAssign={handleAssignEmployee}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              {(isSearching || searchError) && (
+                <EmployeeSearchResult 
+                  employee={null}
+                  isLoading={isSearching}
+                  error={searchError}
+                  onAssign={handleAssignEmployee}
+                />
+              )}
+            </TabsContent>
+          )}
           
           <TabsContent value="view" className="py-4">
             <EmployeeList 
               eventId={event.id}
               staffIds={eventStaffIds}
-              onRemoveEmployee={handleRemoveEmployee}
+              onRemoveEmployee={canEdit ? handleRemoveEmployee : undefined}
               isLoading={isLoadingStaff}
+              canEdit={canEdit}
             />
           </TabsContent>
         </Tabs>

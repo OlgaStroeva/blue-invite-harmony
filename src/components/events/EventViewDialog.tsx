@@ -10,7 +10,6 @@ import EventEditDialog from "./EventEditDialog";
 import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface EventViewDialogProps {
   event: Event;
@@ -70,6 +69,11 @@ const EventViewDialog = ({
     onEventUpdated(updatedEvent);
   };
 
+  // Check if user can edit (event is upcoming and user is creator)
+  const canEdit = isAuthenticated && event.createdBy === user?.id && event.status === 'upcoming';
+  // Check if user can delete (event is finished and user is creator)  
+  const canDelete = isAuthenticated && event.createdBy === user?.id && event.status === 'finished';
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -127,7 +131,7 @@ const EventViewDialog = ({
           </ScrollArea>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t mt-4">
-            {isAuthenticated && event.createdBy === user.id &&  (
+            {canEdit && (
               <Button
                 onClick={() => setShowEditDialog(true)}
                 className="w-full bg-blue-600 hover:bg-blue-700"
@@ -137,7 +141,7 @@ const EventViewDialog = ({
               </Button>
             )}
             
-            {isAuthenticated && (
+            {canEdit && (
               <Button
                 onClick={() => setShowInvitationForm(true)}
                 className="w-full bg-blue-600 hover:bg-blue-700"
@@ -155,7 +159,7 @@ const EventViewDialog = ({
               {t("staff")}
             </Button>
             
-            {isAuthenticated && event.createdBy === user.id && (
+            {canEdit && (
               <Button
                 onClick={() => setShowEmployeeManagement(true)}
                 className="w-full bg-blue-600 hover:bg-blue-700"
@@ -178,6 +182,8 @@ const EventViewDialog = ({
           event={currentEvent}
           onEventUpdated={handleEventUpdated}
           onEventDeleted={onEventDeleted}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
       )}
 
@@ -189,6 +195,7 @@ const EventViewDialog = ({
             if (!open) onOpenChange(true);
           }}
           event={currentEvent}
+          canEdit={canEdit}
         />
       )}
 
@@ -200,6 +207,7 @@ const EventViewDialog = ({
             if (!open) onOpenChange(true);
           }}
           event={currentEvent}
+          canEdit={canEdit}
         />
       )}
 
@@ -211,6 +219,7 @@ const EventViewDialog = ({
             if (!open) onOpenChange(true);
           }}
           event={currentEvent}
+          canEdit={canEdit}
         />
       )}
     </>

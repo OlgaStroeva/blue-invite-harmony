@@ -10,27 +10,27 @@ interface InvitationFormDialogProps {
   onOpenChange: (open: boolean) => void;
   event: Event;
   onClose?: () => void;
+  canEdit: boolean;
 }
 
-const InvitationFormDialog = ({ open, onOpenChange, event }: InvitationFormDialogProps) => {
+const InvitationFormDialog = ({ open, onOpenChange, event, canEdit }: InvitationFormDialogProps) => {
   const {
     formFields,
     setFormFields,
     templates,
-    isEditMode,  // Используем из хука
-    setIsEditMode, // Добавляем в хук
-    selectedTemplate, // Добавляем в хук
-    setSelectedTemplate, // Добавляем в хук
+    isEditMode,
+    setIsEditMode,
+    selectedTemplate,
+    setSelectedTemplate,
     handleSaveTemplate,
     handleApplyTemplate
   } = useInvitationForm(event);
-  //const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-  //const [isEditMode, setIsEditMode] = useState(false);
+  
   const [user, setUser] = useState<{ id: number; name: string; email: string } | null>(null);
 
   const handleTemplateSave = (newTemplate: Template) => {
     setSelectedTemplate(newTemplate);
-    setIsEditMode(false); // Переключаем в режим просмотра
+    setIsEditMode(false);
   };
   
   useEffect(() => {
@@ -47,8 +47,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event }: InvitationFormDialo
           return res.json();
         })
         .then((data) => {
-          
-          setUser(data); // обновляем user
+          setUser(data);
         })
         .catch((err) => {
           console.error("Ошибка при получении пользователя:", err);
@@ -70,7 +69,6 @@ const InvitationFormDialog = ({ open, onOpenChange, event }: InvitationFormDialo
               const fieldsWithKeys = data.fields.map((f, i) => ({
                 id: `${i}`,
                 ...f
-                 // 👈 формируем уникальный ключ
               }));
               
               setFormFields(fieldsWithKeys);
@@ -80,31 +78,29 @@ const InvitationFormDialog = ({ open, onOpenChange, event }: InvitationFormDialo
                 name: "Current Template"
               });
               setIsEditMode(false);
-              enterEditMode(false);
-            } else {
+            } else if (canEdit) {
               setIsEditMode(true);
             }
           })
-
-          .catch(() => enterEditMode(true));
+          .catch(() => canEdit && setIsEditMode(true));
     }
-  }, [event, open]);
-
+  }, [event, open, canEdit]);
 
   const handleSuccessfulSave = (newTemplate: Template) => {
     setSelectedTemplate(newTemplate);
     setIsEditMode(false);
   };
 
-  if (!isEditMode && selectedTemplate) {
+  if ((!isEditMode && selectedTemplate) || !canEdit) {
     return (
         <InvitationFormPreview
             open={open}
             onOpenChange={onOpenChange}
             event={event}
             selectedTemplate={selectedTemplate}
-            onEditMode={() => setIsEditMode(true)} // Исправляем
+            onEditMode={() => canEdit && setIsEditMode(true)}
             user={user?.id}
+            canEdit={canEdit}
         />
     );
   }
@@ -117,12 +113,13 @@ const InvitationFormDialog = ({ open, onOpenChange, event }: InvitationFormDialo
           formFields={formFields}
           setFormFields={setFormFields}
           templates={templates}
-          setIsEditMode={setIsEditMode} // Передаем функцию из хука
+          setIsEditMode={setIsEditMode}
           onSaveTemplate={(template) => {
             setSelectedTemplate(template);
-            setIsEditMode(false); // Переключаем режим
+            setIsEditMode(false);
           }}
           onApplyTemplate={handleApplyTemplate}
+          canEdit={canEdit}
       />
   );
 };

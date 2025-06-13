@@ -1,4 +1,3 @@
-
 import { 
   Dialog, 
   DialogContent, 
@@ -26,14 +25,13 @@ interface InvitationFormEditorProps {
   formFields: FormField[];
   setFormFields: (fields: FormField[]) => void;
   templates: Template[];
-  
   onApplyTemplate: (template: Template) => void;
   isEditMode: boolean;
-  
   selectedTemplate: Template | null;
   setSelectedTemplate: (template: Template) => void;
-  onSaveTemplate: (template: Template) => void; // Теперь принимает Template
-  setIsEditMode: (val: boolean) => void; // Добавляем обязательный пропс
+  onSaveTemplate: (template: Template) => void;
+  setIsEditMode: (val: boolean) => void;
+  canEdit: boolean;
 }
 
 const InvitationFormEditor = ({
@@ -44,12 +42,12 @@ const InvitationFormEditor = ({
                                 setFormFields,
                                 templates,
                                 onApplyTemplate,
-                                onSaveTemplate, // Получаем из пропсов
-                                setIsEditMode // Получаем из пропсов
+                                onSaveTemplate,
+                                setIsEditMode,
+                                canEdit
                               }: InvitationFormEditorProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  //const [isEditMode, setIsEditMode] = useState(false);
 
   const handleSaveTemplate = async () => {
     const eventId = event?.id;
@@ -137,7 +135,9 @@ const InvitationFormEditor = ({
 };
   
   const handleAddField = (field: FormField) => {
-    setFormFields([...formFields, field]);
+    if (canEdit) {
+      setFormFields([...formFields, field]);
+    }
   };
 
   return (
@@ -146,31 +146,35 @@ const InvitationFormEditor = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-blue-700">
             <Mail className="h-5 w-5" /> 
-            {t("invitationFormFor")} {event.title}
+            {canEdit ? t("invitationFormFor") : "View Form for"} {event.title}
           </DialogTitle>
           <DialogDescription className="text-blue-600">
-            {t("createCustomForm")}
+            {canEdit ? t("createCustomForm") : "View invitation form"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <TemplateSelector templates={templates} onApplyTemplate={onApplyTemplate} />
-          </div>
-          {event && (
-          <FormFieldList formFields={formFields} setFormFields={setFormFields} currentEvent={event}/>
+          {canEdit && (
+            <div className="flex justify-between items-center">
+              <TemplateSelector templates={templates} onApplyTemplate={onApplyTemplate} />
+            </div>
           )}
-          <AddFieldForm onAddField={handleAddField} />
+          {event && (
+          <FormFieldList formFields={formFields} setFormFields={setFormFields} currentEvent={event} canEdit={canEdit}/>
+          )}
+          {canEdit && <AddFieldForm onAddField={handleAddField} />}
         </div>
 
         <DialogFooter className="pt-4 border-t border-blue-200">
-          <Button 
-            onClick={handleSaveTemplate}
-            className="bg-blue-600 hover:bg-blue-700 ml-auto"
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {t("save")}
-          </Button>
+          {canEdit && (
+            <Button 
+              onClick={handleSaveTemplate}
+              className="bg-blue-600 hover:bg-blue-700 ml-auto"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {t("save")}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
