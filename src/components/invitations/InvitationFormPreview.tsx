@@ -75,7 +75,7 @@ const InvitationFormPreview = ({
 
     try {
       // Пытаемся получить существующий шаблон
-      const formRes = await fetch(`https://0.0.0.0:7291/api/forms/get-by-event/${event.id}`, {
+      const formRes = await fetch(`https://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -85,7 +85,7 @@ const InvitationFormPreview = ({
         const form = await formRes.json();
         formId = form.id;
       }
-      const res = await fetch(`https://0.0.0.0:7291/api/forms/delete/${formId}`, {
+      const res = await fetch(`https://158.160.171.159:7291/api/forms/delete/${formId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`
@@ -128,7 +128,7 @@ const InvitationFormPreview = ({
 
     if (!token) return;
 
-    fetch("https://0.0.0.0:7291/api/forms/my-templates", {
+    fetch("https://158.160.171.159:7291/api/forms/my-templates", {
       headers: {
         Authorization: `Bearer ${token}`
       }

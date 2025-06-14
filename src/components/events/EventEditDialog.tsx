@@ -82,7 +82,7 @@ const EventEditDialog = ({
   ]);
 
   useEffect(() => {
-    fetch("https://0.0.0.0:7291/api/events/my-events", {
+    fetch("https://158.160.171.159:7291/api/events/my-events", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json"
@@ -174,7 +174,7 @@ const EventEditDialog = ({
     }
 
     try {
-      const response = await fetch(`https://0.0.0.0:7291/api/events/update/${event.id}`, {
+      const response = await fetch(`https://158.160.171.159:7291/api/events/update/${event.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -253,7 +253,7 @@ const EventEditDialog = ({
     try {
       setIsDeleting(true);
 
-      const response = await fetch(`https://0.0.0.0:7291/api/events/delete/${event.id}`, {
+      const response = await fetch(`https://158.160.171.159:7291/api/events/delete/${event.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`
