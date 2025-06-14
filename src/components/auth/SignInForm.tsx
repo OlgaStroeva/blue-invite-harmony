@@ -55,7 +55,7 @@ const SignInForm = () => {
 
     try {
       if (email && password) {
-        const response = await fetch("http://localhost:5212/api/auth/login", {
+        const response = await fetch("http://localhost:7291/api/auth/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
