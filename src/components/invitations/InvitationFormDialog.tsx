@@ -38,7 +38,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, canEdit }: Invitation
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch("https://158.160.171.159:7291/api/auth/me", {
+    fetch("https://localhost:7291/api/auth/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -59,7 +59,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, canEdit }: Invitation
     if (event && open) {
       const token = localStorage.getItem("token");
 
-      fetch(`https://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
+      fetch(`https://localhost:7291/api/forms/get-by-event/${event.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

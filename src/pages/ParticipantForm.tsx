@@ -24,7 +24,7 @@ const ParticipantForm = () => {
 
     if (eventId) {
       // Получаем данные мероприятия
-      fetch(`https://158.160.171.159:7291/api/events/${eventId}`, {
+      fetch(`https://localhost:7291/api/events/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
           .then(res => res.ok ? res.json() : null)
@@ -42,7 +42,7 @@ const ParticipantForm = () => {
           });
 
       // Получаем шаблон анкеты
-      fetch(`https://158.160.171.159:7291/api/forms/get-by-event/${eventId}`, {
+      fetch(`https://localhost:7291/api/forms/get-by-event/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
           .then(res => res.ok ? res.json() : null)
@@ -77,7 +77,7 @@ const ParticipantForm = () => {
         }
       });
 
-      const response = await fetch(`https://158.160.171.159:7291/api/forms/add-participant/${formId}`, {
+      const response = await fetch(`https://localhost:7291/api/forms/add-participant/${formId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

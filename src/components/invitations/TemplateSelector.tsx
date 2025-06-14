@@ -30,7 +30,7 @@ const TemplateSelector = ({ onApplyTemplate }: TemplateSelectorProps) => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch("https://158.160.171.159:7291/api/forms/my-templates", {
+    fetch("https://localhost:7291/api/forms/my-templates", {
       headers: {
         Authorization: `Bearer ${token}`
       }

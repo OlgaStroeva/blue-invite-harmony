@@ -24,7 +24,7 @@ const blueGradients = [
     "from-blue-900 to-blue-950"
 ];
 
-const events: Event[] = await fetch("https://158.160.171.159:7291/api/events/my-events", {
+const events: Event[] = await fetch("https://localhost:7291/api/events/my-events", {
     headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json"
@@ -46,7 +46,7 @@ const events: Event[] = await fetch("https://158.160.171.159:7291/api/events/my-
         return [];
     });
 
-const categories: string[] = await fetch("https://158.160.171.159:7291/api/events/my-events", {
+const categories: string[] = await fetch("https://localhost:7291/api/events/my-events", {
     headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json"
