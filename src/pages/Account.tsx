@@ -79,7 +79,7 @@ const Account = () => {
           return;
         }
 
-        const response = await fetch("https://158.160.171.159:7291/api/auth/me", {
+        const response = await fetch("https://0.0.0.0:7291/api/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
@@ -122,7 +122,7 @@ const Account = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("https://158.160.171.159:7291/api/auth/change-name", {
+      const response = await fetch("https://0.0.0.0:7291/api/auth/change-name", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -162,7 +162,7 @@ const Account = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("https://158.160.171.159:7291/api/auth/change-password", {
+      const response = await fetch("https://0.0.0.0:7291/api/auth/change-password", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -206,7 +206,7 @@ const Account = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://158.160.171.159:7291/api/staff/toggle-can-be-staff/${userData.id}`, {
+      const response = await fetch(`https://0.0.0.0:7291/api/staff/toggle-can-be-staff/${userData.id}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,

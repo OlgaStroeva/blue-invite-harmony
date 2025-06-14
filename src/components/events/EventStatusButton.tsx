@@ -19,7 +19,7 @@ const EventStatusButton = ({ event}: EventStatusButtonProps) => {
   const onStatusChange = async (event: Event, status: 'upcoming' | 'in_progress' | 'finished') => {
     try {
       console.error(status);
-      const response = await fetch(`https://158.160.171.159:7291/api/events/${event.id}/status`, {
+      const response = await fetch(`https://0.0.0.0:7291/api/events/${event.id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

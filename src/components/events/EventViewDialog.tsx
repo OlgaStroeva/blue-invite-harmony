@@ -40,7 +40,7 @@ const EventViewDialog = ({
 
     if (!token) return;
 
-    fetch("https://158.160.171.159:7291/api/auth/me", {
+    fetch("https://0.0.0.0:7291/api/auth/me", {
       headers: {
         Authorization: `Bearer ${token}`
       }
