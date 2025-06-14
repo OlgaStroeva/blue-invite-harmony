@@ -38,7 +38,7 @@ const SignUpForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:7291/api/auth/register", {
+      const response = await fetch("http://158.160.171.159:7291/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -55,7 +55,7 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
     }
 
     try {
-      const response = await fetch("https://localhost:7291/api/events/create", {
+      const response = await fetch("https://158.160.171.159:7291/api/events/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
