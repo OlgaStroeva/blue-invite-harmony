@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       try {
-        const response = await fetch("https://localhost:7291/api/auth/me", {
+        const response = await fetch("https://my_project:7291/api/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch("https://localhost:7291/api/auth/login", {
+      const response = await fetch("https://my_project:7291/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           localStorage.setItem("token", data.token);
           setIsAuthenticated(true);
           // Fetch user data after successful login
-          const userResponse = await fetch("https://localhost:7291/api/auth/me", {
+          const userResponse = await fetch("https://my_project:7291/api/auth/me", {
             headers: {
               Authorization: `Bearer ${data.token}`,
               "Content-Type": "application/json"
@@ -132,7 +132,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   
   const registerUser = async (email: string, password: string) => {
     try {
-      const response = await fetch("https://localhost:7291/api/auth/register", {
+      const response = await fetch("https://my_project:7291/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

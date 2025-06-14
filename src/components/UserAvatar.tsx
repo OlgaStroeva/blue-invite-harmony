@@ -43,7 +43,7 @@ const UserAvatar = () => {
           return;
         }
 
-        const response = await fetch("https://localhost:7291/api/auth/me", {
+        const response = await fetch("https://my_project:7291/api/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"

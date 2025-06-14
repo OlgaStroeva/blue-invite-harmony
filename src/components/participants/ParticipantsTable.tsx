@@ -51,7 +51,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     try {
       setSendingInvites(prev => ({ ...prev, [participantId]: true }));
 
-      const formRes = await fetch(`https://localhost:7291/api/forms/get-by-event/${event.id}`, {
+      const formRes = await fetch(`https://my_project:7291/api/forms/get-by-event/${event.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -60,7 +60,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       if (!formRes.ok) throw new Error("Failed to get form data");
       const { id: formId } = await formRes.json();
 
-      const inviteRes = await fetch(`https://localhost:7291/api/invitations/send/${formId}/${participantId}`, {
+      const inviteRes = await fetch(`https://my_project:7291/api/invitations/send/${formId}/${participantId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     try {
       setSendingInvites(prev => ({ ...prev, [participantId]: true }));
 
-      const formRes = await fetch(`https://localhost:7291/api/forms/get-by-event/${event.id}`, {
+      const formRes = await fetch(`https://my_project:7291/api/forms/get-by-event/${event.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -114,7 +114,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       if (!formRes.ok) throw new Error("Failed to get form data");
       const { id: formId } = await formRes.json();
 
-      const cancelRes = await fetch(`https://localhost:7291/api/invitations/cancel/${formId}/${participantId}`, {
+      const cancelRes = await fetch(`https://my_project:7291/api/invitations/cancel/${formId}/${participantId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -156,7 +156,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     const token = localStorage.getItem("token");
     if (!token || !event?.id) return;
 
-    fetch(`https://localhost:7291/api/forms/participants/${event.id}`, {
+    fetch(`https://my_project:7291/api/forms/participants/${event.id}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -209,7 +209,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     formData.append("file", file);
 
     try {
-      const res = await fetch(`https://localhost:7291/api/forms/upload-participants/${event.id}`, {
+      const res = await fetch(`https://my_project:7291/api/forms/upload-participants/${event.id}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
@@ -274,7 +274,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
   const updateParticipantOnServer = async (participantId: number, updatedData: Record<string, string>) => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`https://localhost:7291/api/forms/update/${participantId}`, {
+      const response = await fetch(`https://my_project:7291/api/forms/update/${participantId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
