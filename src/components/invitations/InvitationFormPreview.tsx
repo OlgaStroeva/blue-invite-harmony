@@ -128,7 +128,7 @@ const InvitationFormPreview = ({
 
     if (!token) return;
 
-    fetch("https://158.160.171.159:7291/api/forms/my-templates", {
+    fetch("http://158.160.171.159:7291/api/forms/my-templates", {
       headers: {
         Authorization: `Bearer ${token}`
       }

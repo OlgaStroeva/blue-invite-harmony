@@ -70,7 +70,7 @@ const EventViewDialog = ({
   };
 
   // Check if user can edit (event is upcoming and user is creator)
-  const canEdit = isAuthenticated && event.createdBy === user?.id && (event.status === 'upcoming' || event.status === null);
+  const canEdit = event.createdBy === user?.id && (event.status !== 'in_progress' || event.status !== 'finished');
   // Check if user can delete (event is finished and user is creator)  
   const canDelete = isAuthenticated && event.createdBy === user?.id && event.status === 'finished';
 
