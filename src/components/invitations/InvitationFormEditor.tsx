@@ -61,7 +61,7 @@ const InvitationFormEditor = ({
 
     try {
       // Пытаемся получить существующий шаблон
-      const formRes = await fetch(import.meta.env.VITE_API_URL +`/api/forms/get-by-event/${eventId}`, {
+      const formRes = await fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${eventId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -72,7 +72,7 @@ const InvitationFormEditor = ({
         formId = form.id;
       } else {
         // Если не найден — создаём новый шаблон
-        const createRes = await fetch(import.meta.env.VITE_API_URL +`/api/forms/create/${eventId}`, {
+        const createRes = await fetch(`http://158.160.171.159:7291/api/forms/create/${eventId}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -87,7 +87,7 @@ const InvitationFormEditor = ({
       
 
       try {
-        const response = await fetch(import.meta.env.VITE_API_URL +`/api/forms/update-form/${formId}`, {
+        const response = await fetch(`http://158.160.171.159:7291/api/forms/update-form/${formId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

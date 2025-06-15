@@ -55,7 +55,7 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
     }
 
     try {
-      const response = await fetch(import.meta.env.VITE_API_URL +"/api/events/create", {
+      const response = await fetch("http://158.160.171.159:7291/api/events/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

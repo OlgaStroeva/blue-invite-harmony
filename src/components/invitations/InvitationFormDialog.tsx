@@ -38,7 +38,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, canEdit }: Invitation
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch(import.meta.env.VITE_API_URL +"/api/auth/me", {
+    fetch("https://158.160.171.159:7291/api/auth/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -59,7 +59,7 @@ const InvitationFormDialog = ({ open, onOpenChange, event, canEdit }: Invitation
     if (event && open) {
       const token = localStorage.getItem("token");
 
-      fetch(import.meta.env.VITE_API_URL +`/api/forms/get-by-event/${event.id}`, {
+      fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

@@ -40,7 +40,7 @@ const EventViewDialog = ({
 
     if (!token) return;
 
-    fetch(import.meta.env.VITE_API_URL +"/api/auth/me", {
+    fetch("http://158.160.171.159:7291/api/auth/me", {
       headers: {
         Authorization: `Bearer ${token}`
       }

@@ -43,7 +43,7 @@ const UserAvatar = () => {
           return;
         }
 
-        const response = await fetch(import.meta.env.VITE_API_URL +"/api/auth/me", {
+        const response = await fetch("http://158.160.171.159:7291/api/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"

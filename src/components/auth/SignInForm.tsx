@@ -29,7 +29,7 @@ const SignInForm = () => {
     const token = params.get("confirm");
 
     if (token) {
-      fetch(import.meta.env.VITE_API_URL +"/api/auth/confirm-email?token=" + token, {
+      fetch("http://158.160.171.159:7291/api/auth/confirm-email?token=" + token, {
         method: "GET"
       })
           .then(async (res) => {
@@ -55,7 +55,7 @@ const SignInForm = () => {
 
     try {
       if (email && password) {
-        const response = await fetch(import.meta.env.VITE_API_URL +"/api/auth/login", {
+        const response = await fetch("http://158.160.171.159:7291/api/auth/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
