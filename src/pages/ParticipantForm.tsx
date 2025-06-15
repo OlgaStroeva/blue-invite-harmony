@@ -24,7 +24,7 @@ const ParticipantForm = () => {
 
     if (eventId) {
       // Получаем данные мероприятия
-      fetch(`https://my_project:7291/api/events/${eventId}`, {
+      fetch(import.meta.env.VITE_API_URL +`/api/events/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
           .then(res => res.ok ? res.json() : null)
@@ -42,7 +42,7 @@ const ParticipantForm = () => {
           });
 
       // Получаем шаблон анкеты
-      fetch(`https://my_project:7291/api/forms/get-by-event/${eventId}`, {
+      fetch(import.meta.env.VITE_API_URL +`/api/forms/get-by-event/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
           .then(res => res.ok ? res.json() : null)
@@ -77,7 +77,7 @@ const ParticipantForm = () => {
         }
       });
 
-      const response = await fetch(`https://my_project:7291/api/forms/add-participant/${formId}`, {
+      const response = await fetch(import.meta.env.VITE_API_URL +`/api/forms/add-participant/${formId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
