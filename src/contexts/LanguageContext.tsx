@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 // Define available languages
@@ -208,6 +209,8 @@ const enTranslations: Record<string, string> = {
   "start": "Start",
   "finish": "Finish",
   "finished": "Finished",
+  "upcoming": "Upcoming",
+  "inProgress": "In Progress",
   "confirmEventStatusChange": "Confirm Event Status Change",
   "areYouSureStatus": "Are you sure you want to",
   "thisEvent": "this event?",
@@ -230,6 +233,29 @@ const enTranslations: Record<string, string> = {
   "fieldsIncluding": "fields including",
   "noTemplatesAvailable": "No templates available",
   
+  // Event Form Dialog
+  "createNewEvent": "Create New Event",
+  "eventTitle": "Event Title",
+  "enterEventTitle": "Enter event title...",
+  "continue": "Continue",
+  "titleRequired": "Title required",
+  "pleaseEnterTitle": "Please enter a title for your event",
+  "error": "Error",
+  "failedToCreateEvent": "Failed to create event",
+  "networkError": "Network Error",
+  "serverNotResponding": "Server not responding",
+  
+  // Participants
+  "sendInvitations": "Send Invitations",
+  "selectParticipants": "Select participants to send invitations to",
+  "selectedParticipants": "Selected Participants",
+  "sendToSelected": "Send to Selected",
+  "invitationsSent": "Invitations Sent",
+  "invitationsSentSuccess": "Invitations sent successfully to selected participants",
+  "failedToSendInvitations": "Failed to send invitations",
+  "noParticipantsSelected": "No participants selected",
+  "pleaseSelectParticipants": "Please select at least one participant",
+  
   // Footer
   "aboutUs": "About Us",
   "contact": "Contact",
@@ -245,7 +271,6 @@ const enTranslations: Record<string, string> = {
   "formal": "Formal",
   "all": "All",
   "loading": "Loading...",
-  "error": "Error",
   "success": "Success",
   "warning": "Warning",
   "info": "Information",
@@ -424,6 +449,8 @@ const ruTranslations: Record<string, string> = {
   "start": "Начать",
   "finish": "Завершить",
   "finished": "Завершено",
+  "upcoming": "Предстоящее",
+  "inProgress": "В процессе",
   "confirmEventStatusChange": "Подтвердите изменение статуса события",
   "areYouSureStatus": "Вы уверены, что хотите",
   "thisEvent": "это событие?",
@@ -446,6 +473,29 @@ const ruTranslations: Record<string, string> = {
   "fieldsIncluding": "полей, включая",
   "noTemplatesAvailable": "Нет доступных шаблонов",
   
+  // Event Form Dialog
+  "createNewEvent": "Создать новое событие",
+  "eventTitle": "Название события",
+  "enterEventTitle": "Введите название события...",
+  "continue": "Продолжить",
+  "titleRequired": "Необходимо название",
+  "pleaseEnterTitle": "Пожалуйста, введите название для вашего события",
+  "error": "Ошибка",
+  "failedToCreateEvent": "Не удалось создать событие",
+  "networkError": "Ошибка сети",
+  "serverNotResponding": "Сервер не отвечает",
+  
+  // Participants
+  "sendInvitations": "Отправить приглашения",
+  "selectParticipants": "Выберите участников для отправки приглашений",
+  "selectedParticipants": "Выбранные участники",
+  "sendToSelected": "Отправить выбранным",
+  "invitationsSent": "Приглашения отправлены",
+  "invitationsSentSuccess": "Приглашения успешно отправлены выбранным участникам",
+  "failedToSendInvitations": "Не удалось отправить приглашения",
+  "noParticipantsSelected": "Участники не выбраны",
+  "pleaseSelectParticipants": "Пожалуйста, выберите хотя бы одного участника",
+  
   // Footer
   "aboutUs": "О нас",
   "contact": "Контакты",
@@ -461,7 +511,6 @@ const ruTranslations: Record<string, string> = {
   "formal": "Формальное",
   "all": "Все",
   "loading": "Загрузка...",
-  "error": "Ошибка",
   "success": "Успех",
   "warning": "Предупреждение",
   "info": "Информация",
