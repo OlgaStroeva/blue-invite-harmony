@@ -47,8 +47,8 @@ interface EventEditDialogProps {
   event: Event;
   onEventUpdated: (event: Event) => void;
   onEventDeleted?: (event: Event) => void;
-  true: boolean;
-  true: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 const EventEditDialog = ({ 
@@ -57,8 +57,8 @@ const EventEditDialog = ({
   event, 
   onEventUpdated,
   onEventDeleted,
-  true,
-  true 
+  canEdit,
+  canDelete 
 }: EventEditDialogProps) => {
   const [title, setTitle] = useState(event.title);
   const [description, setDescription] = useState(event.description || "");
@@ -296,10 +296,10 @@ const EventEditDialog = ({
         <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto bg-blue-50 border-blue-200">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-blue-700">
-              <Edit className="h-5 w-5" /> {true ? "Edit Event" : "View Event"}
+              <Edit className="h-5 w-5" /> {canEdit ? "Edit Event" : "View Event"}
             </DialogTitle>
             <DialogDescription className="text-blue-600">
-              {true ? "Make changes to your event details" : "View event details"}
+              {canEdit ? "Make changes to your event details" : "View event details"}
             </DialogDescription>
           </DialogHeader>
 
@@ -314,7 +314,7 @@ const EventEditDialog = ({
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter event title..."
                     className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
-                    disabled={!true}
+                    disabled={!canEdit}
                   />
                 </div>
 
@@ -327,17 +327,17 @@ const EventEditDialog = ({
                         type="button"
                         variant={category === cat ? "default" : "outline"}
                         size="sm"
-                        onClick={() => true && handleCategoryClick(cat)}
+                        onClick={() => canEdit && handleCategoryClick(cat)}
                         className={category === cat 
                           ? "bg-blue-600 text-white" 
                           : "border-blue-200 text-blue-700 bg-blue-50"}
-                        disabled={!true}
+                        disabled={!canEdit}
                       >
                         {cat} {category === cat && <Check className="ml-1 w-3 h-3" />}
                       </Button>
                     ))}
                     
-                    {true && (showTagInput ? (
+                    {canEdit && (showTagInput ? (
                       <div className="relative">
                         <Input
                           value={newTag}
@@ -366,7 +366,7 @@ const EventEditDialog = ({
                 <div className="space-y-2">
                   <Label htmlFor="image" className="text-blue-700 font-medium">Event Image</Label>
                   <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer bg-blue-100/70">
-                    
+                    {canEdit && (
                       <input
                         id="image"
                         type="file"
@@ -374,7 +374,7 @@ const EventEditDialog = ({
                         onChange={handleImageChange}
                         className="hidden"
                       />
-                    
+                    )}
                     
                     {imagePreview ? (
                       <div className="relative">
@@ -383,7 +383,7 @@ const EventEditDialog = ({
                           alt="Event preview" 
                           className="w-full aspect-[4/3] object-cover rounded-md"
                         />
-                        {true && (
+                        {canEdit && (
                           <Button
                             type="button"
                             variant="destructive"
@@ -398,7 +398,7 @@ const EventEditDialog = ({
                           </Button>
                         )}
                       </div>
-                    ) : true ? (
+                    ) : canEdit ? (
                       <label htmlFor="image" className="flex flex-col items-center justify-center gap-2 h-48">
                         <ImageIcon className="h-10 w-10 text-blue-400" />
                         <span className="text-blue-600 font-medium">Upload an image</span>
@@ -423,7 +423,7 @@ const EventEditDialog = ({
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe your event..."
                     className="border-blue-200 focus-visible:ring-blue-400 min-h-[300px] bg-blue-50"
-                    disabled={!true}
+                    disabled={!canEdit}
                   />
                 </div>
 
@@ -435,7 +435,7 @@ const EventEditDialog = ({
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                     className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
-                    disabled={!true}
+                    disabled={!canEdit}
                   />
                 </div>
 
@@ -447,7 +447,7 @@ const EventEditDialog = ({
                     onChange={(e) => setPlace(e.target.value)}
                     placeholder="Enter event location..."
                     className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
-                    disabled={!true}
+                    disabled={!canEdit}
                   />
                 </div>
               </div>
@@ -455,7 +455,7 @@ const EventEditDialog = ({
             
             <DialogFooter className="gap-2 pt-4 border-t border-blue-200">
               <div className="flex items-center gap-2 w-full justify-between">
-                {true && (
+                {canDelete && (
                   <Button
                     type="button"
                     variant="ghost"
@@ -473,9 +473,9 @@ const EventEditDialog = ({
                     onClick={() => onOpenChange(false)}
                     className="border-blue-200 bg-blue-50 hover:bg-blue-100"
                   >
-                    {true ? t("cancel") : t("close")}
+                    {canEdit ? t("cancel") : t("close")}
                   </Button>
-                  {true && (
+                  {canEdit && (
                     <Button 
                       type="submit"
                       className="bg-blue-600 hover:bg-blue-700 text-white"
