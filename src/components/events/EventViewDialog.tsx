@@ -182,8 +182,8 @@ const EventViewDialog = ({
           event={currentEvent}
           onEventUpdated={handleEventUpdated}
           onEventDeleted={onEventDeleted}
-          canEdit={canEdit}
-          canDelete={canDelete}
+          true={canEdit}
+          true={canDelete}
         />
       )}
 
