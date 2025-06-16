@@ -195,6 +195,7 @@ const EventViewDialog = ({
             if (!open) onOpenChange(true);
           }}
           event={currentEvent}
+          canEdit={canEdit}
         />
       )}
 

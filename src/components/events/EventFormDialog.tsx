@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import EventEditDialog from "./EventEditDialog";
-import {Result} from "postcss";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EventFormDialogProps {
   open: boolean;
@@ -38,6 +38,7 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
   const [tempEvent, setTempEvent] = useState<any>(null);
   const [user, setUser] = useState<{ id: number; name: string; email: string } | null>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   // Get all unique categories from existing events
   const [existingCategories, setExistingCategories] = useState<string[]>([
@@ -47,8 +48,8 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
   const handleContinue = async () => {
     if (!Name.trim()) {
       toast({
-        title: "Title required",
-        description: "Please enter a title for your event",
+        title: t("titleRequired"),
+        description: t("pleaseEnterTitle"),
         variant: "destructive",
       });
       return;
@@ -72,26 +73,28 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
           title: Name,
           description: "",
           image: "",
-          datetime: "",
-          category: "",
+          date: "",
+          time: "",
           location: "",
-          status: 'upcoming' // Set status to upcoming for newly created events
+          category: "",
+          status: 'upcoming' as const,
+          createdBy: 0
         };
         setTempEvent(newEvent);
         onOpenChange(false);
         setShowEditDialog(true);
       } else {
         toast({
-          title: "Ошибка",
-          description: result.message || "Не удалось создать мероприятие",
+          title: t("error"),
+          description: result.message || t("failedToCreateEvent"),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error("Ошибка создания мероприятия:", error);
       toast({
-        title: "Ошибка сети",
-        description: "Сервер не отвечает",
+        title: t("networkError"),
+        description: t("serverNotResponding"),
         variant: "destructive",
       });
     }
@@ -175,20 +178,20 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Create New Event</DialogTitle>
+            <DialogTitle>{t("createNewEvent")}</DialogTitle>
             <DialogDescription>
-              Let's start with a title for your event
+              {t("startWithEventTitle")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-blue-700">Event Title</Label>
+              <Label htmlFor="title" className="text-blue-700">{t("eventTitle")}</Label>
               <Input 
                 id="title"
                 value={Name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter event title..."
+                placeholder={t("enterEventTitle")}
                 className="border-blue-200 focus-visible:ring-blue-400"
                 autoFocus
               />
@@ -199,7 +202,7 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
                 onClick={handleContinue}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Continue
+                {t("continue")}
               </Button>
             </DialogFooter>
           </div>

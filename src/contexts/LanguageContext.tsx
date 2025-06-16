@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 // Define available languages
@@ -186,6 +185,8 @@ const enTranslations: Record<string, string> = {
   "eventLocation": "Event Location",
   "eventDescription": "Event Description",
   "eventType": "Event Type",
+  "eventTitle": "Event Title",
+  "eventImage": "Event Image",
   "participants": "Participants",
   "invitations": "Invitations",
   "responses": "Responses",
@@ -197,9 +198,10 @@ const enTranslations: Record<string, string> = {
   "deleteEvent": "Delete Event",
   "confirmDelete": "Are you sure you want to delete this event?",
   "cancel": "Cancel",
+  "close": "Close",
   "save": "Save",
   "update": "Update",
-  "eventUpdated": "Your event has been updated successfully!",
+  "eventUpdated": "Event Updated",
   "eventStatusUpdated": "Event Status Updated",
   "markedAsUpcoming": "Event has been marked as upcoming",
   "markedAsInProgress": "Event has been marked as in progress",
@@ -232,10 +234,12 @@ const enTranslations: Record<string, string> = {
   "chooseTemplate": "Choose from available templates",
   "fieldsIncluding": "fields including",
   "noTemplatesAvailable": "No templates available",
+  "invitationFormFor": "Invitation Form for",
+  "createCustomForm": "Create custom invitation form for your event",
+  "formSaved": "Form Saved",
+  "formSavedSuccessfully": "Form saved successfully",
   
   // Event Form Dialog
-  "createNewEvent": "Create New Event",
-  "eventTitle": "Event Title",
   "enterEventTitle": "Enter event title...",
   "continue": "Continue",
   "titleRequired": "Title required",
@@ -244,6 +248,7 @@ const enTranslations: Record<string, string> = {
   "failedToCreateEvent": "Failed to create event",
   "networkError": "Network Error",
   "serverNotResponding": "Server not responding",
+  "startWithEventTitle": "Let's start with a title for your event",
   
   // Participants
   "sendInvitations": "Send Invitations",
@@ -265,7 +270,6 @@ const enTranslations: Record<string, string> = {
   "invite": "Invite",
   "invited": "Invited",
   "qrCodeRequired": "QR code required",
-  "sending": "Sending...",
   "inviteAll": "Invite All",
   "invitingAll": "Inviting all...",
   "allInvitationsSent": "All invitations sent",
@@ -331,6 +335,25 @@ const enTranslations: Record<string, string> = {
   "somethingWentWrong": "Something went wrong",
   "enterYourEmailAndPassword": "Enter your email and password to create account",
   "signingUp": "Signing up...",
+  
+  // Additional event form translations
+  "missingInformation": "Missing information",
+  "pleaseEnsureRequiredFields": "Please ensure you've filled in the required fields",
+  "changesSavedSuccessfully": "Changes saved successfully",
+  "failedToUpdateEvent": "Failed to update event",
+  "eventDeleted": "Event Deleted",
+  "eventDeletedSuccessfully": "Event deleted successfully",
+  "viewEvent": "View Event",
+  "makeChangesToEventDetails": "Make changes to your event details",
+  "viewEventDetails": "View event details",
+  "addNewCategory": "Add new category...",
+  "addTag": "Add tag",
+  "eventPreview": "Event preview",
+  "uploadImage": "Upload an image",
+  "orDragAndDrop": "or drag and drop",
+  "noImage": "No image",
+  "describeYourEvent": "Describe your event...",
+  "enterEventLocation": "Enter event location...",
 };
 
 // Russian translations
@@ -470,6 +493,8 @@ const ruTranslations: Record<string, string> = {
   "eventLocation": "Место события",
   "eventDescription": "Описание события",
   "eventType": "Тип события",
+  "eventTitle": "Название события",
+  "eventImage": "Изображение события",
   "participants": "Участники",
   "invitations": "Приглашения",
   "responses": "Ответы",
@@ -481,9 +506,10 @@ const ruTranslations: Record<string, string> = {
   "deleteEvent": "Удалить событие",
   "confirmDelete": "Вы уверены, что хотите удалить это событие?",
   "cancel": "Отмена",
+  "close": "Закрыть",
   "save": "Сохранить",
   "update": "Обновить",
-  "eventUpdated": "Ваше событие было успешно обновлено!",
+  "eventUpdated": "Событие обновлено",
   "eventStatusUpdated": "Статус события обновлен",
   "markedAsUpcoming": "Событие отмечено как предстоящее",
   "markedAsInProgress": "Событие отмечено как в процессе",
@@ -516,10 +542,12 @@ const ruTranslations: Record<string, string> = {
   "chooseTemplate": "Выберите из доступных шаблонов",
   "fieldsIncluding": "полей, включая",
   "noTemplatesAvailable": "Нет доступных шаблонов",
+  "invitationFormFor": "Форма приглашения для",
+  "createCustomForm": "Создайте индивидуальную форму приглашения для вашего события",
+  "formSaved": "Форма сохранена",
+  "formSavedSuccessfully": "Форма успешно сохранена",
   
   // Event Form Dialog
-  "createNewEvent": "Создать новое событие",
-  "eventTitle": "Название события",
   "enterEventTitle": "Введите название события...",
   "continue": "Продолжить",
   "titleRequired": "Необходимо название",
@@ -528,6 +556,7 @@ const ruTranslations: Record<string, string> = {
   "failedToCreateEvent": "Не удалось создать событие",
   "networkError": "Ошибка сети",
   "serverNotResponding": "Сервер не отвечает",
+  "startWithEventTitle": "Давайте начнем с названия для вашего события",
   
   // Participants
   "sendInvitations": "Отправить приглашения",
@@ -549,7 +578,6 @@ const ruTranslations: Record<string, string> = {
   "invite": "Пригласить",
   "invited": "Приглашен",
   "qrCodeRequired": "Требуется QR-код",
-  "sending": "Отправка...",
   "inviteAll": "Пригласить всех",
   "invitingAll": "Приглашение всех...",
   "allInvitationsSent": "Все приглашения отправлены",
@@ -615,4 +643,23 @@ const ruTranslations: Record<string, string> = {
   "somethingWentWrong": "Что-то пошло не так",
   "enterYourEmailAndPassword": "Введите email и пароль для создания аккаунта",
   "signingUp": "Регистрация...",
+  
+  // Additional event form translations
+  "missingInformation": "Отсутствует информация",
+  "pleaseEnsureRequiredFields": "Пожалуйста, убедитесь, что вы заполнили обязательные поля",
+  "changesSavedSuccessfully": "Изменения успешно сохранены",
+  "failedToUpdateEvent": "Не удалось обновить событие",
+  "eventDeleted": "Событие удалено",
+  "eventDeletedSuccessfully": "Событие успешно удалено",
+  "viewEvent": "Просмотр события",
+  "makeChangesToEventDetails": "Внесите изменения в детали вашего события",
+  "viewEventDetails": "Просмотр деталей события",
+  "addNewCategory": "Добавить новую категорию...",
+  "addTag": "Добавить тег",
+  "eventPreview": "Предпросмотр события",
+  "uploadImage": "Загрузить изображение",
+  "orDragAndDrop": "или перетащите сюда",
+  "noImage": "Нет изображения",
+  "describeYourEvent": "Опишите ваше событие...",
+  "enterEventLocation": "Введите место проведения события...",
 };
