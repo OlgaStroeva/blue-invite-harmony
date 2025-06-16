@@ -1,3 +1,4 @@
+
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -10,6 +11,7 @@ import { Event } from "@/types/event";
 import {useEffect, useState} from "react";
 import { Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 
 interface Participant {
   id: number;
@@ -19,6 +21,7 @@ interface Participant {
   dietaryRestrictions: string;
   invitationSent: boolean;
   attended: boolean;
+  haveQr: boolean;
   [key: string]: string | number | boolean;
 }
 
@@ -42,9 +45,34 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
   const { isAuthenticated } = useAuth();
 
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [formFields, setFormFields] = useState<FormField[]>([]);
   const [sendingInvites, setSendingInvites] = useState<Record<number, boolean>>({});
   const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
   const [sendingBulkInvites, setSendingBulkInvites] = useState(false);
+  const [editingParticipant, setEditingParticipant] = useState<number | null>(null);
+  const [editValues, setEditValues] = useState<Record<string, string>>({});
+
+  // Load form fields to get proper column order
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token || !event?.id) return;
+
+    fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(async res => {
+        if (!res.ok) throw new Error("Failed to get form data");
+        return res.json();
+      })
+      .then(data => {
+        setFormFields(data.fields || []);
+      })
+      .catch(err => {
+        console.error("Error loading form fields:", err);
+      });
+  }, [event.id]);
 
   const handleSelectParticipant = (participantId: number, checked: boolean) => {
     if (checked) {
@@ -62,6 +90,82 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       setSelectedParticipants(availableParticipants);
     } else {
       setSelectedParticipants([]);
+    }
+  };
+
+  const handleInviteAll = async () => {
+    const availableParticipants = participants
+      .filter(p => p.haveQr && !p.invitationSent)
+      .map(p => p.id);
+    
+    if (availableParticipants.length === 0) {
+      toast({
+        title: t("noParticipantsSelected"),
+        description: t("pleaseSelectParticipants"),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token || !event?.id) return;
+
+    try {
+      setSendingBulkInvites(true);
+
+      // Get form ID
+      const formRes = await fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!formRes.ok) throw new Error("Failed to get form data");
+      const { id: formId } = await formRes.json();
+
+      // Send invitations to all available participants
+      const promises = availableParticipants.map(async (participantId) => {
+        const inviteRes = await fetch(`http://158.160.171.159:7291/api/invitations/send/${formId}/${participantId}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!inviteRes.ok) {
+          const errorData = await inviteRes.json();
+          throw new Error(`Failed to send invitation to participant ${participantId}: ${errorData.message}`);
+        }
+
+        return participantId;
+      });
+
+      await Promise.all(promises);
+
+      // Update participants state
+      setParticipants(prev =>
+        prev.map(p =>
+          availableParticipants.includes(p.id)
+            ? { ...p, invitationSent: true }
+            : p
+        )
+      );
+
+      toast({
+        title: t("allInvitationsSent"),
+        description: `${t("sentInvitationsTo")} ${availableParticipants.length} ${t("participants")}`,
+      });
+
+    } catch (err: any) {
+      console.error("Error sending bulk invitations:", err);
+      toast({
+        title: t("error"),
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
+      setSendingBulkInvites(false);
     }
   };
 
@@ -260,7 +364,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
             invitationSent: p.attended ?? false,
             haveQr: p.qrCode
           }));
-          console.error(data);
+          console.log("Participants data:", data);
           setParticipants(mapped);
         })
         .catch(err => {
@@ -286,6 +390,62 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       title: t("attendanceUpdated"),
       description: t("participantStatusChanged"),
     });
+  };
+
+  const handleEditParticipant = (participantId: number) => {
+    const participant = participants.find(p => p.id === participantId);
+    if (participant) {
+      setEditingParticipant(participantId);
+      setEditValues({ ...participant });
+    }
+  };
+
+  const handleSaveEdit = async (participantId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch(`http://158.160.171.159:7291/api/forms/update/${participantId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(editValues)
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.message || "Failed to update participant");
+      }
+
+      setParticipants(prev =>
+        prev.map(p =>
+          p.id === participantId ? { ...p, ...editValues } : p
+        )
+      );
+
+      setEditingParticipant(null);
+      setEditValues({});
+
+      toast({
+        title: t("success"),
+        description: "Participant updated successfully",
+      });
+
+    } catch (error: any) {
+      console.error("Error updating participant:", error);
+      toast({
+        title: t("error"),
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingParticipant(null);
+    setEditValues({});
   };
 
   const handleXlsxUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -322,6 +482,9 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
         description: result.message || `${t("successfullyImported")} ${result.count} ${t("records")}`,
       });
 
+      // Reload participants
+      window.location.reload();
+
     } catch (err) {
       console.error("Ошибка отправки файла:", err);
       toast({
@@ -334,7 +497,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
 
   const handleDownloadXlsx = () => {
     const worksheet = XLSX.utils.json_to_sheet(participants.map(p => {
-      const { id, invitationSent, attended, ...rest } = p;
+      const { id, invitationSent, attended, haveQr, ...rest } = p;
       return rest;
     }));
     
@@ -349,56 +512,25 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     });
   };
 
-  const allKeys = Array.from(
-    new Set(
-      participants.flatMap(participant => 
-        Object.keys(participant).filter(key => 
-          !['id', 'invitationSent', 'attended'].includes(key)
+  // Get ordered columns based on form fields, fallback to participant keys
+  const getOrderedColumns = () => {
+    if (formFields.length > 0) {
+      return formFields.map(field => field.name);
+    }
+    
+    // Fallback to all keys except system fields
+    return Array.from(
+      new Set(
+        participants.flatMap(participant => 
+          Object.keys(participant).filter(key => 
+            !['id', 'invitationSent', 'attended', 'haveQr'].includes(key)
+          )
         )
       )
-    )
-  );
-
-  const updateParticipantOnServer = async (participantId: number, updatedData: Record<string, string>) => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await fetch(`http://158.160.171.159:7291/api/forms/update/${participantId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(updatedData)
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        console.error("Ошибка при обновлении:", result.message);
-      } else {
-        console.log("Участник обновлён:", result);
-      }
-    } catch (error) {
-      console.error("Сетевая ошибка при обновлении участника:", error);
-    }
-  };
-
-  const handleFieldChange = (id: number, key: string, value: string) => {
-    setParticipants(prev =>
-        prev.map(participant => {
-          if (participant.id === id) {
-            const updated = { ...participant, [key]: value };
-            
-            updateParticipantOnServer(id, {
-              [key]: value
-            });
-
-            return updated;
-          }
-          return participant;
-        })
     );
   };
 
+  const orderedColumns = getOrderedColumns();
   const isEventFinished = event.status === 'finished';
   const canEdit = event.status === 'upcoming';
   const availableForInvite = participants.filter(p => p.haveQr && !p.invitationSent);
@@ -466,6 +598,21 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                         {t("importXLSX")}
                       </label>
 
+                      {availableForInvite.length > 0 && (
+                        <Button 
+                          onClick={handleInviteAll}
+                          disabled={sendingBulkInvites}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          {sendingBulkInvites ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Send className="mr-2 h-4 w-4" />
+                          )}
+                          {t("inviteAll")} ({availableForInvite.length})
+                        </Button>
+                      )}
+
                       {selectedParticipants.length > 0 && (
                         <Button 
                           onClick={handleSendBulkInvites}
@@ -508,11 +655,9 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                           />
                         </TableHead>
                       )}
-                      {allKeys
-                          .filter(key => key !== 'haveQr')
-                          .map((key) => (
-                        <TableHead key={key} className="capitalize text-blue-700">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                      {orderedColumns.map((columnName) => (
+                        <TableHead key={columnName} className="capitalize text-blue-700">
+                          {columnName.replace(/([A-Z])/g, ' $1').trim()}
                         </TableHead>
                       ))}
 
@@ -537,11 +682,17 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                             />
                           </TableCell>
                         )}
-                        {allKeys
-                            .filter(key => key !== 'haveQr')
-                            .map((key) => (
-                          <TableCell key={`${participant.id}-${key}`}>
-                            {participant[key] !== undefined ? String(participant[key]) : '—'}
+                        {orderedColumns.map((columnName) => (
+                          <TableCell key={`${participant.id}-${columnName}`}>
+                            {editingParticipant === participant.id ? (
+                              <Input
+                                value={editValues[columnName] || ''}
+                                onChange={(e) => setEditValues(prev => ({ ...prev, [columnName]: e.target.value }))}
+                                className="w-full"
+                              />
+                            ) : (
+                              participant[columnName] !== undefined ? String(participant[columnName]) : '—'
+                            )}
                           </TableCell>
                         ))}
                         
@@ -598,13 +749,36 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                         )}
                         
                         <TableCell className="text-right">
-                          <Button 
-                            variant="ghost" 
-                            className="h-8 w-8 p-0" 
-                            aria-label="Edit participant"
-                          >
-                            <Edit className="h-4 w-4 text-blue-600" />
-                          </Button>
+                          {editingParticipant === participant.id ? (
+                            <div className="flex gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleSaveEdit(participant.id)}
+                                className="text-green-600"
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={handleCancelEdit}
+                                className="text-red-600"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button 
+                              variant="ghost" 
+                              className="h-8 w-8 p-0" 
+                              onClick={() => handleEditParticipant(participant.id)}
+                              disabled={!canEdit}
+                              aria-label="Edit participant"
+                            >
+                              <Edit className="h-4 w-4 text-blue-600" />
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
