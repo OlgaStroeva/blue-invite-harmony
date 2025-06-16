@@ -93,12 +93,15 @@ const EventStatusButton = ({ event}: EventStatusButtonProps) => {
     <>
       <Button
         size="sm"
-        onClick={() => event.status !== 'finished' && setShowConfirmDialog(true)}
-        className={`text-white ${buttonContent.className}`}
-        disabled={event.status === 'finished'}
+        onClick={() => {
+          // Don't call any function - make button unclickable
+          return;
+        }}
+        className={`text-white ${buttonContent.className} cursor-default`}
+        disabled={true}
       >
         {buttonContent.icon}
-        {event.status === 'upcoming' ? t('start') : t('finish')}
+        {event.status === 'upcoming' ? t('start') : event.status === 'in_progress' ? t('finish') : t('finished')}
       </Button>
 
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>

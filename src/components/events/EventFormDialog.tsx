@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { PlusCircle, X, Image as ImageIcon, Tag, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -75,9 +74,9 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
           datetime: "",
           category: "",
           location: "",
-          status: 'upcoming'
+          // Don't set status for newly created events
         };
-        setTempEvent(newEvent); // используем данные с сервера
+        setTempEvent(newEvent);
         onOpenChange(false);
         setShowEditDialog(true);
       } else {
@@ -212,6 +211,8 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
           onOpenChange={handleEditDialogClose}
           event={tempEvent}
           onEventUpdated={handleEventUpdated}
+          canEdit={true}
+          canDelete={false}
         />
       )}
     </>
