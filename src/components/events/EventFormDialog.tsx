@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { PlusCircle, X, Image as ImageIcon, Tag, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -74,7 +75,7 @@ const EventFormDialog = ({ open, onOpenChange, onEventCreated }: EventFormDialog
           datetime: "",
           category: "",
           location: "",
-          // Don't set status for newly created events
+          status: 'upcoming' // Set status to upcoming for newly created events
         };
         setTempEvent(newEvent);
         onOpenChange(false);

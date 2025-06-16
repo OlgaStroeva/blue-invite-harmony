@@ -1,8 +1,7 @@
-
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Edit, Table as TableIcon, Mail, Check, X, Upload, Download, FileDown } from "lucide-react";
+import { Edit, Table as TableIcon, Mail, Check, X, Upload, Download, FileDown, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,6 +9,7 @@ import * as XLSX from 'xlsx';
 import { Event } from "@/types/event";
 import {useEffect, useState} from "react";
 import { Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Participant {
   id: number;
@@ -43,6 +43,94 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
 
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [sendingInvites, setSendingInvites] = useState<Record<number, boolean>>({});
+  const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
+  const [sendingBulkInvites, setSendingBulkInvites] = useState(false);
+
+  const handleSelectParticipant = (participantId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedParticipants(prev => [...prev, participantId]);
+    } else {
+      setSelectedParticipants(prev => prev.filter(id => id !== participantId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const availableParticipants = participants
+        .filter(p => p.haveQr && !p.invitationSent)
+        .map(p => p.id);
+      setSelectedParticipants(availableParticipants);
+    } else {
+      setSelectedParticipants([]);
+    }
+  };
+
+  const handleSendBulkInvites = async () => {
+    if (selectedParticipants.length === 0) return;
+
+    const token = localStorage.getItem("token");
+    if (!token || !event?.id) return;
+
+    try {
+      setSendingBulkInvites(true);
+
+      // Get form ID
+      const formRes = await fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!formRes.ok) throw new Error("Failed to get form data");
+      const { id: formId } = await formRes.json();
+
+      // Send invitations to all selected participants
+      const promises = selectedParticipants.map(async (participantId) => {
+        const inviteRes = await fetch(`http://158.160.171.159:7291/api/invitations/send/${formId}/${participantId}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!inviteRes.ok) {
+          const errorData = await inviteRes.json();
+          throw new Error(`Failed to send invitation to participant ${participantId}: ${errorData.message}`);
+        }
+
+        return participantId;
+      });
+
+      await Promise.all(promises);
+
+      // Update participants state
+      setParticipants(prev =>
+        prev.map(p =>
+          selectedParticipants.includes(p.id)
+            ? { ...p, invitationSent: true }
+            : p
+        )
+      );
+
+      setSelectedParticipants([]);
+
+      toast({
+        title: t("invitationsSent"),
+        description: `${t("sentInvitationsTo")} ${selectedParticipants.length} ${t("participants")}`,
+      });
+
+    } catch (err: any) {
+      console.error("Error sending bulk invitations:", err);
+      toast({
+        title: t("error"),
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
+      setSendingBulkInvites(false);
+    }
+  };
 
   const handleSendInvite = async (participantId: number) => {
     const token = localStorage.getItem("token");
@@ -312,6 +400,10 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
   };
 
   const isEventFinished = event.status === 'finished';
+  const canEdit = event.status === 'upcoming';
+  const availableForInvite = participants.filter(p => p.haveQr && !p.invitationSent);
+  const allAvailableSelected = availableForInvite.length > 0 && 
+    availableForInvite.every(p => selectedParticipants.includes(p.id));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -329,6 +421,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
         <div className="mt-4">
           {participants.length === 0 ? (
             <div className="text-center p-8 bg-blue-100/50 rounded-lg">
+              {canEdit && (
                 <div className="mb-4">
                   <input
                     id="xlsx"
@@ -345,6 +438,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                     {t("importXLSX")}
                   </label>
                 </div>
+              )}
               <Mail className="h-10 w-10 mx-auto text-blue-400 mb-2" />
               <h3 className="text-lg font-medium text-blue-700">{t("noParticipantsYet")}</h3>
               <p className="text-blue-600 mt-1">
@@ -353,30 +447,51 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
             </div>
           ) : (
             <div>
-                <div className="mb-4 flex justify-between">
-                  <input
-                    id="xlsx"
-                    type="file"
-                    accept=".xlsx,.xls"
-                    onChange={handleXlsxUpload}
-                    className="hidden"
-                  />
-                  <label 
-                    htmlFor="xlsx" 
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
-                  >
-                    <Upload className="h-4 w-4" />
-                    {t("importXLSX")}
-                  </label>
-                  
-                  <Button 
-                    onClick={handleDownloadXlsx}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <FileDown className="mr-2 h-4 w-4" />
-                    {t("exportToExcel")}
-                  </Button>
+              <div className="mb-4 flex justify-between items-center">
+                <div className="flex gap-2">
+                  {canEdit && (
+                    <>
+                      <input
+                        id="xlsx"
+                        type="file"
+                        accept=".xlsx,.xls"
+                        onChange={handleXlsxUpload}
+                        className="hidden"
+                      />
+                      <label 
+                        htmlFor="xlsx" 
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                      >
+                        <Upload className="h-4 w-4" />
+                        {t("importXLSX")}
+                      </label>
+
+                      {selectedParticipants.length > 0 && (
+                        <Button 
+                          onClick={handleSendBulkInvites}
+                          disabled={sendingBulkInvites}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          {sendingBulkInvites ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Send className="mr-2 h-4 w-4" />
+                          )}
+                          {t("sendInvites")} ({selectedParticipants.length})
+                        </Button>
+                      )}
+                    </>
+                  )}
                 </div>
+                
+                <Button 
+                  onClick={handleDownloadXlsx}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <FileDown className="mr-2 h-4 w-4" />
+                  {t("exportToExcel")}
+                </Button>
+              </div>
               
               <div className="border border-blue-200 rounded-md bg-white overflow-hidden">
                 <Table>
@@ -385,6 +500,14 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                   </TableCaption>
                   <TableHeader>
                     <TableRow className="bg-blue-50">
+                      {canEdit && availableForInvite.length > 0 && (
+                        <TableHead className="w-12">
+                          <Checkbox
+                            checked={allAvailableSelected}
+                            onCheckedChange={handleSelectAll}
+                          />
+                        </TableHead>
+                      )}
                       {allKeys
                           .filter(key => key !== 'haveQr')
                           .map((key) => (
@@ -393,19 +516,27 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                         </TableHead>
                       ))}
 
-                        <>
-                          <TableHead className="text-blue-700">{t("invite")}</TableHead>
-                          {isEventFinished && (
-                            <TableHead className="text-blue-700">{t("attended")}</TableHead>
-                          )}
-                          <TableHead className="text-right text-blue-700">{t("actions")}</TableHead>
-                        </>
-
+                      {canEdit && (
+                        <TableHead className="text-blue-700">{t("invite")}</TableHead>
+                      )}
+                      {isEventFinished && (
+                        <TableHead className="text-blue-700">{t("attended")}</TableHead>
+                      )}
+                      <TableHead className="text-right text-blue-700">{t("actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {participants.map((participant) => (
                       <TableRow key={participant.id} className="hover:bg-blue-50">
+                        {canEdit && availableForInvite.some(p => p.id === participant.id) && (
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedParticipants.includes(participant.id)}
+                              onCheckedChange={(checked) => handleSelectParticipant(participant.id, checked as boolean)}
+                              disabled={!participant.haveQr || participant.invitationSent}
+                            />
+                          </TableCell>
+                        )}
                         {allKeys
                             .filter(key => key !== 'haveQr')
                             .map((key) => (
@@ -414,67 +545,67 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                           </TableCell>
                         ))}
                         
-                          <>
-                            <TableCell>
-                              <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => participant.invitationSent ? handleCancelInvite(participant.id) : handleSendInvite(participant.id)}
-                                  disabled={sendingInvites[participant.id] || !participant.haveQr}
-                                  className={
-                                    participant.invitationSent
-                                        ? "text-red-600"
-                                        : sendingInvites[participant.id] && !participant.haveQr && !participant.invitationSent
-                                            ? "text-gray-400 cursor-not-allowed"
-                                            : "text-blue-600 hover:text-blue-700"
-                                  }
-                                  title={
-                                    !participant.haveQr
-                                        ? t("qrCodeRequired")
-                                        : sendingInvites[participant.id]
-                                            ? t("sending")
-                                            : ""
-                                  }
-                              >
-                                {sendingInvites[participant.id] ? (
-                                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                                ) : participant.invitationSent ? (
-                                    <>
-                                      <X className="h-4 w-4 mr-1" />
-                                      {t("cancel")}
-                                    </>
-                                ) : (
-                                    <>
-                                      <Mail className="h-4 w-4 mr-1" />
-                                      {t("invite")}
-                                    </>
-                                )}
-                              </Button>
-                            </TableCell>
-                            
-                            {isEventFinished && (
-                              <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleToggleAttendance(participant.id)}
-                                  className={participant.attended ? "text-green-600" : "text-gray-400"}
-                                >
-                                  <Check className="h-4 w-4" />
-                                </Button>
-                              </TableCell>
-                            )}
-                            
-                            <TableCell className="text-right">
-                              <Button 
-                                variant="ghost" 
-                                className="h-8 w-8 p-0" 
-                                aria-label="Edit participant"
-                              >
-                                <Edit className="h-4 w-4 text-blue-600" />
-                              </Button>
-                            </TableCell>
-                          </>
+                        {canEdit && (
+                          <TableCell>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => participant.invitationSent ? handleCancelInvite(participant.id) : handleSendInvite(participant.id)}
+                                disabled={sendingInvites[participant.id] || !participant.haveQr}
+                                className={
+                                  participant.invitationSent
+                                      ? "text-red-600"
+                                      : sendingInvites[participant.id] && !participant.haveQr && !participant.invitationSent
+                                          ? "text-gray-400 cursor-not-allowed"
+                                          : "text-blue-600 hover:text-blue-700"
+                                }
+                                title={
+                                  !participant.haveQr
+                                      ? t("qrCodeRequired")
+                                      : sendingInvites[participant.id]
+                                          ? t("sending")
+                                          : ""
+                                }
+                            >
+                              {sendingInvites[participant.id] ? (
+                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                              ) : participant.invitationSent ? (
+                                  <>
+                                    <X className="h-4 w-4 mr-1" />
+                                    {t("cancel")}
+                                  </>
+                              ) : (
+                                  <>
+                                    <Mail className="h-4 w-4 mr-1" />
+                                    {t("invite")}
+                                  </>
+                              )}
+                            </Button>
+                          </TableCell>
+                        )}
+                        
+                        {isEventFinished && (
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleToggleAttendance(participant.id)}
+                              className={participant.attended ? "text-green-600" : "text-gray-400"}
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        )}
+                        
+                        <TableCell className="text-right">
+                          <Button 
+                            variant="ghost" 
+                            className="h-8 w-8 p-0" 
+                            aria-label="Edit participant"
+                          >
+                            <Edit className="h-4 w-4 text-blue-600" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
