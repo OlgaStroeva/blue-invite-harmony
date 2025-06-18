@@ -99,7 +99,40 @@ const enTranslations: Record<string, string> = {
   "joinOver": "Join over 10,000 users creating stunning invitations",
   "startCrafting": "Start crafting your perfect invitation today",
   
-  // Registration Form
+  // Account Settings - New translations
+  "manageYourAccount": "Manage your account settings and preferences",
+  "personalInformation": "Personal Information",
+  "updateYourPersonal": "Update your personal details",
+  "fullName": "Full Name",
+  "emailAddress": "Email Address",
+  "emailCannotBeChanged": "Email cannot be changed",
+  "saving": "Saving...",
+  "profileUpdated": "Profile updated",
+  "personalInfoUpdated": "Your personal information has been updated successfully.",
+  "updatePassword": "Update your password to maintain account security",
+  "updating": "Updating...",
+  "updatePassword": "Update Password",
+  "passwordUpdated": "Password updated",
+  "passwordChangedSuccessfully": "Your password has been changed successfully.",
+  "assignmentPreferences": "Assignment Preferences",
+  "controlHowOthers": "Control how others can interact with your account",
+  "allowOthersToAssign": "Allow others to assign you to events",
+  "whenEnabledOthers": "When enabled, other users can assign you to events",
+  "preferencesUpdated": "Preferences updated",
+  "othersCanNowAssign": "Other users can now assign you to events",
+  "othersCanNoLonger": "Other users can no longer assign you to events",
+  "personalInfo": "Personal Info",
+  "preferences": "Preferences",
+  
+  // Staff Management - New translations
+  "assignStaffMembers": "Search and assign staff members to this event",
+  "noAvailableStaff": "No available staff found with that email",
+  "hasBeenAssigned": "has been assigned to this event",
+  "hasBeenRemoved": "The staff member has been removed from this event",
+  "noStaffAssignedYet": "No staff assigned to this event yet",
+  "for": "for",
+  
+  // All other existing translations...
   "registrationForm": "Registration Form",
   "submitRegistration": "Submit Registration",
   "registrationComplete": "Registration Complete!",
@@ -107,16 +140,11 @@ const enTranslations: Record<string, string> = {
   "returnHome": "Return Home",
   "eventNotFound": "Event Not Found",
   "eventNotExist": "The event you're looking for doesn't exist or has been removed.",
-  
-  // Form Fields
   "email": "Email",
-  "fullName": "Full Name",
   "dietary": "Dietary Restrictions",
   "company": "Company",
   "position": "Position",
   "enter": "Enter",
-  
-  // Sign In
   "backToHome": "Back to Home",
   "signInHeading": "Sign In",
   "enterCredentials": "Enter your credentials to access your account",
@@ -125,8 +153,6 @@ const enTranslations: Record<string, string> = {
   "signingIn": "Signing in...",
   "orContinueWith": "Or continue with",
   "dontHaveAccount": "Don't have an account?",
-  
-  // Sign Up
   "createAccount": "Create an Account",
   "alreadyHaveAccount": "Already have an account?",
   "passwordRequirements": "Password must be at least 8 characters",
@@ -135,8 +161,6 @@ const enTranslations: Record<string, string> = {
   "privacyPolicy": "Privacy Policy",
   "createAccountButton": "Create Account",
   "creatingAccount": "Creating account...",
-  
-  // Password Reset
   "resetPassword": "Reset Password",
   "enterEmailForPasswordReset": "Enter your email address and we'll send you a link to reset your password.",
   "emailRequired": "Please enter your email address",
@@ -145,8 +169,6 @@ const enTranslations: Record<string, string> = {
   "failedToSendResetEmail": "Failed to send password reset email. Please try again.",
   "passwordResetEmailSentSuccess": "Password reset email sent successfully!",
   "sending": "Sending...",
-  
-  // Dashboard
   "welcome": "Welcome",
   "yourEvents": "Your Events",
   "createEvent": "Create Event",
@@ -160,13 +182,10 @@ const enTranslations: Record<string, string> = {
   "manageEvents": "Manage your events and create new invitations",
   "open": "Open",
   "createNewEvent": "Create new event",
-  
-  // Account
   "accountSettings": "Account Settings",
   "profile": "Profile",
   "security": "Security",
   "notifications": "Notifications",
-  "personalInfo": "Personal Information",
   "updateProfile": "Update Profile",
   "changePassword": "Change Password",
   "currentPassword": "Current Password",
@@ -177,8 +196,6 @@ const enTranslations: Record<string, string> = {
   "accountUpdated": "Account updated successfully",
   "passwordChanged": "Password changed successfully",
   "settingsSaved": "Settings saved successfully",
-  
-  // Event related
   "eventDetails": "Event Details",
   "eventName": "Event Name",
   "eventDate": "Event Date",
@@ -206,8 +223,6 @@ const enTranslations: Record<string, string> = {
   "markedAsUpcoming": "Event has been marked as upcoming",
   "markedAsInProgress": "Event has been marked as in progress",
   "markedAsFinished": "Event has been marked as finished",
-  
-  // Event Status Button
   "start": "Start",
   "finish": "Finish",
   "finished": "Finished",
@@ -218,14 +233,10 @@ const enTranslations: Record<string, string> = {
   "thisEvent": "this event?",
   "actionCannotBeUndone": "This action cannot be undone.",
   "confirm": "Confirm",
-  
-  // User Avatar
   "userMenu": "User menu",
   "signOut": "Sign Out",
   "loggedOutSuccessfully": "Logged out successfully",
   "youHaveBeenSignedOut": "You have been signed out",
-  
-  // Invitation templates
   "templateApplied": "Template Applied",
   "theTemplate": "The template",
   "hasBeenApplied": "has been applied",
@@ -238,8 +249,6 @@ const enTranslations: Record<string, string> = {
   "createCustomForm": "Create custom invitation form for your event",
   "formSaved": "Form Saved",
   "formSavedSuccessfully": "Form saved successfully",
-  
-  // Event Form Dialog
   "enterEventTitle": "Enter event title...",
   "continue": "Continue",
   "titleRequired": "Title required",
@@ -249,8 +258,6 @@ const enTranslations: Record<string, string> = {
   "networkError": "Network Error",
   "serverNotResponding": "Server not responding",
   "startWithEventTitle": "Let's start with a title for your event",
-  
-  // Participants
   "sendInvitations": "Send Invitations",
   "selectParticipants": "Select participants to send invitations to",
   "selectedParticipants": "Selected Participants",
@@ -291,8 +298,6 @@ const enTranslations: Record<string, string> = {
   "attended": "Attended",
   "actions": "Actions",
   "sendInvites": "Send Invites",
-  
-  // Staff management
   "staff": "Staff",
   "manageStaff": "Manage Staff",
   "viewStaff": "View Staff",
@@ -309,15 +314,11 @@ const enTranslations: Record<string, string> = {
   "noStaffAssigned": "No staff assigned to this event yet",
   "searchAndAssignStaff": "Search and assign staff members to this event",
   "removeFromEvent": "Remove from Event",
-  
-  // Footer
   "aboutUs": "About Us",
   "contact": "Contact",
   "support": "Support",
   "termsOfService": "Terms of Service",
   "copyright": "© 2023 Invite. All rights reserved.",
-  
-  // Other common text
   "wedding": "Wedding",
   "birthday": "Birthday",
   "corporate": "Corporate",
@@ -333,8 +334,6 @@ const enTranslations: Record<string, string> = {
   "settings": "Settings",
   "search": "Search",
   "category": "Category",
-  
-  // Additional registration translations
   "passwordsDoNotMatch": "Passwords do not match",
   "registrationSuccessful": "Registration Successful",
   "youCanNowSignIn": "You can now sign in to your account",
@@ -342,8 +341,6 @@ const enTranslations: Record<string, string> = {
   "somethingWentWrong": "Something went wrong",
   "enterYourEmailAndPassword": "Enter your email and password to create account",
   "signingUp": "Signing up...",
-  
-  // Additional event form translations
   "missingInformation": "Missing information",
   "pleaseEnsureRequiredFields": "Please ensure you've filled in the required fields",
   "changesSavedSuccessfully": "Changes saved successfully",
@@ -361,8 +358,6 @@ const enTranslations: Record<string, string> = {
   "noImage": "No image",
   "describeYourEvent": "Describe your event...",
   "enterEventLocation": "Enter event location...",
-  
-  // Additional translations for new features
   "participantDeleted": "Participant deleted",
   "deleteParticipant": "Delete Participant",
   "delete": "Delete",
@@ -431,7 +426,39 @@ const ruTranslations: Record<string, string> = {
   "joinOver": "Присоединяйтесь к более чем 10 000 пользователей, создающих потрясающие приглашения",
   "startCrafting": "Начните создавать свое идеальное приглашение сегодня",
   
-  // Registration Form
+  // Account Settings - New Russian translations
+  "manageYourAccount": "Управляйте настройками и предпочтениями вашего аккаунта",
+  "personalInformation": "Личная информация",
+  "updateYourPersonal": "Обновите ваши личные данные",
+  "fullName": "Полное имя",
+  "emailAddress": "Адрес электронной почты",
+  "emailCannotBeChanged": "Электронную почту нельзя изменить",
+  "saving": "Сохранение...",
+  "profileUpdated": "Профиль обновлен",
+  "personalInfoUpdated": "Ваша личная информация была успешно обновлена.",
+  "updatePassword": "Обновите ваш пароль для поддержания безопасности аккаунта",
+  "updating": "Обновление...",
+  "passwordUpdated": "Пароль обновлен",
+  "passwordChangedSuccessfully": "Ваш пароль был успешно изменен.",
+  "assignmentPreferences": "Настройки назначений",
+  "controlHowOthers": "Контролируйте, как другие могут взаимодействовать с вашим аккаунтом",
+  "allowOthersToAssign": "Разрешить другим назначать вас на события",
+  "whenEnabledOthers": "Когда включено, другие пользователи могут назначать вас на события",
+  "preferencesUpdated": "Настройки обновлены",
+  "othersCanNowAssign": "Другие пользователи теперь могут назначать вас на события",
+  "othersCanNoLonger": "Другие пользователи больше не могут назначать вас на события",
+  "personalInfo": "Личная информация",
+  "preferences": "Настройки",
+  
+  // Staff Management - New Russian translations
+  "assignStaffMembers": "Найдите и назначьте сотрудников для этого события",
+  "noAvailableStaff": "Доступные сотрудники с таким email не найдены",
+  "hasBeenAssigned": "был назначен на это событие",
+  "hasBeenRemoved": "Сотрудник был удален с этого события",
+  "noStaffAssignedYet": "К этому событию пока не назначены сотрудники",
+  "for": "для",
+  
+  // All other existing translations...
   "registrationForm": "Форма регистрации",
   "submitRegistration": "Отправить регистрацию",
   "registrationComplete": "Регистрация завершена!",
@@ -439,16 +466,11 @@ const ruTranslations: Record<string, string> = {
   "returnHome": "Вернуться на главную",
   "eventNotFound": "Событие не найдено",
   "eventNotExist": "Событие, которое вы ищете, не существует или было удалено.",
-  
-  // Form Fields
   "email": "Электронная почта",
-  "fullName": "Полное имя",
   "dietary": "Пищевые ограничения",
   "company": "Компания",
   "position": "Должность",
   "enter": "Введите",
-  
-  // Sign In
   "backToHome": "Назад на главную",
   "signInHeading": "Вход",
   "enterCredentials": "Введите свои учетные данные для доступа к аккаунту",
@@ -457,8 +479,6 @@ const ruTranslations: Record<string, string> = {
   "signingIn": "Выполняется вход...",
   "orContinueWith": "Или продолжить с",
   "dontHaveAccount": "Нет аккаунта?",
-  
-  // Sign Up
   "createAccount": "Создать аккаунт",
   "alreadyHaveAccount": "Уже есть аккаунт?",
   "passwordRequirements": "Пароль должен содержать не менее 8 символов",
@@ -467,8 +487,6 @@ const ruTranslations: Record<string, string> = {
   "privacyPolicy": "Политика конфиденциальности",
   "createAccountButton": "Создать аккаунт",
   "creatingAccount": "Создание аккаунта...",
-  
-  // Password Reset
   "resetPassword": "Сбросить пароль",
   "enterEmailForPasswordReset": "Введите ваш email, и мы отправим вам ссылку для сброса пароля.",
   "emailRequired": "Пожалуйста, введите ваш email",
@@ -477,8 +495,6 @@ const ruTranslations: Record<string, string> = {
   "failedToSendResetEmail": "Не удалось отправить письмо для сброса пароль. Пожалуйста, попробуйте снова.",
   "passwordResetEmailSentSuccess": "Письмо для сброса пароля успешно отправлено!",
   "sending": "Отправка...",
-  
-  // Dashboard
   "welcome": "Добро пожаловать",
   "yourEvents": "Ваши события",
   "createEvent": "Создать событие",
@@ -492,13 +508,10 @@ const ruTranslations: Record<string, string> = {
   "manageEvents": "Управляйте своими событиями и создавайте новые приглашения",
   "open": "Открыть",
   "createNewEvent": "Создать новое событие",
-  
-  // Account
   "accountSettings": "Настройки аккаунта",
   "profile": "Профиль",
   "security": "Безопасность",
   "notifications": "Уведомления",
-  "personalInfo": "Личная информация",
   "updateProfile": "Обновить профиль",
   "changePassword": "Изменить пароль",
   "currentPassword": "Текущий пароль",
@@ -509,8 +522,6 @@ const ruTranslations: Record<string, string> = {
   "accountUpdated": "Аккаунт успешно обновлен",
   "passwordChanged": "Пароль успешно изменен",
   "settingsSaved": "Настройки успешно сохранены",
-  
-  // Event related
   "eventDetails": "Детали события",
   "eventName": "Название события",
   "eventDate": "Дата события",
@@ -538,8 +549,6 @@ const ruTranslations: Record<string, string> = {
   "markedAsUpcoming": "Событие отмечено как предстоящее",
   "markedAsInProgress": "Событие отмечено как в процессе",
   "markedAsFinished": "Событие отмечено как завершенное",
-  
-  // Event Status Button
   "start": "Начать",
   "finish": "Завершить",
   "finished": "Завершено",
@@ -550,14 +559,10 @@ const ruTranslations: Record<string, string> = {
   "thisEvent": "это событие?",
   "actionCannotBeUndone": "Это действие нельзя отменить.",
   "confirm": "Подтвердить",
-  
-  // User Avatar
   "userMenu": "Меню пользователя",
   "signOut": "Выйти",
   "loggedOutSuccessfully": "Выход выполнен успешно",
   "youHaveBeenSignedOut": "Вы вышли из системы",
-  
-  // Invitation templates
   "templateApplied": "Шаблон применен",
   "theTemplate": "Шаблон",
   "hasBeenApplied": "был применен",
@@ -570,8 +575,6 @@ const ruTranslations: Record<string, string> = {
   "createCustomForm": "Создайте индивидуальную форму приглашения для вашего события",
   "formSaved": "Форма сохранена",
   "formSavedSuccessfully": "Форма успешно сохранена",
-  
-  // Event Form Dialog
   "enterEventTitle": "Введите название события...",
   "continue": "Продолжить",
   "titleRequired": "Необходимо название",
@@ -581,8 +584,6 @@ const ruTranslations: Record<string, string> = {
   "networkError": "Ошибка сети",
   "serverNotResponding": "Сервер не отвечает",
   "startWithEventTitle": "Давайте начнем с названия для вашего события",
-  
-  // Participants
   "sendInvitations": "Отправить приглашения",
   "selectParticipants": "Выберите участников для отправки приглашений",
   "selectedParticipants": "Выбранные участники",
@@ -623,8 +624,6 @@ const ruTranslations: Record<string, string> = {
   "attended": "Присутствовал",
   "actions": "Действия",
   "sendInvites": "Отправить приглашения",
-  
-  // Staff management
   "staff": "Сотрудники",
   "manageStaff": "Управление сотрудниками",
   "viewStaff": "Просмотр сотрудников",
@@ -641,15 +640,11 @@ const ruTranslations: Record<string, string> = {
   "noStaffAssigned": "К этому событию пока не назначены сотрудники",
   "searchAndAssignStaff": "Найдите и назначьте сотрудников для этого события",
   "removeFromEvent": "Удалить с события",
-  
-  // Footer
   "aboutUs": "О нас",
   "contact": "Контакты",
   "support": "Поддержка",
   "termsOfService": "Условия использования",
   "copyright": "© 2023 Invite. Все права защищены.",
-  
-  // Other common text
   "wedding": "Свадьба",
   "birthday": "День рождения",
   "corporate": "Корпоратив",
@@ -665,8 +660,6 @@ const ruTranslations: Record<string, string> = {
   "settings": "Настройки",
   "search": "Поиск",
   "category": "Категория",
-  
-  // Additional registration translations
   "passwordsDoNotMatch": "Пароли не совпадают",
   "registrationSuccessful": "Регистрация успешна",
   "youCanNowSignIn": "Теперь вы можете войти в свой аккаунт",
@@ -674,8 +667,6 @@ const ruTranslations: Record<string, string> = {
   "somethingWentWrong": "Что-то пошло не так",
   "enterYourEmailAndPassword": "Введите email и пароль для создания аккаунта",
   "signingUp": "Регистрация...",
-  
-  // Additional event form translations
   "missingInformation": "Отсутствует информация",
   "pleaseEnsureRequiredFields": "Пожалуйста, убедитесь, что вы заполнили обязательные поля",
   "changesSavedSuccessfully": "Изменения успешно сохранены",
@@ -693,8 +684,6 @@ const ruTranslations: Record<string, string> = {
   "noImage": "Нет изображения",
   "describeYourEvent": "Опишите ваше событие...",
   "enterEventLocation": "Введите место проведения события...",
-  
-  // Additional translations for new features
   "participantDeleted": "Участник удален",
   "deleteParticipant": "Удалить участника",
   "delete": "Удалить",

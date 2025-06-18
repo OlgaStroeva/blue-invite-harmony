@@ -52,8 +52,8 @@ const EmployeeManagementDialog = ({
     } catch (error) {
       console.error("Error loading event staff:", error);
       toast({
-        title: "Error",
-        description: "Failed to load event staff",
+        title: t("error"),
+        description: t("failedToCreateEvent"),
         variant: "destructive",
       });
     } finally {
@@ -73,13 +73,13 @@ const EmployeeManagementDialog = ({
       const filteredResults = results.filter(staff => !eventStaffIds.includes(staff.id));
       
       if (filteredResults.length === 0) {
-        setSearchError("No available staff found with that email");
+        setSearchError(t("noAvailableStaff"));
       } else {
         setSearchResults(filteredResults);
       }
     } catch (error) {
       console.error("Error searching staff:", error);
-      setSearchError("Failed to search for staff");
+      setSearchError(t("failedToAssignStaff"));
     } finally {
       setIsSearching(false);
     }
@@ -96,14 +96,14 @@ const EmployeeManagementDialog = ({
       setSearchResults(prev => prev.filter(s => s.id !== employee.id));
       
       toast({
-        title: "Staff assigned",
-        description: `${employee.name} has been assigned to this event`,
+        title: t("staffAssigned"),
+        description: `${employee.name} ${t("hasBeenAssigned")}`,
       });
     } catch (error) {
       console.error("Error assigning staff:", error);
       toast({
-        title: "Error",
-        description: "Failed to assign staff member",
+        title: t("error"),
+        description: t("failedToAssignStaff"),
         variant: "destructive",
       });
     }
@@ -119,14 +119,14 @@ const EmployeeManagementDialog = ({
       setEventStaffIds(prev => prev.filter(id => id !== userId));
       
       toast({
-        title: "Staff removed",
-        description: "The staff member has been removed from this event",
+        title: t("staffRemoved"),
+        description: t("hasBeenRemoved"),
       });
     } catch (error) {
       console.error("Error removing staff:", error);
       toast({
-        title: "Error",
-        description: "Failed to remove staff member",
+        title: t("error"),
+        description: t("failedToRemoveStaff"),
         variant: "destructive",
       });
     }
@@ -141,7 +141,7 @@ const EmployeeManagementDialog = ({
             {canEdit ? t("manageStaff") : t("viewStaff")}
           </DialogTitle>
           <DialogDescription className="text-blue-600">
-            {canEdit ? t("searchAndAssignStaff") : `${t("viewStaff")} ${t("for")}`} {event.title}
+            {canEdit ? t("assignStaffMembers") : `${t("viewStaff")} ${t("for")}`} {event.title}
           </DialogDescription>
         </DialogHeader>
 
@@ -195,7 +195,6 @@ const EmployeeManagementDialog = ({
               staffIds={eventStaffIds}
               onRemoveEmployee={canEdit ? handleRemoveEmployee : undefined}
               isLoading={isLoadingStaff}
-              canEdit={canEdit}
             />
           </TabsContent>
         </Tabs>
