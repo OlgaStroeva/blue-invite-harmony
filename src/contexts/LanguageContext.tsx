@@ -711,5 +711,3 @@ const ruTranslations: Record<string, string> = {
   "fileExported": "Файл экспортирован",
   "downloadStarted": "Загрузка началась",
 };
-
-</edits_to_apply>
