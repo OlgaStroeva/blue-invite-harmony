@@ -361,7 +361,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
             invitationSent: p.attended ?? false,
             haveQr: p.qrCode
           }));
-          console.error(participants);
+          console.error(mapped);
           console.log("Participants data:", data);
           setParticipants(mapped);
         })
