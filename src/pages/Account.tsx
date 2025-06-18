@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { User, Lock, ShieldAlert, Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Form,
   FormControl,
@@ -51,6 +52,7 @@ const Account = () => {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [allowAssignments, setAllowAssignments] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const personalInfoForm = useForm<z.infer<typeof personalInfoSchema>>({
@@ -106,8 +108,8 @@ const Account = () => {
       } catch (error) {
         console.error("Error fetching user:", error);
         toast({
-          title: "Error",
-          description: "Failed to load user data",
+          title: t("error"),
+          description: t("failedToCreateEvent"),
           variant: "destructive",
         });
       } finally {
@@ -116,7 +118,7 @@ const Account = () => {
     };
 
     fetchUserData();
-  }, [navigate, personalInfoForm, toast]);
+  }, [navigate, personalInfoForm, toast, t]);
 
   const handlePersonalInfoSubmit = async (values: z.infer<typeof personalInfoSchema>) => {
     setIsLoading(true);
@@ -144,13 +146,13 @@ const Account = () => {
       }
       
       toast({
-        title: "Profile updated",
-        description: "Your personal information has been updated successfully.",
+        title: t("profileUpdated"),
+        description: t("personalInfoUpdated"),
       });
     } catch (error: any) {
       toast({
-        title: "An error occurred",
-        description: error.message || "Failed to update profile information.",
+        title: t("error"),
+        description: error.message || t("failedToUpdateEvent"),
         variant: "destructive",
       });
     } finally {
@@ -180,8 +182,8 @@ const Account = () => {
       }
       
       toast({
-        title: "Password updated",
-        description: "Your password has been changed successfully.",
+        title: t("passwordUpdated"),
+        description: t("passwordChangedSuccessfully"),
       });
 
       passwordForm.reset({
@@ -191,8 +193,8 @@ const Account = () => {
       });
     } catch (error: any) {
       toast({
-        title: "An error occurred",
-        description: error.message || "Failed to update password.",
+        title: t("error"),
+        description: error.message || t("failedToUpdateEvent"),
         variant: "destructive",
       });
     } finally {
@@ -223,15 +225,15 @@ const Account = () => {
       setUserData({ ...userData, canBeStaff: value });
       
       toast({
-        title: "Preferences updated",
+        title: t("preferencesUpdated"),
         description: value 
-          ? "Other users can now assign you to events" 
-          : "Other users can no longer assign you to events",
+          ? t("othersCanNowAssign")
+          : t("othersCanNoLonger"),
       });
     } catch (error: any) {
       toast({
-        title: "An error occurred",
-        description: error.message || "Failed to update assignment preferences.",
+        title: t("error"),
+        description: error.message || t("failedToUpdateEvent"),
         variant: "destructive",
       });
     } finally {
@@ -253,8 +255,8 @@ const Account = () => {
     return (
       <Container className="py-10">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">Error loading account</h1>
-          <p className="text-muted-foreground mt-2">Please try refreshing the page</p>
+          <h1 className="text-2xl font-bold text-red-600">{t("error")}</h1>
+          <p className="text-muted-foreground mt-2">{t("tryAgain")}</p>
         </div>
       </Container>
     );
@@ -263,25 +265,25 @@ const Account = () => {
   return (
     <Container className="py-10">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("accountSettings")}</h1>
         <p className="text-muted-foreground mt-2">
-          Manage your account settings and preferences
+          {t("manageYourAccount")}
         </p>
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="personal">Personal Info</TabsTrigger>
-          <TabsTrigger value="password">Password</TabsTrigger>
-          <TabsTrigger value="preferences">Preferences</TabsTrigger>
+          <TabsTrigger value="personal">{t("personalInfo")}</TabsTrigger>
+          <TabsTrigger value="password">{t("password")}</TabsTrigger>
+          <TabsTrigger value="preferences">{t("preferences")}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="personal">
           <Card>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
+              <CardTitle>{t("personalInformation")}</CardTitle>
               <CardDescription>
-                Update your personal details
+                {t("updateYourPersonal")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -292,11 +294,11 @@ const Account = () => {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel>{t("fullName")}</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input className="pl-10" placeholder="Your name" {...field} />
+                            <Input className="pl-10" placeholder={t("fullName")} {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -309,7 +311,7 @@ const Account = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t("emailAddress")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -318,7 +320,7 @@ const Account = () => {
                           />
                         </FormControl>
                         <FormDescription>
-                          Email cannot be changed
+                          {t("emailCannotBeChanged")}
                         </FormDescription>
                       </FormItem>
                     )}
@@ -329,7 +331,7 @@ const Account = () => {
                     className="mt-4" 
                     disabled={isLoading || !personalInfoForm.formState.isDirty}
                   >
-                    {isLoading ? "Saving..." : "Save Changes"}
+                    {isLoading ? t("saving") : t("saveChanges")}
                   </Button>
                 </form>
               </Form>
@@ -340,9 +342,9 @@ const Account = () => {
         <TabsContent value="password">
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
+              <CardTitle>{t("changePassword")}</CardTitle>
               <CardDescription>
-                Update your password to maintain account security
+                {t("updatePassword")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -353,14 +355,14 @@ const Account = () => {
                     name="currentPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Current Password</FormLabel>
+                        <FormLabel>{t("currentPassword")}</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input 
                               className="pl-10" 
                               type="password" 
-                              placeholder="Your current password"
+                              placeholder={t("currentPassword")}
                               {...field}
                             />
                           </div>
@@ -375,14 +377,14 @@ const Account = () => {
                     name="newPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>New Password</FormLabel>
+                        <FormLabel>{t("newPassword")}</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input 
                               className="pl-10" 
                               type="password" 
-                              placeholder="New password"
+                              placeholder={t("newPassword")}
                               {...field}
                             />
                           </div>
@@ -397,14 +399,14 @@ const Account = () => {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Confirm New Password</FormLabel>
+                        <FormLabel>{t("confirmPassword")}</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input 
                               className="pl-10" 
                               type="password" 
-                              placeholder="Confirm new password"
+                              placeholder={t("confirmPassword")}
                               {...field}
                             />
                           </div>
@@ -419,7 +421,7 @@ const Account = () => {
                     className="mt-4" 
                     disabled={isLoading || !passwordForm.formState.isDirty}
                   >
-                    {isLoading ? "Updating..." : "Update Password"}
+                    {isLoading ? t("updating") : t("update")}
                   </Button>
                 </form>
               </Form>
@@ -430,9 +432,9 @@ const Account = () => {
         <TabsContent value="preferences">
           <Card>
             <CardHeader>
-              <CardTitle>Assignment Preferences</CardTitle>
+              <CardTitle>{t("assignmentPreferences")}</CardTitle>
               <CardDescription>
-                Control how others can interact with your account
+                {t("controlHowOthers")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -443,9 +445,9 @@ const Account = () => {
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium">Allow others to assign you to events</h3>
+                      <h3 className="font-medium">{t("allowOthersToAssign")}</h3>
                       <p className="text-sm text-muted-foreground">
-                        When enabled, other users can assign you to events
+                        {t("whenEnabledOthers")}
                       </p>
                     </div>
                     <Switch 

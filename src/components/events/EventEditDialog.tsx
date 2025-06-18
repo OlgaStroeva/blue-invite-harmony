@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Edit, X, Image as ImageIcon, Tag, Save, Mail, Table, Users, Upload, Trash2, Check } from "lucide-react";
 import * as XLSX from 'xlsx';
@@ -28,18 +29,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import InvitationFormDialog from "@/components/invitations/InvitationFormDialog";
 import ParticipantsTable from "@/components/participants/ParticipantsTable";
 import EmployeeManagementDialog from "@/components/employees/EmployeeManagementDialog";
-
-interface Event {
-  id: number;
-  title: string;
-  category: string;
-  description?: string;
-  image: string;
-  gradient: string;
-  date?: string;
-  place?: string;
-  status?: 'upcoming' | 'in_progress' | 'finished';
-}
+import { Event } from "@/types/event";
 
 interface EventEditDialogProps {
   open: boolean;
@@ -66,9 +56,9 @@ const EventEditDialog = ({
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState("");
   const [date, setDate] = useState(event.date || "");
-  const [place, setPlace] = useState(event.place || "");
+  const [place, setPlace] = useState(event.location || "");
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>(event.image);
+  const [imagePreview, setImagePreview] = useState<string>(event.image || "");
   const [showInvitationForm, setShowInvitationForm] = useState(false);
   const [showParticipantsTable, setShowParticipantsTable] = useState(false);
   const [showEmployeeManagement, setShowEmployeeManagement] = useState(false);
@@ -77,9 +67,7 @@ const EventEditDialog = ({
   const { t } = useLanguage();
 
   // Get all unique categories from existing events
-  const [existingCategories, setExistingCategories] = useState<string[]>([
-    // Get all unique categories from existing events
-  ]);
+  const [existingCategories, setExistingCategories] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("http://158.160.171.159:7291/api/events/my-events", {
@@ -94,9 +82,9 @@ const EventEditDialog = ({
               new Set(
                   data
                       .map((event: any) => event.category)
-                      .filter((cat) => typeof cat === "string" && cat.trim() !== "")
+                      .filter((cat: any) => typeof cat === "string" && cat.trim() !== "")
               )
-          );
+          ) as string[];
           setExistingCategories(unique);
         })
         .catch(console.error);
@@ -108,8 +96,8 @@ const EventEditDialog = ({
     setDescription(event.description || "");
     setCategory(event.category);
     setDate(event.date || "");
-    setPlace(event.place || "");
-    setImagePreview(event.image);
+    setPlace(event.location || "");
+    setImagePreview(event.image || "");
     setShowTagInput(false);
     setNewTag("");
   }, [event]);
@@ -166,8 +154,8 @@ const EventEditDialog = ({
 
     if (!title.trim()) {
       toast({
-        title: "Missing information",
-        description: "Please ensure you've filled in the required fields",
+        title: t("missingInformation"),
+        description: t("pleaseEnsureRequiredFields"),
         variant: "destructive",
       });
       return;
@@ -201,29 +189,31 @@ const EventEditDialog = ({
           description,
           category,
           date,
-          place,
+          location: place,
           image: imagePreview,
-          status: result.status
+          status: result.status,
+          time: event.time,
+          createdBy: event.createdBy
         });
 
         onOpenChange(false);
 
         toast({
-          title: "Мероприятие обновлено",
-          description: "Изменения успешно сохранены.",
+          title: t("eventUpdated"),
+          description: t("changesSavedSuccessfully"),
         });
       } else {
         toast({
-          title: "Ошибка",
-          description: result.message || "Не удалось обновить мероприятие",
+          title: t("error"),
+          description: result.message || t("failedToUpdateEvent"),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error("Ошибка при обновлении:", error);
       toast({
-        title: "Ошибка сети",
-        description: "Сервер не отвечает",
+        title: t("networkError"),
+        description: t("serverNotResponding"),
         variant: "destructive",
       });
     }
@@ -276,7 +266,7 @@ const EventEditDialog = ({
       }
       onOpenChange(false);
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error deleting event:", err);
       toast({
         title: t("error"),
@@ -296,10 +286,10 @@ const EventEditDialog = ({
         <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto bg-blue-50 border-blue-200">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-blue-700">
-              <Edit className="h-5 w-5" /> {canEdit ? "Edit Event" : "View Event"}
+              <Edit className="h-5 w-5" /> {canEdit ? t("editEvent") : t("viewEvent")}
             </DialogTitle>
             <DialogDescription className="text-blue-600">
-              {canEdit ? "Make changes to your event details" : "View event details"}
+              {canEdit ? t("makeChangesToEventDetails") : t("viewEventDetails")}
             </DialogDescription>
           </DialogHeader>
 
@@ -307,19 +297,19 @@ const EventEditDialog = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-blue-700 font-medium">Event Title</Label>
+                  <Label htmlFor="title" className="text-blue-700 font-medium">{t("eventTitle")}</Label>
                   <Input 
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter event title..."
+                    placeholder={t("enterEventTitle")}
                     className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
                     disabled={!canEdit}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category" className="text-blue-700 font-medium">Category</Label>
+                  <Label htmlFor="category" className="text-blue-700 font-medium">{t("category")}</Label>
                   <div className="flex flex-wrap gap-2">
                     {existingCategories.map((cat) => (
                       <Button
@@ -344,7 +334,7 @@ const EventEditDialog = ({
                           onChange={(e) => setNewTag(e.target.value)}
                           onKeyDown={handleTagInputKeyDown}
                           onBlur={handleTagInputBlur}
-                          placeholder="Add new category..."
+                          placeholder={t("addNewCategory")}
                           className="border-blue-200 focus-visible:ring-blue-400 py-1 h-9 min-w-[150px] bg-blue-50"
                           autoFocus
                         />
@@ -357,14 +347,14 @@ const EventEditDialog = ({
                         onClick={handleAddNewTag}
                         className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-100 bg-blue-50"
                       >
-                        <Tag className="mr-1 h-3 w-3" /> Add tag
+                        <Tag className="mr-1 h-3 w-3" /> {t("addTag")}
                       </Button>
                     ))}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="image" className="text-blue-700 font-medium">Event Image</Label>
+                  <Label htmlFor="image" className="text-blue-700 font-medium">{t("eventImage")}</Label>
                   <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:bg-blue-50/50 transition-colors cursor-pointer bg-blue-100/70">
                     {canEdit && (
                       <input
@@ -380,7 +370,7 @@ const EventEditDialog = ({
                       <div className="relative">
                         <img 
                           src={imagePreview} 
-                          alt="Event preview" 
+                          alt={t("eventPreview")} 
                           className="w-full aspect-[4/3] object-cover rounded-md"
                         />
                         {canEdit && (
@@ -401,13 +391,13 @@ const EventEditDialog = ({
                     ) : canEdit ? (
                       <label htmlFor="image" className="flex flex-col items-center justify-center gap-2 h-48">
                         <ImageIcon className="h-10 w-10 text-blue-400" />
-                        <span className="text-blue-600 font-medium">Upload an image</span>
-                        <span className="text-sm text-blue-400">or drag and drop</span>
+                        <span className="text-blue-600 font-medium">{t("uploadImage")}</span>
+                        <span className="text-sm text-blue-400">{t("orDragAndDrop")}</span>
                       </label>
                     ) : (
                       <div className="flex flex-col items-center justify-center gap-2 h-48">
                         <ImageIcon className="h-10 w-10 text-blue-400" />
-                        <span className="text-blue-600 font-medium">No image</span>
+                        <span className="text-blue-600 font-medium">{t("noImage")}</span>
                       </div>
                     )}
                   </div>
@@ -416,19 +406,19 @@ const EventEditDialog = ({
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-blue-700 font-medium">Description</Label>
+                  <Label htmlFor="description" className="text-blue-700 font-medium">{t("eventDescription")}</Label>
                   <Textarea 
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe your event..."
+                    placeholder={t("describeYourEvent")}
                     className="border-blue-200 focus-visible:ring-blue-400 min-h-[300px] bg-blue-50"
                     disabled={!canEdit}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="date" className="text-blue-700 font-medium">Event Date</Label>
+                  <Label htmlFor="date" className="text-blue-700 font-medium">{t("eventDate")}</Label>
                   <Input 
                     id="date"
                     type="datetime-local"
@@ -440,12 +430,12 @@ const EventEditDialog = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="place" className="text-blue-700 font-medium">Event Location</Label>
+                  <Label htmlFor="place" className="text-blue-700 font-medium">{t("eventLocation")}</Label>
                   <Input 
                     id="place"
                     value={place}
                     onChange={(e) => setPlace(e.target.value)}
-                    placeholder="Enter event location..."
+                    placeholder={t("enterEventLocation")}
                     className="border-blue-200 focus-visible:ring-blue-400 bg-blue-50"
                     disabled={!canEdit}
                   />
@@ -513,6 +503,7 @@ const EventEditDialog = ({
           open={showInvitationForm}
           onOpenChange={setShowInvitationForm}
           event={event}
+          canEdit={canEdit}
           onClose={() => {
             setShowInvitationForm(false);
             onOpenChange(true);
@@ -536,6 +527,7 @@ const EventEditDialog = ({
             if (!open) onOpenChange(true);
           }}
           event={event}
+          canEdit={canEdit}
         />
       )}
     </>
