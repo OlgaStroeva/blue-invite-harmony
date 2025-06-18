@@ -361,6 +361,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
             invitationSent: p.attended ?? false,
             haveQr: p.qrCode
           }));
+          console.error(participants);
           console.log("Participants data:", data);
           setParticipants(mapped);
         })
@@ -372,6 +373,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
             variant: "destructive"
           });
         });
+    
   }, [event]);
 
   const handleToggleAttendance = (participantId: number) => {
@@ -608,7 +610,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                         {t("importXLSX")}
                       </label>
 
-                      {true && (
+                      {availableForInvite.length > 0 && (
                         <Button 
                           onClick={handleInviteAll}
                           disabled={sendingBulkInvites}
