@@ -642,6 +642,44 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                                   <Edit className="h-4 w-4 text-blue-600" />
                                 </Button>
                               </TableCell>
+                              {canEdit && (
+                                  <TableCell>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => participant.invitationSent ? handleCancelInvite(participant.id) : handleSendInvite(participant.id)}
+                                        disabled={sendingInvites[participant.id] || !participant.haveQr}
+                                        className={
+                                          participant.invitationSent
+                                              ? "text-red-600"
+                                              : sendingInvites[participant.id] && !participant.haveQr && !participant.invitationSent
+                                                  ? "text-gray-400 cursor-not-allowed"
+                                                  : "text-blue-600 hover:text-blue-700"
+                                        }
+                                        title={
+                                          !participant.haveQr
+                                              ? t("qrCodeRequired")
+                                              : sendingInvites[participant.id]
+                                                  ? t("sending")
+                                                  : ""
+                                        }
+                                    >
+                                      {sendingInvites[participant.id] ? (
+                                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                      ) : participant.invitationSent ? (
+                                          <>
+                                            <X className="h-4 w-4 mr-1" />
+                                            {t("cancel")}
+                                          </>
+                                      ) : (
+                                          <>
+                                            <Mail className="h-4 w-4 mr-1" />
+                                            {t("invite")}
+                                          </>
+                                      )}
+                                    </Button>
+                                  </TableCell>
+                              )}
                             </TableRow>
                         ))}
                       </TableBody>
