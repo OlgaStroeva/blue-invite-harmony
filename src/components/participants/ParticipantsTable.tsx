@@ -269,7 +269,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     try {
       setSendingInvites(prev => ({ ...prev, [participantId]: true }));
 
-      const cancelRes = await fetch(`http://158.160.171.159:7291/api/invitations/cancel/${formId}/${participantId}`, {
+      const cancelRes = await fetch(`http://158.160.171.159:7291/api/invitations/delete/${formId}/${participantId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
