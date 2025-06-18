@@ -608,7 +608,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                         {t("importXLSX")}
                       </label>
 
-                      {availableForInvite.length > 0 && (
+                      {true && (
                         <Button 
                           onClick={handleInviteAll}
                           disabled={sendingBulkInvites}
