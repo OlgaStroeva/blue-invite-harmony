@@ -1,4 +1,3 @@
-
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -51,8 +50,9 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
   const [sendingBulkInvites, setSendingBulkInvites] = useState(false);
   const [editingParticipant, setEditingParticipant] = useState<number | null>(null);
   const [editValues, setEditValues] = useState<Record<string, string>>({});
+  const [formId, setFormId] = useState<number | null>(null);
 
-  // Load form fields to get proper column order
+  // Load form fields to get proper column order and form ID
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token || !event?.id) return;
@@ -68,6 +68,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       })
       .then(data => {
         setFormFields(data.fields || []);
+        setFormId(data.id); // Store form ID for upload
       })
       .catch(err => {
         console.error("Error loading form fields:", err);
@@ -108,20 +109,10 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     }
 
     const token = localStorage.getItem("token");
-    if (!token || !event?.id) return;
+    if (!token || !formId) return;
 
     try {
       setSendingBulkInvites(true);
-
-      // Get form ID
-      const formRes = await fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!formRes.ok) throw new Error("Failed to get form data");
-      const { id: formId } = await formRes.json();
 
       // Send invitations to all available participants
       const promises = availableParticipants.map(async (participantId) => {
@@ -173,20 +164,10 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     if (selectedParticipants.length === 0) return;
 
     const token = localStorage.getItem("token");
-    if (!token || !event?.id) return;
+    if (!token || !formId) return;
 
     try {
       setSendingBulkInvites(true);
-
-      // Get form ID
-      const formRes = await fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!formRes.ok) throw new Error("Failed to get form data");
-      const { id: formId } = await formRes.json();
 
       // Send invitations to all selected participants
       const promises = selectedParticipants.map(async (participantId) => {
@@ -238,19 +219,10 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
 
   const handleSendInvite = async (participantId: number) => {
     const token = localStorage.getItem("token");
-    if (!token || !event?.id) return;
+    if (!token || !formId) return;
 
     try {
       setSendingInvites(prev => ({ ...prev, [participantId]: true }));
-
-      const formRes = await fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!formRes.ok) throw new Error("Failed to get form data");
-      const { id: formId } = await formRes.json();
 
       const inviteRes = await fetch(`http://158.160.171.159:7291/api/invitations/send/${formId}/${participantId}`, {
         method: "POST",
@@ -292,19 +264,10 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
 
   const handleCancelInvite = async (participantId: number) => {
     const token = localStorage.getItem("token");
-    if (!token || !event?.id) return;
+    if (!token || !formId) return;
 
     try {
       setSendingInvites(prev => ({ ...prev, [participantId]: true }));
-
-      const formRes = await fetch(`http://158.160.171.159:7291/api/forms/get-by-event/${event.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!formRes.ok) throw new Error("Failed to get form data");
-      const { id: formId } = await formRes.json();
 
       const cancelRes = await fetch(`http://158.160.171.159:7291/api/invitations/cancel/${formId}/${participantId}`, {
         method: "POST",
@@ -452,14 +415,14 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
 
   const handleXlsxUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !event?.id) return;
+    if (!file || !formId) return;
 
     const token = localStorage.getItem("token");
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const res = await fetch(`http://158.160.171.159:7291/api/forms/upload/${event.id}`, {
+      const res = await fetch(`http://158.160.171.159:7291/api/forms/upload/${formId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`

@@ -12,7 +12,7 @@ interface LanguageContextType {
 
 // Create the context with a default value
 const LanguageContext = createContext<LanguageContextType>({
-  language: "en",
+  language: "ru",
   setLanguage: () => {},
   t: (key: string) => key,
 });
@@ -22,10 +22,10 @@ export const useLanguage = () => useContext(LanguageContext);
 
 // Language provider component
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  // Get initial language from localStorage or default to 'en'
+  // Get initial language from localStorage or default to 'ru'
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = localStorage.getItem("language") as Language;
-    return savedLanguage && ["en", "ru"].includes(savedLanguage) ? savedLanguage : "en";
+    return savedLanguage && ["en", "ru"].includes(savedLanguage) ? savedLanguage : "ru";
   });
 
   // Update localStorage when language changes
@@ -302,6 +302,13 @@ const enTranslations: Record<string, string> = {
   "staffRemoved": "Staff removed",
   "failedToAssignStaff": "Failed to assign staff member",
   "failedToRemoveStaff": "Failed to remove staff member",
+  "searchForStaff": "Search for staff by email...",
+  "searchStaff": "Search Staff",
+  "assignToEvent": "Assign to Event",
+  "noStaffFoundForEmail": "No staff found with that email",
+  "noStaffAssigned": "No staff assigned to this event yet",
+  "searchAndAssignStaff": "Search and assign staff members to this event",
+  "removeFromEvent": "Remove from Event",
   
   // Footer
   "aboutUs": "About Us",
@@ -610,6 +617,13 @@ const ruTranslations: Record<string, string> = {
   "staffRemoved": "Сотрудник удален",
   "failedToAssignStaff": "Не удалось назначить сотрудника",
   "failedToRemoveStaff": "Не удалось удалить сотрудника",
+  "searchForStaff": "Поиск сотрудника по email...",
+  "searchStaff": "Поиск сотрудника",
+  "assignToEvent": "Назначить на событие",
+  "noStaffFoundForEmail": "Сотрудники с таким email не найдены",
+  "noStaffAssigned": "К этому событию пока не назначены сотрудники",
+  "searchAndAssignStaff": "Найдите и назначьте сотрудников для этого события",
+  "removeFromEvent": "Удалить с события",
   
   // Footer
   "aboutUs": "О нас",
