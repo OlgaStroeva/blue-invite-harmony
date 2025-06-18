@@ -361,6 +361,23 @@ const enTranslations: Record<string, string> = {
   "noImage": "No image",
   "describeYourEvent": "Describe your event...",
   "enterEventLocation": "Enter event location...",
+  
+  // Additional translations for new features
+  "participantDeleted": "Participant deleted",
+  "deleteParticipant": "Delete Participant",
+  "delete": "Delete",
+  "deleteForm": "Delete Form",
+  "deleteFormConfirmation": "Are you sure you want to delete this form? This action cannot be undone.",
+  "formDeleted": "Form deleted",
+  "formDeletedSuccessfully": "Form deleted successfully",
+  "deleteFailed": "Delete failed",
+  "noFormAvailable": "No form available",
+  "createForm": "Create Form",
+  "invitationPreview": "Invitation Preview",
+  "editForm": "Edit Form",
+  "addParticipant": "Add Participant",
+  "fileExported": "File exported",
+  "downloadStarted": "Download started",
 };
 
 // Russian translations
@@ -676,4 +693,23 @@ const ruTranslations: Record<string, string> = {
   "noImage": "Нет изображения",
   "describeYourEvent": "Опишите ваше событие...",
   "enterEventLocation": "Введите место проведения события...",
+  
+  // Additional translations for new features
+  "participantDeleted": "Участник удален",
+  "deleteParticipant": "Удалить участника",
+  "delete": "Удалить",
+  "deleteForm": "Удалить форму",
+  "deleteFormConfirmation": "Вы уверены, что хотите удалить эту форму? Это действие нельзя отменить.",
+  "formDeleted": "Форма удалена",
+  "formDeletedSuccessfully": "Форма успешно удалена",
+  "deleteFailed": "Удаление не удалось",
+  "noFormAvailable": "Форма недоступна",
+  "createForm": "Создать форму",
+  "invitationPreview": "Предпросмотр приглашения",
+  "editForm": "Редактировать форму",
+  "addParticipant": "Добавить участника",
+  "fileExported": "Файл экспортирован",
+  "downloadStarted": "Загрузка началась",
 };
+
+</edits_to_apply>

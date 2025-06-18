@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
 import { 
   Dialog, 
   DialogContent, 
@@ -35,6 +35,7 @@ const EmployeeManagementDialog = ({
   const [eventStaffIds, setEventStaffIds] = useState<number[]>([]);
   const [isLoadingStaff, setIsLoadingStaff] = useState(true);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (open) {
@@ -136,10 +137,10 @@ const EmployeeManagementDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-blue-700">
             <Users className="h-5 w-5" /> 
-            {canEdit ? "Manage Staff" : "View Staff"}
+            {canEdit ? t("manageStaff") : t("viewStaff")}
           </DialogTitle>
           <DialogDescription className="text-blue-600">
-            {canEdit ? "Assign and manage staff for" : "View staff for"} {event.title}
+            {canEdit ? t("searchAndAssignStaff") : `${t("viewStaff")} ${t("for")}`} {event.title}
           </DialogDescription>
         </DialogHeader>
 
@@ -147,11 +148,11 @@ const EmployeeManagementDialog = ({
           <TabsList className="grid grid-cols-2 bg-blue-100">
             {canEdit && (
               <TabsTrigger value="assign" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                Assign Staff
+                {t("assignStaff")}
               </TabsTrigger>
             )}
             <TabsTrigger value="view" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              {canEdit ? "View Assigned" : "Staff"} ({eventStaffIds.length})
+              {canEdit ? t("viewAssigned") : t("staff")} ({eventStaffIds.length})
             </TabsTrigger>
           </TabsList>
           

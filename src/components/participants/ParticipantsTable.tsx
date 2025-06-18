@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Edit, Table as TableIcon, Mail, Check, X, Upload, Download, FileDown, Send } from "lucide-react";
+import { Edit, Table as TableIcon, Mail, Check, X, Upload, Download, FileDown, Send, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -306,7 +306,41 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       setSendingInvites(prev => ({ ...prev, [participantId]: false }));
     }
   };
-  
+
+  const handleDeleteParticipant = async (participantId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch(`http://158.160.171.159:7291/api/forms/delete-participant/${participantId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.message || "Failed to delete participant");
+      }
+
+      setParticipants(prev => prev.filter(p => p.id !== participantId));
+
+      toast({
+        title: t("success"),
+        description: t("participantDeleted"),
+      });
+
+    } catch (error: any) {
+      console.error("Error deleting participant:", error);
+      toast({
+        title: t("error"),
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token || !event?.id) return;
@@ -734,15 +768,27 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
                               </Button>
                             </div>
                           ) : (
-                            <Button 
-                              variant="ghost" 
-                              className="h-8 w-8 p-0" 
-                              onClick={() => handleEditParticipant(participant.id)}
-                              disabled={!canEdit}
-                              aria-label="Edit participant"
-                            >
-                              <Edit className="h-4 w-4 text-blue-600" />
-                            </Button>
+                            <div className="flex gap-1">
+                              <Button 
+                                variant="ghost" 
+                                className="h-8 w-8 p-0" 
+                                onClick={() => handleEditParticipant(participant.id)}
+                                disabled={!canEdit}
+                                aria-label="Edit participant"
+                              >
+                                <Edit className="h-4 w-4 text-blue-600" />
+                              </Button>
+                              {canEdit && !participant.invitationSent && (
+                                <Button 
+                                  variant="ghost" 
+                                  className="h-8 w-8 p-0" 
+                                  onClick={() => handleDeleteParticipant(participant.id)}
+                                  aria-label="Delete participant"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              )}
+                            </div>
                           )}
                         </TableCell>
                       </TableRow>
