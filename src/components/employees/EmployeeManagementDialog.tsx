@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/hooks/use-language";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Dialog, 
   DialogContent, 
