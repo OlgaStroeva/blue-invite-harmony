@@ -402,7 +402,18 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     if (!token) return;
 
     try {
-      const { id, invitationSent, haveQr, ...valuesToUpdate } = editValues;
+      // Создаем новый объект с правильным порядком полей
+      const orderedValues: Record<string, any> = {};
+
+      // Проходим по всем полям шаблона
+      formFields.forEach(field => {
+        const fieldName = field.name; // предполагая, что field.name содержит имя поля
+        // Если поле есть в editValues и не в списке исключений - добавляем его
+        if (editValues.hasOwnProperty(fieldName) &&
+            !['id', 'invitationSent', 'haveQr'].includes(fieldName)) {
+          orderedValues[fieldName] = editValues[fieldName];
+        }
+      });
 
       const response = await fetch(`http://158.160.171.159:7291/api/forms/update/${participantId}`, {
         method: "PUT",
@@ -410,18 +421,19 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(valuesToUpdate)
+        body: JSON.stringify(orderedValues)
       });
 
+      // Остальной код остается без изменений
       if (!response.ok) {
         const result = await response.json();
         throw new Error(result.message || "Failed to update participant");
       }
 
       setParticipants(prev =>
-        prev.map(p =>
-          p.id === participantId ? { ...p, ...editValues } : p
-        )
+          prev.map(p =>
+              p.id === participantId ? { ...p, ...editValues } : p
+          )
       );
 
       setEditingParticipant(null);
@@ -441,7 +453,6 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
       });
     }
   };
-
   const handleCancelEdit = () => {
     setEditingParticipant(null);
     setEditValues({});
