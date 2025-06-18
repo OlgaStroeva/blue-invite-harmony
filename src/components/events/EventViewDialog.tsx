@@ -70,7 +70,7 @@ const EventViewDialog = ({
   };
 
   // Check if user can edit (event is upcoming and user is creator)
-  const canEdit = event.createdBy === user?.id && event.status === 'upcoming';
+  const canEdit = event.createdBy === user?.id && (event.status !== 'in_progress' || event.status !== 'finished');
   // Check if user can delete (event is finished and user is creator)  
   const canDelete = isAuthenticated && event.createdBy === user?.id && event.status === 'finished';
 
@@ -119,10 +119,10 @@ const EventViewDialog = ({
                     </div>
                   )}
 
-                  {currentEvent.location && (
+                  {currentEvent.place && (
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-blue-600" />
-                      <span>{currentEvent.location}</span>
+                      <span>{currentEvent.place}</span>
                     </div>
                   )}
                 </div>
@@ -156,7 +156,7 @@ const EventViewDialog = ({
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Table className="mr-2 h-4 w-4" />
-              {t("participants")}
+              {t("staff")}
             </Button>
             
             {canEdit && (
@@ -165,7 +165,7 @@ const EventViewDialog = ({
                 className="w-full bg-blue-600 hover:bg-blue-700"
               >
                 <Users className="mr-2 h-4 w-4" />
-                {t("staff")}
+                {t("employees")}
               </Button>
             )}
           </div>
@@ -207,6 +207,7 @@ const EventViewDialog = ({
             if (!open) onOpenChange(true);
           }}
           event={currentEvent}
+          canEdit={canEdit}
         />
       )}
 

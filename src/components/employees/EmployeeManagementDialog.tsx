@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Dialog, 
   DialogContent, 
@@ -36,7 +35,6 @@ const EmployeeManagementDialog = ({
   const [eventStaffIds, setEventStaffIds] = useState<number[]>([]);
   const [isLoadingStaff, setIsLoadingStaff] = useState(true);
   const { toast } = useToast();
-  const { t } = useLanguage();
 
   useEffect(() => {
     if (open) {
@@ -52,8 +50,8 @@ const EmployeeManagementDialog = ({
     } catch (error) {
       console.error("Error loading event staff:", error);
       toast({
-        title: t("error"),
-        description: t("failedToCreateEvent"),
+        title: "Error",
+        description: "Failed to load event staff",
         variant: "destructive",
       });
     } finally {
@@ -73,13 +71,13 @@ const EmployeeManagementDialog = ({
       const filteredResults = results.filter(staff => !eventStaffIds.includes(staff.id));
       
       if (filteredResults.length === 0) {
-        setSearchError(t("noAvailableStaff"));
+        setSearchError("No available staff found with that email");
       } else {
         setSearchResults(filteredResults);
       }
     } catch (error) {
       console.error("Error searching staff:", error);
-      setSearchError(t("failedToAssignStaff"));
+      setSearchError("Failed to search for staff");
     } finally {
       setIsSearching(false);
     }
@@ -96,14 +94,14 @@ const EmployeeManagementDialog = ({
       setSearchResults(prev => prev.filter(s => s.id !== employee.id));
       
       toast({
-        title: t("staffAssigned"),
-        description: `${employee.name} ${t("hasBeenAssigned")}`,
+        title: "Staff assigned",
+        description: `${employee.name} has been assigned to this event`,
       });
     } catch (error) {
       console.error("Error assigning staff:", error);
       toast({
-        title: t("error"),
-        description: t("failedToAssignStaff"),
+        title: "Error",
+        description: "Failed to assign staff member",
         variant: "destructive",
       });
     }
@@ -119,14 +117,14 @@ const EmployeeManagementDialog = ({
       setEventStaffIds(prev => prev.filter(id => id !== userId));
       
       toast({
-        title: t("staffRemoved"),
-        description: t("hasBeenRemoved"),
+        title: "Staff removed",
+        description: "The staff member has been removed from this event",
       });
     } catch (error) {
       console.error("Error removing staff:", error);
       toast({
-        title: t("error"),
-        description: t("failedToRemoveStaff"),
+        title: "Error",
+        description: "Failed to remove staff member",
         variant: "destructive",
       });
     }
@@ -138,10 +136,10 @@ const EmployeeManagementDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-blue-700">
             <Users className="h-5 w-5" /> 
-            {canEdit ? t("manageStaff") : t("viewStaff")}
+            {canEdit ? "Manage Staff" : "View Staff"}
           </DialogTitle>
           <DialogDescription className="text-blue-600">
-            {canEdit ? t("assignStaffMembers") : `${t("viewStaff")} ${t("for")}`} {event.title}
+            {canEdit ? "Assign and manage staff for" : "View staff for"} {event.title}
           </DialogDescription>
         </DialogHeader>
 
@@ -149,11 +147,11 @@ const EmployeeManagementDialog = ({
           <TabsList className="grid grid-cols-2 bg-blue-100">
             {canEdit && (
               <TabsTrigger value="assign" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                {t("assignStaff")}
+                Assign Staff
               </TabsTrigger>
             )}
             <TabsTrigger value="view" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              {canEdit ? t("viewAssigned") : t("staff")} ({eventStaffIds.length})
+              {canEdit ? "View Assigned" : "Staff"} ({eventStaffIds.length})
             </TabsTrigger>
           </TabsList>
           
@@ -195,6 +193,7 @@ const EmployeeManagementDialog = ({
               staffIds={eventStaffIds}
               onRemoveEmployee={canEdit ? handleRemoveEmployee : undefined}
               isLoading={isLoadingStaff}
+              canEdit={canEdit}
             />
           </TabsContent>
         </Tabs>

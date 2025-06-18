@@ -1,4 +1,3 @@
-
 import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -176,7 +175,7 @@ const InvitationFormPreview = ({
   if (!selectedTemplate) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-blue-50 border-blue-200">
+        <DialogContent className="sm:max-w-3xl bg-blue-50 border-blue-200">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-blue-700">
               <Mail className="h-5 w-5" />
@@ -228,7 +227,7 @@ const InvitationFormPreview = ({
       </AlertDialog>
 
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-5xl w-[95vw] max-h-[95vh] overflow-y-auto bg-blue-50 border-blue-200">
+        <DialogContent className="sm:max-w-3xl bg-blue-50 border-blue-200">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-blue-700">
               <Mail className="h-5 w-5" />
@@ -239,23 +238,23 @@ const InvitationFormPreview = ({
           <div className="space-y-6">
             <FormFieldList formFields={selectedTemplate.fields} currentEvent={event} readOnly />
             
-            <div className="flex flex-col lg:flex-row justify-between gap-3 pt-4 border-t border-blue-200">
+            <div className="flex justify-between gap-3 pt-4 border-t border-blue-200">
               {event.createdBy === user && (
                 <Button
                   onClick={() => setShowDeleteAlert(true)}
                   variant="destructive"
-                  className="bg-[#ea384c] hover:bg-[#ea384c]/90 w-full lg:w-auto"
+                  className="bg-[#ea384c] hover:bg-[#ea384c]/90"
                 >
                   <Trash2 className="h-4 w-4 text-white" />
                   <span className="ml-2">{t("deleteForm")}</span>
                 </Button>
               )}
               
-              <div className="flex flex-col lg:flex-row gap-3 lg:ml-auto">
+              <div className="flex gap-3 ml-auto">
                 {event.createdBy === user && canEdit && (
                     <Button
                         onClick={() => onEditMode()}
-                        className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto min-w-[150px]"
+                        className="bg-blue-600 hover:bg-blue-700"
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       {t("editForm")}
@@ -264,7 +263,7 @@ const InvitationFormPreview = ({
                 
                 <Button
                   onClick={() => navigate(`/participant-form/${event.id}`)}
-                  className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto min-w-[180px]"
+                  className="bg-blue-600 hover:bg-blue-700"
                 >
                   <UserPlus className="mr-2 h-4 w-4" />
                   {t("addParticipant")}
@@ -272,7 +271,7 @@ const InvitationFormPreview = ({
                 
                   <Button
                     onClick={handleExportToXLSX}
-                    className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto min-w-[180px]"
+                    className="bg-blue-600 hover:bg-blue-700"
                   >
                     <FileDown className="mr-2 h-4 w-4" />
                     {t("exportToExcel")}
