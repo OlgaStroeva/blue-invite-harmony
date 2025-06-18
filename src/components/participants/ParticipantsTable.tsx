@@ -405,13 +405,15 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     if (!token) return;
 
     try {
+      const { id, invitationSent, haveQr, ...valuesToUpdate } = editValues;
+
       const response = await fetch(`http://158.160.171.159:7291/api/forms/update/${participantId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(editValues)
+        body: JSON.stringify(valuesToUpdate)
       });
 
       if (!response.ok) {
@@ -457,7 +459,7 @@ const ParticipantsTable = ({ open, onOpenChange, event }: ParticipantsTableProps
     formData.append("file", file);
 
     try {
-      const res = await fetch(`http://158.160.171.159:7291/api/forms/upload-participants/${event.id}`, {
+      const res = await fetch(`http://158.160.171.159:7291/api/forms/upload/${event.id}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
